@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NUtify - Login</title>
+    <link rel="stylesheet" href="../global.css" />
+    <!--Facicon-->
+    <link rel="icon" type="image/x-icon" href="../img/bell.png" />
+    <!--Montserrat/Armio-->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <!--Bootstrap CSS-->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr"
+      crossorigin="anonymous"
+    />
+  </head>
+
+  <body>
+    <div class="login-container">
+      <div class="login-card">
+        <h1 class="login-title">Login</h1>
+        <p class="login-subtitle">Stay connected. Stay updated.</p>
+
+        <form>
+          <div class="input-group">
+            <img src="../feather/user.svg" alt="User" class="input-icon" />
+            <input
+              type="text"
+              class="login-input"
+              placeholder="Username"
+              required
+            />
+          </div>
+
+          <div class="input-group">
+            <img src="../feather/lock.svg" alt="Password" class="input-icon" />
+            <input
+              type="password"
+              class="login-input"
+              placeholder="Password"
+              id="password"
+              required
+            />
+            <img src="../feather/eye.svg" alt="Toggle Password" class="toggle-password" data-target="password" />
+          </div>
+
+          <div class="remember-container">
+            <div class="remember-section">
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  value=""
+                  id="remember"
+                />
+                <label class="form-check-label remember-label" for="remember">
+                  Remember me
+                </label>
+              </div>
+            </div>
+            <a href="forgot.html" class="forgot-password">Forgot Password?</a>
+          </div>
+
+          <button type="submit" class="login-button">Login</button>
+
+          <div class="signup-link">
+            Don't have an account? <a href="signup.html">Sign up</a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
+      crossorigin="anonymous"
+    ></script>
+    <script src="../global.js"></script>
+  </body>
+</html>
