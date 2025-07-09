@@ -121,12 +121,9 @@ body {
   padding: 15px 25px 15px 65px;
   border: none;
   border-radius: 30px !important;
-  border-radius: 50px;
-  border-radius: 50px;
   background: #f8f8f8;
   box-shadow: inset 15px 15px 30px #e0e0e0, inset -15px -15px 30px #ffffff;
   font-size: 16px;
-  color: #333333;
   outline: none;
   transition: all 0.3s ease;
   font-family: "Helvetica", sans-serif;

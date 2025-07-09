@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NUtify - History</title>
+    <link rel="stylesheet" href="studenthistory.css" />
+    
+    <!-- Instant sidebar state restoration -->
+    <script>
+      if (localStorage.getItem('sidebarExpanded') === 'true') {
+        document.documentElement.classList.add('sidebar-expanded-instant');
+      }
+    </script>
+    
+    <!--Favicon-->
+    <link rel="icon" type="image/x-icon" href="../img/bell.png" />
+    <!--Montserrat/Armio-->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <!--Bootstrap CSS-->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <!--Sidebar-->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-content">
+        <div class="sidebar-header">
+          <div class="sidebar-logo">
+            <img src="../img/NUtifywhite.png" alt="NUtify" class="logo" />
+            <div class="chevron-icon" id="menuToggle">
+              <img src="../feather/chevron-left.svg" alt="Collapse" class="icon" />
+            </div>
+          </div>
+          <div class="sidebar-icon menu-burger" id="menuToggleBurger">
+            <img src="../feather/menu.svg" alt="Menu" class="icon" />
+          </div>
+        </div>
+
+        <div class="sidebar-nav">
+          <div class="sidebar-icon">
+            <img src="../feather/home.svg" alt="Home" class="icon" />
+            <span class="nav-text">Home</span>
+          </div>
+          <div class="sidebar-icon active">
+            <img src="../feather/inbox.svg" alt="History" class="icon" />
+            <span class="nav-text">History</span>
+          </div>
+        </div>
+
+        <!--Profile-->
+        <div class="sidebar-bottom">
+          <div class="user-info">
+            <div class="sidebar-avatar">
+              <img src="../img/avatar.avif" alt="Avatar" class="avatar" />
+            </div>
+            <div class="user-details">
+              <div class="user-name">John Doe</div>
+              <div class="user-role">Student - SACE</div>
+            </div>
+            <div class="settings-icon" id="settingsToggle">
+              <img src="../feather/settings.svg" alt="Settings" class="icon" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-dropdown" id="settingsDropdown">
+        <div class="dropdown-item">Edit Profile Details</div>
+        <div class="dropdown-item">Forgot Password</div>
+        <div class="dropdown-item">Logout</div>
+      </div>
+    </div>
+ 
+    <div class="main-content">
+      
+    </div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
+      crossorigin="anonymous"
+    ></script>
+    <script src="student.js"></script>
+  </body>
+</html>
