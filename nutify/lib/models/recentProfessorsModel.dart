@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 class RecentProfessor {
   final String name;
   final String id;

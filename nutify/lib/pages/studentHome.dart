@@ -20,7 +20,6 @@ class StudentHome extends StatelessWidget {
         ],
       )
     );
-
   }
 
   Column mostRecentProfessors(List<RecentProfessor> recentProfessors) {
