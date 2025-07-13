@@ -79,8 +79,7 @@ class _StudentHomeState extends State<StudentHome> {
               ),
             ),
             SizedBox(height: 10),
-            Container(
-              height: 300,
+            Expanded(
               child: appointments.isEmpty
                 ? Center(
                     child: Text(
@@ -483,13 +482,13 @@ class _StudentHomeState extends State<StudentHome> {
   }
 
   Widget mainContent(List<RecentProfessor> recentProfessors) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          mostRecentProfessors(recentProfessors),
-          upcomingAppointments(),
-        ],
-      ),
+    return Column(
+      children: [
+        mostRecentProfessors(recentProfessors),
+        Expanded(
+          child: upcomingAppointments(),
+        ),
+      ],
     );
   }
 
