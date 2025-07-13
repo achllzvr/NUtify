@@ -48,10 +48,7 @@ class _StudentProfileState extends State<StudentProfile> {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             gradient: LinearGradient(
-                              colors: [
-                                Color(0xFFE3F2FD),
-                                Color(0xFFBBDEFB),
-                              ],
+                              colors: [Color(0xFFE3F2FD), Color(0xFFBBDEFB)],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
@@ -138,7 +135,12 @@ class _StudentProfileState extends State<StudentProfile> {
     );
   }
 
-  Widget profileOption(String title, IconData icon, Color iconColor, VoidCallback onTap) {
+  Widget profileOption(
+    String title,
+    IconData icon,
+    Color iconColor,
+    VoidCallback onTap,
+  ) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -165,11 +167,7 @@ class _StudentProfileState extends State<StudentProfile> {
                 color: iconColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(
-                icon,
-                color: iconColor,
-                size: 24,
-              ),
+              child: Icon(icon, color: iconColor, size: 24),
             ),
             SizedBox(width: 15),
             Expanded(
@@ -213,10 +211,7 @@ class _StudentProfileState extends State<StudentProfile> {
       flexibleSpace: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              const Color(0xFF35408E),
-              const Color(0xFF1A2049),
-            ],
+            colors: [const Color(0xFF35408E), const Color(0xFF1A2049)],
             begin: const FractionalOffset(0.0, 0.0),
             end: const FractionalOffset(0.0, 1.0),
             stops: [0.0, 1.0],
@@ -263,7 +258,8 @@ class _StudentProfileState extends State<StudentProfile> {
                 icon: const Icon(Icons.inbox, color: Color(0xFFFFD418)),
                 onPressed: () {
                   // Check if already on StudentInbox page
-                  if (ModalRoute.of(context)?.settings.name == '/studentInbox') {
+                  if (ModalRoute.of(context)?.settings.name ==
+                      '/studentInbox') {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
@@ -419,10 +415,7 @@ class _StudentProfileState extends State<StudentProfile> {
                       child: Container(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [
-                              Color(0xFFF44336),
-                              Color(0xFFE53935),
-                            ],
+                            colors: [Color(0xFFF44336), Color(0xFFE53935)],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),

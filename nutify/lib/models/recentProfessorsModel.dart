@@ -2,10 +2,7 @@ class RecentProfessor {
   final String name;
   final String id;
 
-  RecentProfessor({
-    required this.name,
-    required this.id,
-  });
+  RecentProfessor({required this.name, required this.id});
 
   static List<RecentProfessor> getRecentProfessors() {
     List<RecentProfessor> recentProfessors = [];
@@ -18,5 +15,4 @@ class RecentProfessor {
 
     return recentProfessors;
   }
-
 }

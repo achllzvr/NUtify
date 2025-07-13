@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:nutify/pages/studentHome.dart';
+import 'package:nutify/services/firebase_service.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class LoginPage extends StatefulWidget {
   LoginPage({super.key});
@@ -26,10 +29,7 @@ class _LoginPageState extends State<LoginPage> {
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              const Color(0xFF35408E),
-              const Color(0xFF1A2049),
-            ],
+            colors: [const Color(0xFF35408E), const Color(0xFF1A2049)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -38,9 +38,10 @@ class _LoginPageState extends State<LoginPage> {
           child: SingleChildScrollView(
             child: Container(
               constraints: BoxConstraints(
-                minHeight: MediaQuery.of(context).size.height - 
-                          MediaQuery.of(context).padding.top - 
-                          MediaQuery.of(context).padding.bottom,
+                minHeight:
+                    MediaQuery.of(context).size.height -
+                    MediaQuery.of(context).padding.top -
+                    MediaQuery.of(context).padding.bottom,
               ),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 30.0),
@@ -51,19 +52,15 @@ class _LoginPageState extends State<LoginPage> {
                     // NUtify Logo
                     nutifyLogo(),
                     SizedBox(height: 40),
-                // Login Form Container
-                loginFields(),
-                SizedBox(height: 30),
-                // Forgot Password Link
-                Center(
-                  child: loginForgotPassword(),
-                ),
-                SizedBox(height: 15),
-                // Register Link
-                Center(
-                  child: loginRegister(),
-                ),
-                SizedBox(height: 40),
+                    // Login Form Container
+                    loginFields(),
+                    SizedBox(height: 30),
+                    // Forgot Password Link
+                    Center(child: loginForgotPassword()),
+                    SizedBox(height: 15),
+                    // Register Link
+                    Center(child: loginRegister()),
+                    SizedBox(height: 40),
                   ],
                 ),
               ),
@@ -74,250 +71,421 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  void getDeviceToken() async {
+    String url = "https://nutify.site/api.php?action=fetchToken";
+
+    // You would need a user ID to fetch their token
+    // This is just an example - you'd get the actual user ID from somewhere
+    String userID = "1"; // Replace with actual user ID
+
+    try {
+      final Map<String, dynamic> requestBody = {'userID': userID};
+
+      // Make HTTP POST request
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: requestBody,
+      );
+
+      if (response.statusCode == 200) {
+        try {
+          final Map<String, dynamic> responseData = json.decode(response.body);
+
+          if (responseData['error'] == false) {
+            // Successfully retrieved FCM token
+            List<dynamic> tokens = responseData['fcm_token'];
+            if (tokens.isNotEmpty) {
+              // Token available for use in push notifications
+            }
+          }
+        } catch (jsonError) {
+          // Handle JSON parsing error silently
+        }
+      }
+    } catch (e) {
+      // Handle error silently
+    }
+  }
+
+  void loginUser() async {
+    String url =
+        "https://nutify.site/api.php?action=login"; // Action as query parameter
+    String username = _usernameController.text.trim();
+    String password = _passwordController.text.trim();
+
+    try {
+      // Get FCM token before login
+      String? fcmToken = await FirebaseService().getToken();
+
+      // Create request body that matches your API expectations
+      final Map<String, dynamic> requestBody = {
+        'username': username, // API expects full name like "John Doe"
+        'password': password,
+        'fcm_token': fcmToken ?? '', // Include FCM token in login request
+      };
+      // Make HTTP POST request with JSON body
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: json.encode(requestBody),
+      );
+
+      if (response.statusCode == 200) {
+        try {
+          // Parse JSON response
+          final Map<String, dynamic> responseData = json.decode(response.body);
+
+          if (responseData['success'] == true) {
+            // Login successful
+            String userId = responseData['user_id'].toString();
+
+            // Send FCM token to server for this specific user
+            if (fcmToken != null && fcmToken.isNotEmpty) {
+              await FirebaseService().sendTokenToServerForUser(
+                userId,
+                fcmToken,
+              );
+            }
+
+            // Show success message
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'Welcome, ${responseData['user_fn']} ${responseData['user_ln']}!',
+                    style: TextStyle(fontFamily: 'Arimo'),
+                  ),
+                  backgroundColor: Color(0xFF4CAF50),
+                  duration: Duration(seconds: 2),
+                ),
+              );
+
+              // Navigate based on user type (1=Student, 2=Teacher, 3=Moderator)
+              int userType = responseData['user_type'];
+              if (userType == 1) {
+                // Student
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => StudentHome(),
+                    settings: RouteSettings(name: '/studentHome'),
+                  ),
+                  (Route<dynamic> route) => false,
+                );
+              } else {
+                // Show message for other account types (not implemented yet)
+                String userTypeName = userType == 2 ? 'Teacher' : 'Moderator';
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      '$userTypeName login not implemented yet',
+                      style: TextStyle(fontFamily: 'Arimo'),
+                    ),
+                    backgroundColor: Color(0xFF35408E),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              }
+            }
+          } else {
+            // Login failed
+            String errorMessage =
+                responseData['message'] ?? 'Invalid credentials';
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    errorMessage,
+                    style: TextStyle(fontFamily: 'Arimo'),
+                  ),
+                  backgroundColor: Colors.red,
+                  duration: Duration(seconds: 3),
+                ),
+              );
+            }
+          }
+        } catch (jsonError) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'Invalid server response. Please try again.',
+                  style: TextStyle(fontFamily: 'Arimo'),
+                ),
+                backgroundColor: Colors.red,
+                duration: Duration(seconds: 3),
+              ),
+            );
+          }
+        }
+      } else {
+        // HTTP error
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Server error (${response.statusCode}). Please try again later.',
+                style: TextStyle(fontFamily: 'Arimo'),
+              ),
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      // Network or other error
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Network error. Please check your connection and try again.',
+              style: TextStyle(fontFamily: 'Arimo'),
+            ),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+    }
+  }
+
   Container nutifyLogo() {
     return Container(
-                    height: 80,
-                    child: Image.asset(
-                      'assets/icons/NUtify_full_logo.png',
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Text(
-                          'NUtify',
-                          style: TextStyle(
-                            fontFamily: 'Arimo',
-                            fontSize: 36,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        );
-                      },
-                    ),
-                  );
+      height: 80,
+      child: Image.asset(
+        'assets/icons/NUtify_full_logo.png',
+        fit: BoxFit.contain,
+        errorBuilder: (context, error, stackTrace) {
+          return Text(
+            'NUtify',
+            style: TextStyle(
+              fontFamily: 'Arimo',
+              fontSize: 36,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          );
+        },
+      ),
+    );
   }
 
   Container loginFields() {
     return Container(
-                padding: EdgeInsets.all(25.0),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.white,
-                      Color(0xFFF8F9FA),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      spreadRadius: 2,
-                      blurRadius: 15,
-                      offset: Offset(0, 5),
-                    ),
-                  ],
+      padding: EdgeInsets.all(25.0),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.white, Color(0xFFF8F9FA)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            spreadRadius: 2,
+            blurRadius: 15,
+            offset: Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Account Type Selection Title
+          Center(
+            child: Text(
+              'Select Account Type:',
+              style: TextStyle(
+                fontFamily: 'Arimo',
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF2C3E50),
+              ),
+            ),
+          ),
+          SizedBox(height: 15),
+          // Account Type Selection Buttons
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              accountTypeButton('Student'),
+              accountTypeButton('Teacher'),
+              accountTypeButton('Moderator'),
+            ],
+          ),
+          SizedBox(height: 30),
+          // Username Field
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12.0),
+              color: Colors.grey.shade100,
+              border: Border.all(color: Colors.grey.withOpacity(0.3), width: 1),
+              boxShadow: [
+                // Simulate inset shadow
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  spreadRadius: -1,
+                  blurRadius: 3,
+                  offset: Offset(1, 1),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Account Type Selection Title
-                    Center(
-                      child: Text(
-                        'Select Account Type:',
-                        style: TextStyle(
-                          fontFamily: 'Arimo',
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF2C3E50),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 15),
-                    // Account Type Selection Buttons
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        accountTypeButton('Student'),
-                        accountTypeButton('Faculty'),
-                        accountTypeButton('Moderator'),
-                      ],
-                    ),
-                    SizedBox(height: 30),
-                    // Username Field
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12.0),
-                        color: Colors.grey.shade100,
-                        border: Border.all(
-                          color: Colors.grey.withOpacity(0.3),
-                          width: 1,
-                        ),
-                        boxShadow: [
-                          // Simulate inset shadow
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            spreadRadius: -1,
-                            blurRadius: 3,
-                            offset: Offset(1, 1),
-                          ),
-                        ],
-                      ),
-                      child: TextField(
-                        controller: _usernameController,
-                        decoration: InputDecoration(
-                          hintText: 'Username',
-                          hintStyle: TextStyle(
-                            fontFamily: 'Arimo',
-                            color: Colors.grey.shade500,
-                            fontSize: 16,
-                          ),
-                          filled: true,
-                          fillColor: Colors.transparent,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                            borderSide: BorderSide.none,
-                          ),
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 16,
-                          ),
-                        ),
-                        style: TextStyle(
-                          fontFamily: 'Arimo',
-                          fontSize: 16,
-                          color: Color(0xFF2C3E50),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 15),
-                    // Password Field
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12.0),
-                        color: Colors.grey.shade100,
-                        border: Border.all(
-                          color: Colors.grey.withOpacity(0.3),
-                          width: 1,
-                        ),
-                        boxShadow: [
-                          // Simulate inset shadow
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            spreadRadius: -1,
-                            blurRadius: 3,
-                            offset: Offset(1, 1),
-                          ),
-                        ],
-                      ),
-                      child: TextField(
-                        controller: _passwordController,
-                        obscureText: true,
-                        decoration: InputDecoration(
-                          hintText: 'Password',
-                          hintStyle: TextStyle(
-                            fontFamily: 'Arimo',
-                            color: Colors.grey.shade500,
-                            fontSize: 16,
-                          ),
-                          filled: true,
-                          fillColor: Colors.transparent,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                            borderSide: BorderSide.none,
-                          ),
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 16,
-                          ),
-                        ),
-                        style: TextStyle(
-                          fontFamily: 'Arimo',
-                          fontSize: 16,
-                          color: Color(0xFF2C3E50),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 25),
-                    // Login Button
-                    Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Color(0xFFFFD418),
-                            Color(0xFFFFC107),
-                          ],
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color(0xFFFFD418).withOpacity(0.4),
-                            spreadRadius: 2,
-                            blurRadius: 10,
-                            offset: Offset(0, 6),
-                          ),
-                        ],
-                      ),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          _handleLogin();
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.transparent,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          textStyle: const TextStyle(
-                            fontFamily: 'Arimo',
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          elevation: 0,
-                        ),
-                        child: const Text('Login'),
-                      ),
-                    ),
-                  ],
+              ],
+            ),
+            child: TextField(
+              controller: _usernameController,
+              decoration: InputDecoration(
+                hintText: 'Full Name (e.g., John Doe)',
+                hintStyle: TextStyle(
+                  fontFamily: 'Arimo',
+                  color: Colors.grey.shade500,
+                  fontSize: 16,
                 ),
-              );
+                filled: true,
+                fillColor: Colors.transparent,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
+                ),
+              ),
+              style: TextStyle(
+                fontFamily: 'Arimo',
+                fontSize: 16,
+                color: Color(0xFF2C3E50),
+              ),
+            ),
+          ),
+          SizedBox(height: 15),
+          // Password Field
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12.0),
+              color: Colors.grey.shade100,
+              border: Border.all(color: Colors.grey.withOpacity(0.3), width: 1),
+              boxShadow: [
+                // Simulate inset shadow
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  spreadRadius: -1,
+                  blurRadius: 3,
+                  offset: Offset(1, 1),
+                ),
+              ],
+            ),
+            child: TextField(
+              controller: _passwordController,
+              obscureText: true,
+              decoration: InputDecoration(
+                hintText: 'Password',
+                hintStyle: TextStyle(
+                  fontFamily: 'Arimo',
+                  color: Colors.grey.shade500,
+                  fontSize: 16,
+                ),
+                filled: true,
+                fillColor: Colors.transparent,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
+                ),
+              ),
+              style: TextStyle(
+                fontFamily: 'Arimo',
+                fontSize: 16,
+                color: Color(0xFF2C3E50),
+              ),
+            ),
+          ),
+          SizedBox(height: 25),
+          // Login Button
+          Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFFFFD418), Color(0xFFFFC107)],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              ),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Color(0xFFFFD418).withOpacity(0.4),
+                  spreadRadius: 2,
+                  blurRadius: 10,
+                  offset: Offset(0, 6),
+                ),
+              ],
+            ),
+            child: ElevatedButton(
+              onPressed: () {
+                _handleLogin();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                textStyle: const TextStyle(
+                  fontFamily: 'Arimo',
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 0,
+              ),
+              child: const Text('Login'),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   GestureDetector loginRegister() {
     return GestureDetector(
-                  onTap: () {
-                    print('Register tapped');
-                  },
-                  child: Text(
-                    "Don't have an account? Register",
-                    style: TextStyle(
-                      fontFamily: 'Arimo',
-                      fontSize: 16,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                );
+      onTap: () {
+        // Navigate to register page when implemented
+      },
+      child: Text(
+        "Don't have an account? Register",
+        style: TextStyle(
+          fontFamily: 'Arimo',
+          fontSize: 16,
+          color: Colors.white,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
   }
 
   GestureDetector loginForgotPassword() {
     return GestureDetector(
-                  onTap: () {
-                    print('Forgot Password tapped');
-                  },
-                  child: Text(
-                    'Forgot Password?',
-                    style: TextStyle(
-                      fontFamily: 'Arimo',
-                      fontSize: 16,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                );
+      onTap: () {
+        // Handle forgot password when implemented
+      },
+      child: Text(
+        'Forgot Password?',
+        style: TextStyle(
+          fontFamily: 'Arimo',
+          fontSize: 16,
+          color: Colors.white,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
   }
 
   Widget accountTypeButton(String type) {
@@ -327,56 +495,53 @@ class _LoginPageState extends State<LoginPage> {
         setState(() {
           _selectedAccountType = type;
         });
-        print('Selected account type: $type');
       },
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          gradient: isSelected ? LinearGradient(
-            colors: [
-              const Color(0xFF35408E),
-              const Color(0xFF1A2049),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ) : LinearGradient(
-            colors: [
-              Colors.grey.shade300,
-              Colors.grey.shade400,
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          gradient: isSelected
+              ? LinearGradient(
+                  colors: [const Color(0xFF35408E), const Color(0xFF1A2049)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                )
+              : LinearGradient(
+                  colors: [Colors.grey.shade300, Colors.grey.shade400],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
           borderRadius: BorderRadius.circular(25),
-          boxShadow: isSelected ? [
-            // Sunken effect for selected state
-            BoxShadow(
-              color: Colors.black.withOpacity(0.3),
-              spreadRadius: -1,
-              blurRadius: 6,
-              offset: Offset(2, 2),
-            ),
-            BoxShadow(
-              color: Colors.white.withOpacity(0.5),
-              spreadRadius: -1,
-              blurRadius: 6,
-              offset: Offset(-2, -2),
-            ),
-          ] : [
-            // Sunken effect for unselected state
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.4),
-              spreadRadius: -1,
-              blurRadius: 4,
-              offset: Offset(1, 1),
-            ),
-            BoxShadow(
-              color: Colors.white.withOpacity(0.8),
-              spreadRadius: -1,
-              blurRadius: 4,
-              offset: Offset(-1, -1),
-            ),
-          ],
+          boxShadow: isSelected
+              ? [
+                  // Sunken effect for selected state
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
+                    spreadRadius: -1,
+                    blurRadius: 6,
+                    offset: Offset(2, 2),
+                  ),
+                  BoxShadow(
+                    color: Colors.white.withOpacity(0.5),
+                    spreadRadius: -1,
+                    blurRadius: 6,
+                    offset: Offset(-2, -2),
+                  ),
+                ]
+              : [
+                  // Sunken effect for unselected state
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.4),
+                    spreadRadius: -1,
+                    blurRadius: 4,
+                    offset: Offset(1, 1),
+                  ),
+                  BoxShadow(
+                    color: Colors.white.withOpacity(0.8),
+                    spreadRadius: -1,
+                    blurRadius: 4,
+                    offset: Offset(-1, -1),
+                  ),
+                ],
         ),
         child: Text(
           type,
@@ -409,33 +574,7 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    print('Login attempt:');
-    print('Account Type: $_selectedAccountType');
-    print('Username: $username');
-    print('Password: $password');
-
-    // For now, simulate successful login and navigate to appropriate page
-    if (_selectedAccountType == 'Student') {
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(
-          builder: (context) => StudentHome(),
-          settings: RouteSettings(name: '/studentHome'),
-        ),
-        (Route<dynamic> route) => false,
-      );
-    } else {
-      // Show message for other account types (not implemented yet)
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            '$_selectedAccountType login not implemented yet',
-            style: TextStyle(fontFamily: 'Arimo'),
-          ),
-          backgroundColor: Color(0xFF35408E),
-          duration: Duration(seconds: 2),
-        ),
-      );
-    }
+    // Call the API login function
+    loginUser();
   }
 }

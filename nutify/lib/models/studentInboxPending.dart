@@ -14,9 +14,15 @@ class StudentInboxPending {
   static List<StudentInboxPending> getStudentInboxPendings() {
     List<StudentInboxPending> studentInboxPendings = [];
 
-    studentInboxPendings.add(StudentInboxPending(name: 'Dr. Brown', id: '003', timestamp: '2023-10-03 12:00', isSelected: false));
+    studentInboxPendings.add(
+      StudentInboxPending(
+        name: 'Dr. Brown',
+        id: '003',
+        timestamp: '2023-10-03 12:00',
+        isSelected: false,
+      ),
+    );
 
     return studentInboxPendings;
   }
-
 }

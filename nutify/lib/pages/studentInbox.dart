@@ -13,7 +13,8 @@ class StudentInbox extends StatefulWidget {
   _StudentInboxState createState() => _StudentInboxState();
 }
 
-class _StudentInboxState extends State<StudentInbox> with SingleTickerProviderStateMixin {
+class _StudentInboxState extends State<StudentInbox>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -30,7 +31,6 @@ class _StudentInboxState extends State<StudentInbox> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: studentAppBar(context),
@@ -41,31 +41,32 @@ class _StudentInboxState extends State<StudentInbox> with SingleTickerProviderSt
           // Tab Bar View
           tabViews(),
         ],
-      )
+      ),
     );
   }
 
   Expanded tabViews() {
     return Expanded(
-          child: TabBarView(
-            controller: _tabController,
-            children: [
-              // Pending Tab
-              buildPendingTab(),
-              // Cancelled Tab
-              buildCancelledTab(),
-              // Missed Tab
-              buildMissedTab(),
-              // Completed Tab
-              buildCompletedTab(),
-            ],
-          ),
-        );
+      child: TabBarView(
+        controller: _tabController,
+        children: [
+          // Pending Tab
+          buildPendingTab(),
+          // Cancelled Tab
+          buildCancelledTab(),
+          // Missed Tab
+          buildMissedTab(),
+          // Completed Tab
+          buildCompletedTab(),
+        ],
+      ),
+    );
   }
 
   Widget buildPendingTab() {
-    List<StudentInboxPending> pendingAppointments = StudentInboxPending.getStudentInboxPendings();
-    
+    List<StudentInboxPending> pendingAppointments =
+        StudentInboxPending.getStudentInboxPendings();
+
     if (pendingAppointments.isEmpty) {
       return Center(
         child: Text(
@@ -89,7 +90,9 @@ class _StudentInboxState extends State<StudentInbox> with SingleTickerProviderSt
           margin: EdgeInsets.only(bottom: 12),
           elevation: 2,
           color: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
           child: Padding(
             padding: EdgeInsets.all(16),
             child: Column(
@@ -157,7 +160,9 @@ class _StudentInboxState extends State<StudentInbox> with SingleTickerProviderSt
                     ),
                     child: ElevatedButton(
                       onPressed: () {
-                        print('View Details clicked for pending appointment ID: ${appointment.id}');
+                        print(
+                          'View Details clicked for pending appointment ID: ${appointment.id}',
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.transparent,
@@ -188,8 +193,9 @@ class _StudentInboxState extends State<StudentInbox> with SingleTickerProviderSt
   }
 
   Widget buildCancelledTab() {
-    List<StudentInboxCancelled> cancelledAppointments = StudentInboxCancelled.getStudentInboxCancelled();
-    
+    List<StudentInboxCancelled> cancelledAppointments =
+        StudentInboxCancelled.getStudentInboxCancelled();
+
     if (cancelledAppointments.isEmpty) {
       return Center(
         child: Text(
@@ -213,7 +219,9 @@ class _StudentInboxState extends State<StudentInbox> with SingleTickerProviderSt
           margin: EdgeInsets.only(bottom: 12),
           elevation: 2,
           color: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
           child: Padding(
             padding: EdgeInsets.all(16),
             child: Column(
@@ -281,7 +289,9 @@ class _StudentInboxState extends State<StudentInbox> with SingleTickerProviderSt
                     ),
                     child: ElevatedButton(
                       onPressed: () {
-                        print('View Details clicked for cancelled appointment ID: ${appointment.id}');
+                        print(
+                          'View Details clicked for cancelled appointment ID: ${appointment.id}',
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.transparent,
@@ -312,8 +322,9 @@ class _StudentInboxState extends State<StudentInbox> with SingleTickerProviderSt
   }
 
   Widget buildMissedTab() {
-    List<StudentInboxMissed> missedAppointments = StudentInboxMissed.getStudentInboxMissed();
-    
+    List<StudentInboxMissed> missedAppointments =
+        StudentInboxMissed.getStudentInboxMissed();
+
     if (missedAppointments.isEmpty) {
       return Center(
         child: Text(
@@ -337,7 +348,9 @@ class _StudentInboxState extends State<StudentInbox> with SingleTickerProviderSt
           margin: EdgeInsets.only(bottom: 12),
           elevation: 2,
           color: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
           child: Padding(
             padding: EdgeInsets.all(16),
             child: Column(
@@ -405,7 +418,9 @@ class _StudentInboxState extends State<StudentInbox> with SingleTickerProviderSt
                     ),
                     child: ElevatedButton(
                       onPressed: () {
-                        print('View Details clicked for missed appointment ID: ${appointment.id}');
+                        print(
+                          'View Details clicked for missed appointment ID: ${appointment.id}',
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.transparent,
@@ -436,8 +451,9 @@ class _StudentInboxState extends State<StudentInbox> with SingleTickerProviderSt
   }
 
   Widget buildCompletedTab() {
-    List<StudentInboxCompleted> completedAppointments = StudentInboxCompleted.getStudentInboxCompleted();
-    
+    List<StudentInboxCompleted> completedAppointments =
+        StudentInboxCompleted.getStudentInboxCompleted();
+
     if (completedAppointments.isEmpty) {
       return Center(
         child: Text(
@@ -461,7 +477,9 @@ class _StudentInboxState extends State<StudentInbox> with SingleTickerProviderSt
           margin: EdgeInsets.only(bottom: 12),
           elevation: 2,
           color: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
           child: Padding(
             padding: EdgeInsets.all(16),
             child: Column(
@@ -529,7 +547,9 @@ class _StudentInboxState extends State<StudentInbox> with SingleTickerProviderSt
                     ),
                     child: ElevatedButton(
                       onPressed: () {
-                        print('View Details clicked for completed appointment ID: ${appointment.id}');
+                        print(
+                          'View Details clicked for completed appointment ID: ${appointment.id}',
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.transparent,
@@ -561,41 +581,41 @@ class _StudentInboxState extends State<StudentInbox> with SingleTickerProviderSt
 
   Container navigationalTabs() {
     return Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
-                spreadRadius: 1,
-                blurRadius: 3,
-                offset: Offset(0, 2),
-              ),
-            ],
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 3,
+            offset: Offset(0, 2),
           ),
-          child: TabBar(
-            controller: _tabController,
-            labelColor: Color(0xFFFFD418),
-            unselectedLabelColor: Colors.grey.shade600,
-            indicatorColor: Color(0xFFFFD418),
-            indicatorWeight: 3,
-            labelStyle: TextStyle(
-              fontFamily: 'Arimo',
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-            ),
-            unselectedLabelStyle: TextStyle(
-              fontFamily: 'Arimo',
-              fontSize: 14,
-              fontWeight: FontWeight.normal,
-            ),
-            tabs: [
-              Tab(text: 'Pending'),
-              Tab(text: 'Cancelled'),
-              Tab(text: 'Missed'),
-              Tab(text: 'Completed'),
-            ],
-          ),
-        );
+        ],
+      ),
+      child: TabBar(
+        controller: _tabController,
+        labelColor: Color(0xFFFFD418),
+        unselectedLabelColor: Colors.grey.shade600,
+        indicatorColor: Color(0xFFFFD418),
+        indicatorWeight: 3,
+        labelStyle: TextStyle(
+          fontFamily: 'Arimo',
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+        ),
+        unselectedLabelStyle: TextStyle(
+          fontFamily: 'Arimo',
+          fontSize: 14,
+          fontWeight: FontWeight.normal,
+        ),
+        tabs: [
+          Tab(text: 'Pending'),
+          Tab(text: 'Cancelled'),
+          Tab(text: 'Missed'),
+          Tab(text: 'Completed'),
+        ],
+      ),
+    );
   }
 
   AppBar studentAppBar(BuildContext context) {
@@ -617,10 +637,7 @@ class _StudentInboxState extends State<StudentInbox> with SingleTickerProviderSt
       flexibleSpace: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              const Color(0xFF35408E),
-              const Color(0xFF1A2049),
-            ],
+            colors: [const Color(0xFF35408E), const Color(0xFF1A2049)],
             begin: const FractionalOffset(0.0, 0.0),
             end: const FractionalOffset(0.0, 1.0),
             stops: [0.0, 1.0],
@@ -659,11 +676,11 @@ class _StudentInboxState extends State<StudentInbox> with SingleTickerProviderSt
             margin: const EdgeInsets.only(right: 25.0),
             child: CircleAvatar(
               backgroundImage: AssetImage('assets/icons/profile.png'),
-              backgroundColor: Colors.transparent, // Make sure the background is transparent
+              backgroundColor:
+                  Colors.transparent, // Make sure the background is transparent
             ),
           ),
         ),
-
       ],
 
       // Nav bar below text and profile icon
@@ -674,8 +691,7 @@ class _StudentInboxState extends State<StudentInbox> with SingleTickerProviderSt
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               IconButton(
-                icon: const Icon(Icons.home, color: Color(0xFFFFD418),
-                ),
+                icon: const Icon(Icons.home, color: Color(0xFFFFD418)),
                 onPressed: () {
                   // Check if already on StudentHome page
                   if (ModalRoute.of(context)?.settings.name == '/studentHome') {
@@ -705,7 +721,8 @@ class _StudentInboxState extends State<StudentInbox> with SingleTickerProviderSt
                 icon: const Icon(Icons.inbox, color: Color(0xFFFFD418)),
                 onPressed: () {
                   // Check if already on StudentInbox page
-                  if (ModalRoute.of(context)?.settings.name == '/studentInbox' || 
+                  if (ModalRoute.of(context)?.settings.name ==
+                          '/studentInbox' ||
                       context.widget.runtimeType == StudentInbox) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -733,9 +750,6 @@ class _StudentInboxState extends State<StudentInbox> with SingleTickerProviderSt
           ),
         ),
       ),
-
     );
   }
-
-
 }

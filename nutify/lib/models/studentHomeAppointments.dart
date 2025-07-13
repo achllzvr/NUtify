@@ -14,11 +14,31 @@ class StudentHomeAppointments {
   static List<StudentHomeAppointments> getStudentHomeAppointments() {
     List<StudentHomeAppointments> studentHomeAppointments = [];
 
-    studentHomeAppointments.add(StudentHomeAppointments(name: 'Dr. Smith', id: '001', timestamp: '2023-10-01 10:00', isSelected: false));
-    studentHomeAppointments.add(StudentHomeAppointments(name: 'Prof. Johnson', id: '002', timestamp: '2023-10-02 11:00', isSelected: false));
-    studentHomeAppointments.add(StudentHomeAppointments(name: 'Dr. Brown', id: '003', timestamp: '2023-10-03 12:00', isSelected: false));
+    studentHomeAppointments.add(
+      StudentHomeAppointments(
+        name: 'Dr. Smith',
+        id: '001',
+        timestamp: '2023-10-01 10:00',
+        isSelected: false,
+      ),
+    );
+    studentHomeAppointments.add(
+      StudentHomeAppointments(
+        name: 'Prof. Johnson',
+        id: '002',
+        timestamp: '2023-10-02 11:00',
+        isSelected: false,
+      ),
+    );
+    studentHomeAppointments.add(
+      StudentHomeAppointments(
+        name: 'Dr. Brown',
+        id: '003',
+        timestamp: '2023-10-03 12:00',
+        isSelected: false,
+      ),
+    );
 
     return studentHomeAppointments;
   }
-
 }

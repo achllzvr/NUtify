@@ -14,9 +14,15 @@ class StudentInboxCompleted {
   static List<StudentInboxCompleted> getStudentInboxCompleted() {
     List<StudentInboxCompleted> studentInboxCompleted = [];
 
-    studentInboxCompleted.add(StudentInboxCompleted(name: 'Prof. Johnson', id: '002', timestamp: '2023-10-02 11:00', isSelected: false));
+    studentInboxCompleted.add(
+      StudentInboxCompleted(
+        name: 'Prof. Johnson',
+        id: '002',
+        timestamp: '2023-10-02 11:00',
+        isSelected: false,
+      ),
+    );
 
     return studentInboxCompleted;
   }
-
 }

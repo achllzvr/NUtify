@@ -14,9 +14,15 @@ class StudentInboxMissed {
   static List<StudentInboxMissed> getStudentInboxMissed() {
     List<StudentInboxMissed> studentInboxMissed = [];
 
-    studentInboxMissed.add(StudentInboxMissed(name: 'Dr. Smith', id: '001', timestamp: '2023-10-01 10:00', isSelected: false));
+    studentInboxMissed.add(
+      StudentInboxMissed(
+        name: 'Dr. Smith',
+        id: '001',
+        timestamp: '2023-10-01 10:00',
+        isSelected: false,
+      ),
+    );
 
     return studentInboxMissed;
   }
-
 }
