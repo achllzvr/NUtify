@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nutify/models/recentProfessorsModel.dart';
 import 'package:nutify/models/studentHomeAppointments.dart';
 import 'package:nutify/pages/studentInbox.dart';
+import 'package:nutify/pages/studentProfile.dart';
 import 'package:nutify/models/studentSearch.dart';
 
 class StudentHome extends StatefulWidget {
@@ -397,7 +398,28 @@ class _StudentHomeState extends State<StudentHome> {
       actions: [
         GestureDetector(
           onTap: () {
-            // Handle profile icon tap
+            // Check if already on StudentProfile page
+            if (ModalRoute.of(context)?.settings.name == '/studentProfile') {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'You are already on the Profile page',
+                    style: TextStyle(fontFamily: 'Arimo'),
+                  ),
+                  duration: Duration(seconds: 2),
+                  backgroundColor: Color(0xFF35408E),
+                ),
+              );
+            } else {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => StudentProfile(),
+                  settings: RouteSettings(name: '/studentProfile'),
+                ),
+                (Route<dynamic> route) => false,
+              );
+            }
           },
           child: Container(
             margin: const EdgeInsets.only(right: 25.0),
