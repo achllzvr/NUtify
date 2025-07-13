@@ -96,8 +96,20 @@ class _StudentInboxState extends State<StudentInbox> with SingleTickerProviderSt
               children: [
                 Row(
                   children: [
-                    CircleAvatar(
-                      backgroundColor: Color(0xFF87CEEB), // Pastel sky blue
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Color(0xFF87CEEB), // Pastel sky blue
+                            Color(0xFF4682B4), // Steel blue
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        shape: BoxShape.circle,
+                      ),
                       child: Icon(Icons.pending, color: Colors.white),
                     ),
                     SizedBox(width: 12),
@@ -130,25 +142,38 @@ class _StudentInboxState extends State<StudentInbox> with SingleTickerProviderSt
                 SizedBox(height: 12),
                 SizedBox(
                   width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      print('View Details clicked for pending appointment ID: ${appointment.id}');
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF87CEEB),
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Color(0xFF87CEEB), // Pastel sky blue
+                          Color(0xFF4682B4), // Steel blue
+                        ],
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
                       ),
-                      elevation: 0,
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Text(
-                      'View Details',
-                      style: TextStyle(
-                        fontFamily: 'Arimo',
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        print('View Details clicked for pending appointment ID: ${appointment.id}');
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        'View Details',
+                        style: TextStyle(
+                          fontFamily: 'Arimo',
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
@@ -195,8 +220,20 @@ class _StudentInboxState extends State<StudentInbox> with SingleTickerProviderSt
               children: [
                 Row(
                   children: [
-                    CircleAvatar(
-                      backgroundColor: Color(0xFFB22222), // Deep red
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Color(0xFFB22222), // Deep red
+                            Color(0xFF8B0000), // Dark red
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        shape: BoxShape.circle,
+                      ),
                       child: Icon(Icons.cancel, color: Colors.white),
                     ),
                     SizedBox(width: 12),
@@ -229,25 +266,38 @@ class _StudentInboxState extends State<StudentInbox> with SingleTickerProviderSt
                 SizedBox(height: 12),
                 SizedBox(
                   width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      print('View Details clicked for cancelled appointment ID: ${appointment.id}');
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFFB22222),
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Color(0xFFB22222), // Deep red
+                          Color(0xFF8B0000), // Dark red
+                        ],
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
                       ),
-                      elevation: 0,
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Text(
-                      'View Details',
-                      style: TextStyle(
-                        fontFamily: 'Arimo',
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        print('View Details clicked for cancelled appointment ID: ${appointment.id}');
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        'View Details',
+                        style: TextStyle(
+                          fontFamily: 'Arimo',
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
@@ -294,8 +344,20 @@ class _StudentInboxState extends State<StudentInbox> with SingleTickerProviderSt
               children: [
                 Row(
                   children: [
-                    CircleAvatar(
-                      backgroundColor: Color(0xFFFF8C00), // Yellow-orange
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Color(0xFFFF8C00), // Yellow-orange
+                            Color(0xFFFF4500), // Orange red
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        shape: BoxShape.circle,
+                      ),
                       child: Icon(Icons.schedule, color: Colors.white),
                     ),
                     SizedBox(width: 12),
@@ -328,25 +390,38 @@ class _StudentInboxState extends State<StudentInbox> with SingleTickerProviderSt
                 SizedBox(height: 12),
                 SizedBox(
                   width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      print('View Details clicked for missed appointment ID: ${appointment.id}');
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFFFF8C00),
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Color(0xFFFF8C00), // Yellow-orange
+                          Color(0xFFFF4500), // Orange red
+                        ],
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
                       ),
-                      elevation: 0,
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Text(
-                      'View Details',
-                      style: TextStyle(
-                        fontFamily: 'Arimo',
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        print('View Details clicked for missed appointment ID: ${appointment.id}');
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        'View Details',
+                        style: TextStyle(
+                          fontFamily: 'Arimo',
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
@@ -393,8 +468,20 @@ class _StudentInboxState extends State<StudentInbox> with SingleTickerProviderSt
               children: [
                 Row(
                   children: [
-                    CircleAvatar(
-                      backgroundColor: Color(0xFF228B22), // Green
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Color(0xFF228B22), // Green
+                            Color(0xFF006400), // Dark green
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        shape: BoxShape.circle,
+                      ),
                       child: Icon(Icons.check_circle, color: Colors.white),
                     ),
                     SizedBox(width: 12),
@@ -427,25 +514,38 @@ class _StudentInboxState extends State<StudentInbox> with SingleTickerProviderSt
                 SizedBox(height: 12),
                 SizedBox(
                   width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      print('View Details clicked for completed appointment ID: ${appointment.id}');
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF228B22),
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Color(0xFF228B22), // Green
+                          Color(0xFF006400), // Dark green
+                        ],
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
                       ),
-                      elevation: 0,
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Text(
-                      'View Details',
-                      style: TextStyle(
-                        fontFamily: 'Arimo',
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        print('View Details clicked for completed appointment ID: ${appointment.id}');
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        'View Details',
+                        style: TextStyle(
+                          fontFamily: 'Arimo',
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
