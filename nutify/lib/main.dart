@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:nutify/pages/studentHome.dart';
+import 'package:nutify/pages/login.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: 'Arimo',
       ),
-      home: StudentHome()
+      home: LoginPage()
     );
   }
 }
