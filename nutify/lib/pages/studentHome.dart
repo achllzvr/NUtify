@@ -78,7 +78,7 @@ class _StudentHomeState extends State<StudentHome> {
                 ),
               ),
             ),
-            SizedBox(height: 10),
+            SizedBox(height: 5),
             Expanded(
               child: appointments.isEmpty
                 ? Center(
