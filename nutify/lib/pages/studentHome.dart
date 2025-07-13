@@ -340,7 +340,8 @@ class StudentHome extends StatelessWidget {
           child: Container(
             margin: const EdgeInsets.only(right: 25.0),
             child: CircleAvatar(
-              backgroundImage: AssetImage('assets/icons/student.png'),
+              backgroundImage: AssetImage('assets/icons/profile.png'),
+              backgroundColor: Colors.transparent, // Make sure the background is transparent
             ),
           ),
         ),
