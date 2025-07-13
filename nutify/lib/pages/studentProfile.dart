@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nutify/pages/studentHome.dart';
 import 'package:nutify/pages/studentInbox.dart';
+import 'package:nutify/pages/login.dart';
 
 class StudentProfile extends StatefulWidget {
   StudentProfile({super.key});
@@ -124,7 +125,7 @@ class _StudentProfileState extends State<StudentProfile> {
                     Icons.logout_outlined,
                     Color(0xFFF44336),
                     () {
-                      print('Logout tapped');
+                      _handleLogout();
                     },
                   ),
                   SizedBox(height: 20),
@@ -289,6 +290,190 @@ class _StudentProfileState extends State<StudentProfile> {
           ),
         ),
       ),
+    );
+  }
+
+  void _handleLogout() {
+    // Show a confirmation dialog first
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: EdgeInsets.all(25),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.15),
+                  spreadRadius: 3,
+                  blurRadius: 20,
+                  offset: Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Logout Icon with gradient background
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: [
+                        Color(0xFFF44336).withOpacity(0.1),
+                        Color(0xFFE53935).withOpacity(0.1),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.logout_outlined,
+                    color: Color(0xFFF44336),
+                    size: 30,
+                  ),
+                ),
+                SizedBox(height: 20),
+                // Title
+                Text(
+                  'Logout',
+                  style: TextStyle(
+                    fontFamily: 'Arimo',
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2C3E50),
+                  ),
+                ),
+                SizedBox(height: 10),
+                // Content
+                Text(
+                  'Are you sure you want to logout?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: 'Arimo',
+                    fontSize: 16,
+                    color: Colors.grey.shade600,
+                    height: 1.4,
+                  ),
+                ),
+                SizedBox(height: 25),
+                // Action Buttons
+                Row(
+                  children: [
+                    // Cancel Button
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.grey.shade200,
+                              Colors.grey.shade300,
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.3),
+                              spreadRadius: 1,
+                              blurRadius: 6,
+                              offset: Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop(); // Close dialog
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            foregroundColor: Colors.grey.shade700,
+                            padding: EdgeInsets.symmetric(vertical: 14),
+                            textStyle: TextStyle(
+                              fontFamily: 'Arimo',
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: Text('Cancel'),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 12),
+                    // Logout Button
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Color(0xFFF44336),
+                              Color(0xFFE53935),
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0xFFF44336).withOpacity(0.4),
+                              spreadRadius: 1,
+                              blurRadius: 8,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop(); // Close dialog
+                            // Navigate to login page and clear navigation stack
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => LoginPage(),
+                                settings: RouteSettings(name: '/login'),
+                              ),
+                              (Route<dynamic> route) => false,
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            foregroundColor: Colors.white,
+                            padding: EdgeInsets.symmetric(vertical: 14),
+                            textStyle: TextStyle(
+                              fontFamily: 'Arimo',
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: Text('Logout'),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

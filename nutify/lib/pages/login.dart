@@ -49,249 +49,19 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     SizedBox(height: 60),
                     // NUtify Logo
-                    Container(
-                      height: 80,
-                      child: Image.asset(
-                        'assets/icons/NUtify_full_logo.png',
-                        fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Text(
-                            'NUtify',
-                            style: TextStyle(
-                              fontFamily: 'Arimo',
-                              fontSize: 36,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
+                    nutifyLogo(),
                     SizedBox(height: 40),
                 // Login Form Container
-                Container(
-                  padding: EdgeInsets.all(25.0),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.white,
-                        Color(0xFFF8F9FA),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        spreadRadius: 2,
-                        blurRadius: 15,
-                        offset: Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Account Type Selection Title
-                      Center(
-                        child: Text(
-                          'Select Account Type:',
-                          style: TextStyle(
-                            fontFamily: 'Arimo',
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF2C3E50),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 15),
-                      // Account Type Selection Buttons
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          accountTypeButton('Student'),
-                          accountTypeButton('Faculty'),
-                          accountTypeButton('Moderator'),
-                        ],
-                      ),
-                      SizedBox(height: 30),
-                      // Username Field
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12.0),
-                          color: Colors.grey.shade100,
-                          border: Border.all(
-                            color: Colors.grey.withOpacity(0.3),
-                            width: 1,
-                          ),
-                          boxShadow: [
-                            // Simulate inset shadow
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              spreadRadius: -1,
-                              blurRadius: 3,
-                              offset: Offset(1, 1),
-                            ),
-                          ],
-                        ),
-                        child: TextField(
-                          controller: _usernameController,
-                          decoration: InputDecoration(
-                            hintText: 'Username',
-                            hintStyle: TextStyle(
-                              fontFamily: 'Arimo',
-                              color: Colors.grey.shade500,
-                              fontSize: 16,
-                            ),
-                            filled: true,
-                            fillColor: Colors.transparent,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12.0),
-                              borderSide: BorderSide.none,
-                            ),
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 16,
-                            ),
-                          ),
-                          style: TextStyle(
-                            fontFamily: 'Arimo',
-                            fontSize: 16,
-                            color: Color(0xFF2C3E50),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 15),
-                      // Password Field
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12.0),
-                          color: Colors.grey.shade100,
-                          border: Border.all(
-                            color: Colors.grey.withOpacity(0.3),
-                            width: 1,
-                          ),
-                          boxShadow: [
-                            // Simulate inset shadow
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              spreadRadius: -1,
-                              blurRadius: 3,
-                              offset: Offset(1, 1),
-                            ),
-                          ],
-                        ),
-                        child: TextField(
-                          controller: _passwordController,
-                          obscureText: true,
-                          decoration: InputDecoration(
-                            hintText: 'Password',
-                            hintStyle: TextStyle(
-                              fontFamily: 'Arimo',
-                              color: Colors.grey.shade500,
-                              fontSize: 16,
-                            ),
-                            filled: true,
-                            fillColor: Colors.transparent,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12.0),
-                              borderSide: BorderSide.none,
-                            ),
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 16,
-                            ),
-                          ),
-                          style: TextStyle(
-                            fontFamily: 'Arimo',
-                            fontSize: 16,
-                            color: Color(0xFF2C3E50),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 25),
-                      // Login Button
-                      Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Color(0xFFFFD418),
-                              Color(0xFFFFC107),
-                            ],
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                          ),
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Color(0xFFFFD418).withOpacity(0.4),
-                              spreadRadius: 2,
-                              blurRadius: 10,
-                              offset: Offset(0, 6),
-                            ),
-                          ],
-                        ),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            _handleLogin();
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.transparent,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            textStyle: const TextStyle(
-                              fontFamily: 'Arimo',
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 0,
-                          ),
-                          child: const Text('Login'),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                loginFields(),
                 SizedBox(height: 30),
                 // Forgot Password Link
                 Center(
-                  child: GestureDetector(
-                    onTap: () {
-                      print('Forgot Password tapped');
-                    },
-                    child: Text(
-                      'Forgot Password?',
-                      style: TextStyle(
-                        fontFamily: 'Arimo',
-                        fontSize: 16,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
+                  child: loginForgotPassword(),
                 ),
                 SizedBox(height: 15),
                 // Register Link
                 Center(
-                  child: GestureDetector(
-                    onTap: () {
-                      print('Register tapped');
-                    },
-                    child: Text(
-                      "Don't have an account? Register",
-                      style: TextStyle(
-                        fontFamily: 'Arimo',
-                        fontSize: 16,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
+                  child: loginRegister(),
                 ),
                 SizedBox(height: 40),
                   ],
@@ -302,6 +72,252 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
+  }
+
+  Container nutifyLogo() {
+    return Container(
+                    height: 80,
+                    child: Image.asset(
+                      'assets/icons/NUtify_full_logo.png',
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Text(
+                          'NUtify',
+                          style: TextStyle(
+                            fontFamily: 'Arimo',
+                            fontSize: 36,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        );
+                      },
+                    ),
+                  );
+  }
+
+  Container loginFields() {
+    return Container(
+                padding: EdgeInsets.all(25.0),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.white,
+                      Color(0xFFF8F9FA),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      spreadRadius: 2,
+                      blurRadius: 15,
+                      offset: Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Account Type Selection Title
+                    Center(
+                      child: Text(
+                        'Select Account Type:',
+                        style: TextStyle(
+                          fontFamily: 'Arimo',
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF2C3E50),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 15),
+                    // Account Type Selection Buttons
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        accountTypeButton('Student'),
+                        accountTypeButton('Faculty'),
+                        accountTypeButton('Moderator'),
+                      ],
+                    ),
+                    SizedBox(height: 30),
+                    // Username Field
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12.0),
+                        color: Colors.grey.shade100,
+                        border: Border.all(
+                          color: Colors.grey.withOpacity(0.3),
+                          width: 1,
+                        ),
+                        boxShadow: [
+                          // Simulate inset shadow
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            spreadRadius: -1,
+                            blurRadius: 3,
+                            offset: Offset(1, 1),
+                          ),
+                        ],
+                      ),
+                      child: TextField(
+                        controller: _usernameController,
+                        decoration: InputDecoration(
+                          hintText: 'Username',
+                          hintStyle: TextStyle(
+                            fontFamily: 'Arimo',
+                            color: Colors.grey.shade500,
+                            fontSize: 16,
+                          ),
+                          filled: true,
+                          fillColor: Colors.transparent,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 16,
+                          ),
+                        ),
+                        style: TextStyle(
+                          fontFamily: 'Arimo',
+                          fontSize: 16,
+                          color: Color(0xFF2C3E50),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 15),
+                    // Password Field
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12.0),
+                        color: Colors.grey.shade100,
+                        border: Border.all(
+                          color: Colors.grey.withOpacity(0.3),
+                          width: 1,
+                        ),
+                        boxShadow: [
+                          // Simulate inset shadow
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            spreadRadius: -1,
+                            blurRadius: 3,
+                            offset: Offset(1, 1),
+                          ),
+                        ],
+                      ),
+                      child: TextField(
+                        controller: _passwordController,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          hintText: 'Password',
+                          hintStyle: TextStyle(
+                            fontFamily: 'Arimo',
+                            color: Colors.grey.shade500,
+                            fontSize: 16,
+                          ),
+                          filled: true,
+                          fillColor: Colors.transparent,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 16,
+                          ),
+                        ),
+                        style: TextStyle(
+                          fontFamily: 'Arimo',
+                          fontSize: 16,
+                          color: Color(0xFF2C3E50),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 25),
+                    // Login Button
+                    Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Color(0xFFFFD418),
+                            Color(0xFFFFC107),
+                          ],
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0xFFFFD418).withOpacity(0.4),
+                            spreadRadius: 2,
+                            blurRadius: 10,
+                            offset: Offset(0, 6),
+                          ),
+                        ],
+                      ),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          _handleLogin();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          textStyle: const TextStyle(
+                            fontFamily: 'Arimo',
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: const Text('Login'),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+  }
+
+  GestureDetector loginRegister() {
+    return GestureDetector(
+                  onTap: () {
+                    print('Register tapped');
+                  },
+                  child: Text(
+                    "Don't have an account? Register",
+                    style: TextStyle(
+                      fontFamily: 'Arimo',
+                      fontSize: 16,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                );
+  }
+
+  GestureDetector loginForgotPassword() {
+    return GestureDetector(
+                  onTap: () {
+                    print('Forgot Password tapped');
+                  },
+                  child: Text(
+                    'Forgot Password?',
+                    style: TextStyle(
+                      fontFamily: 'Arimo',
+                      fontSize: 16,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                );
   }
 
   Widget accountTypeButton(String type) {
