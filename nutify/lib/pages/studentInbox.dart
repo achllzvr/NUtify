@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:nutify/pages/studentHome.dart';
+import 'package:nutify/models/studentInboxPending.dart';
+import 'package:nutify/models/studentInboxCancelled.dart';
+import 'package:nutify/models/studentInboxCompleted.dart';
+import 'package:nutify/models/studentInboxMissed.dart';
 
 class StudentInbox extends StatefulWidget {
   StudentInbox({super.key});
@@ -32,97 +36,465 @@ class _StudentInboxState extends State<StudentInbox> with SingleTickerProviderSt
       body: Column(
         children: [
           // Tab Bar
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
-                  spreadRadius: 1,
-                  blurRadius: 3,
-                  offset: Offset(0, 2),
-                ),
-              ],
-            ),
-            child: TabBar(
-              controller: _tabController,
-              labelColor: Color(0xFFFFD418),
-              unselectedLabelColor: Colors.grey.shade600,
-              indicatorColor: Color(0xFFFFD418),
-              indicatorWeight: 3,
-              labelStyle: TextStyle(
-                fontFamily: 'Arimo',
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
-              unselectedLabelStyle: TextStyle(
-                fontFamily: 'Arimo',
-                fontSize: 14,
-                fontWeight: FontWeight.normal,
-              ),
-              tabs: [
-                Tab(text: 'Pending'),
-                Tab(text: 'Cancelled'),
-                Tab(text: 'Missed'),
-                Tab(text: 'Completed'),
-              ],
-            ),
-          ),
+          navigationalTabs(),
           // Tab Bar View
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                // Pending Tab
-                Center(
-                  child: Text(
-                    'Pending Appointments',
-                    style: TextStyle(
-                      fontFamily: 'Arimo',
-                      fontSize: 16,
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                ),
-                // Cancelled Tab
-                Center(
-                  child: Text(
-                    'Cancelled Appointments',
-                    style: TextStyle(
-                      fontFamily: 'Arimo',
-                      fontSize: 16,
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                ),
-                // Missed Tab
-                Center(
-                  child: Text(
-                    'Missed Appointments',
-                    style: TextStyle(
-                      fontFamily: 'Arimo',
-                      fontSize: 16,
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                ),
-                // Completed Tab
-                Center(
-                  child: Text(
-                    'Completed Appointments',
-                    style: TextStyle(
-                      fontFamily: 'Arimo',
-                      fontSize: 16,
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          tabViews(),
         ],
       )
     );
+  }
+
+  Expanded tabViews() {
+    return Expanded(
+          child: TabBarView(
+            controller: _tabController,
+            children: [
+              // Pending Tab
+              buildPendingTab(),
+              // Cancelled Tab
+              buildCancelledTab(),
+              // Missed Tab
+              buildMissedTab(),
+              // Completed Tab
+              buildCompletedTab(),
+            ],
+          ),
+        );
+  }
+
+  Widget buildPendingTab() {
+    List<StudentInboxPending> pendingAppointments = StudentInboxPending.getStudentInboxPendings();
+    
+    if (pendingAppointments.isEmpty) {
+      return Center(
+        child: Text(
+          'No pending appointments',
+          style: TextStyle(
+            fontFamily: 'Arimo',
+            fontSize: 16,
+            color: Colors.grey.shade600,
+            fontStyle: FontStyle.italic,
+          ),
+        ),
+      );
+    }
+
+    return ListView.builder(
+      padding: EdgeInsets.all(16),
+      itemCount: pendingAppointments.length,
+      itemBuilder: (context, index) {
+        var appointment = pendingAppointments[index];
+        return Card(
+          margin: EdgeInsets.only(bottom: 12),
+          elevation: 2,
+          color: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    CircleAvatar(
+                      backgroundColor: Color(0xFF87CEEB), // Pastel sky blue
+                      child: Icon(Icons.pending, color: Colors.white),
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            appointment.name,
+                            style: TextStyle(
+                              fontFamily: 'Arimo',
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            appointment.timestamp,
+                            style: TextStyle(
+                              fontFamily: 'Arimo',
+                              fontSize: 14,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      print('View Details clicked for pending appointment ID: ${appointment.id}');
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFF87CEEB),
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      'View Details',
+                      style: TextStyle(
+                        fontFamily: 'Arimo',
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget buildCancelledTab() {
+    List<StudentInboxCancelled> cancelledAppointments = StudentInboxCancelled.getStudentInboxCancelled();
+    
+    if (cancelledAppointments.isEmpty) {
+      return Center(
+        child: Text(
+          'No cancelled appointments',
+          style: TextStyle(
+            fontFamily: 'Arimo',
+            fontSize: 16,
+            color: Colors.grey.shade600,
+            fontStyle: FontStyle.italic,
+          ),
+        ),
+      );
+    }
+
+    return ListView.builder(
+      padding: EdgeInsets.all(16),
+      itemCount: cancelledAppointments.length,
+      itemBuilder: (context, index) {
+        var appointment = cancelledAppointments[index];
+        return Card(
+          margin: EdgeInsets.only(bottom: 12),
+          elevation: 2,
+          color: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    CircleAvatar(
+                      backgroundColor: Color(0xFFB22222), // Deep red
+                      child: Icon(Icons.cancel, color: Colors.white),
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            appointment.name,
+                            style: TextStyle(
+                              fontFamily: 'Arimo',
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            appointment.timestamp,
+                            style: TextStyle(
+                              fontFamily: 'Arimo',
+                              fontSize: 14,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      print('View Details clicked for cancelled appointment ID: ${appointment.id}');
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFFB22222),
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      'View Details',
+                      style: TextStyle(
+                        fontFamily: 'Arimo',
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget buildMissedTab() {
+    List<StudentInboxMissed> missedAppointments = StudentInboxMissed.getStudentInboxMissed();
+    
+    if (missedAppointments.isEmpty) {
+      return Center(
+        child: Text(
+          'No missed appointments',
+          style: TextStyle(
+            fontFamily: 'Arimo',
+            fontSize: 16,
+            color: Colors.grey.shade600,
+            fontStyle: FontStyle.italic,
+          ),
+        ),
+      );
+    }
+
+    return ListView.builder(
+      padding: EdgeInsets.all(16),
+      itemCount: missedAppointments.length,
+      itemBuilder: (context, index) {
+        var appointment = missedAppointments[index];
+        return Card(
+          margin: EdgeInsets.only(bottom: 12),
+          elevation: 2,
+          color: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    CircleAvatar(
+                      backgroundColor: Color(0xFFFF8C00), // Yellow-orange
+                      child: Icon(Icons.schedule, color: Colors.white),
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            appointment.name,
+                            style: TextStyle(
+                              fontFamily: 'Arimo',
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            appointment.timestamp,
+                            style: TextStyle(
+                              fontFamily: 'Arimo',
+                              fontSize: 14,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      print('View Details clicked for missed appointment ID: ${appointment.id}');
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFFFF8C00),
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      'View Details',
+                      style: TextStyle(
+                        fontFamily: 'Arimo',
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget buildCompletedTab() {
+    List<StudentInboxCompleted> completedAppointments = StudentInboxCompleted.getStudentInboxCompleted();
+    
+    if (completedAppointments.isEmpty) {
+      return Center(
+        child: Text(
+          'No completed appointments',
+          style: TextStyle(
+            fontFamily: 'Arimo',
+            fontSize: 16,
+            color: Colors.grey.shade600,
+            fontStyle: FontStyle.italic,
+          ),
+        ),
+      );
+    }
+
+    return ListView.builder(
+      padding: EdgeInsets.all(16),
+      itemCount: completedAppointments.length,
+      itemBuilder: (context, index) {
+        var appointment = completedAppointments[index];
+        return Card(
+          margin: EdgeInsets.only(bottom: 12),
+          elevation: 2,
+          color: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    CircleAvatar(
+                      backgroundColor: Color(0xFF228B22), // Green
+                      child: Icon(Icons.check_circle, color: Colors.white),
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            appointment.name,
+                            style: TextStyle(
+                              fontFamily: 'Arimo',
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            appointment.timestamp,
+                            style: TextStyle(
+                              fontFamily: 'Arimo',
+                              fontSize: 14,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      print('View Details clicked for completed appointment ID: ${appointment.id}');
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFF228B22),
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: Text(
+                      'View Details',
+                      style: TextStyle(
+                        fontFamily: 'Arimo',
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Container navigationalTabs() {
+    return Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.1),
+                spreadRadius: 1,
+                blurRadius: 3,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          child: TabBar(
+            controller: _tabController,
+            labelColor: Color(0xFFFFD418),
+            unselectedLabelColor: Colors.grey.shade600,
+            indicatorColor: Color(0xFFFFD418),
+            indicatorWeight: 3,
+            labelStyle: TextStyle(
+              fontFamily: 'Arimo',
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+            unselectedLabelStyle: TextStyle(
+              fontFamily: 'Arimo',
+              fontSize: 14,
+              fontWeight: FontWeight.normal,
+            ),
+            tabs: [
+              Tab(text: 'Pending'),
+              Tab(text: 'Cancelled'),
+              Tab(text: 'Missed'),
+              Tab(text: 'Completed'),
+            ],
+          ),
+        );
   }
 
   AppBar studentAppBar(BuildContext context) {
