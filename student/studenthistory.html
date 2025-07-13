@@ -30,7 +30,11 @@
           <div class="sidebar-logo">
             <img src="../img/NUtifywhite.png" alt="NUtify" class="logo" />
             <div class="chevron-icon" id="menuToggle">
-              <img src="../feather/chevron-left.svg" alt="Collapse" class="icon" />
+              <img
+                src="../feather/chevron-left.svg"
+                alt="Collapse"
+                class="icon"
+              />
             </div>
           </div>
           <div class="sidebar-icon menu-burger" id="menuToggleBurger">
@@ -44,7 +48,7 @@
             <span class="nav-text">Home</span>
           </div>
           <div class="sidebar-icon active">
-            <img src="../feather/inbox.svg" alt="History" class="icon" />
+            <img src="../feather/mail.svg" alt="History" class="icon" />
             <span class="nav-text">History</span>
           </div>
         </div>
@@ -53,7 +57,11 @@
         <div class="sidebar-bottom">
           <div class="user-info">
             <div class="sidebar-avatar">
-              <img src="../img/avatar.avif" alt="Avatar" class="avatar" />
+              <img
+                src="../tabler-avatars-1.0.0/jpg/1c9a4dd0bbd964e3eecbd40caf3b7e37.jpg"
+                alt="Avatar"
+                class="avatar"
+              />
             </div>
             <div class="user-details">
               <div class="user-name">John Doe</div>
@@ -67,14 +75,372 @@
       </div>
 
       <div class="settings-dropdown" id="settingsDropdown">
-        <div class="dropdown-item">Edit Profile Details</div>
-        <div class="dropdown-item">Forgot Password</div>
-        <div class="dropdown-item">Logout</div>
+        <a href="#" class="dropdown-item">Edit Profile Details</a>
+        <a href="studentforgot.html" class="dropdown-item">Forgot Password</a>
+        <a href="#" class="dropdown-item">Logout</a>
       </div>
     </div>
- 
+
+    <!-- Top Header -->
+    <div class="top-header">
+      <div class="header-left">
+        <h1 class="header-title">Consultation History</h1>
+        <p class="header-subtitle">
+          Track all your past and pending consultations appointments
+        </p>
+      </div>
+      <div class="header-right">
+        <div class="search-container">
+          <div class="search-input-wrapper">
+            <img src="../feather/menu.svg" alt="Menu" class="menu-icon" />
+            <input
+              type="text"
+              class="search-input"
+              placeholder="Search History"
+            />
+            <img
+              src="../feather/search.svg"
+              alt="Search"
+              class="search-icon-end"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="main-content">
-      
+      <div class="content-container">
+        <!-- History List -->
+        <div class="history-section">
+          <!-- Filter Tabs -->
+          <div class="filter-tabs" data-active="all">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="pending">Pending</button>
+            <button class="filter-btn" data-filter="cancelled">
+              Cancelled
+            </button>
+            <button class="filter-btn" data-filter="missed">Missed</button>
+            <button class="filter-btn" data-filter="completed">
+              Completed
+            </button>
+          </div>
+
+          <!-- Mobile Filter Button -->
+          <button
+            class="filter-mobile-btn"
+            id="filterMobileBtn"
+            data-bs-toggle="modal"
+            data-bs-target="#filterModal"
+          >
+            <img src="../feather/filter.svg" alt="Filter" class="filter-icon" />
+            <span>Filter</span>
+          </button>
+
+          <div class="history-list">
+            <div class="history-item" data-status="pending">
+              <div class="history-avatar">
+                <img
+                  src="../tabler-avatars-1.0.0/jpg/1c9a4dd0bbd964e3eecbd40caf3b7e37.jpg"
+                  alt="Jei Pastrana"
+                  class="avatar-img"
+                />
+              </div>
+              <div class="history-info">
+                <div class="history-name">Jei Pastrana</div>
+                <div class="history-details">Faculty - SACE</div>
+                <div class="history-time">June 13 - 00:00 am</div>
+                <div class="history-status">
+                  <span class="status-badge pending">Pending</span>
+                </div>
+                <div class="history-actions">
+                  <button class="see-more-btn">See More</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="history-item" data-status="missed">
+              <div class="history-avatar">
+                <img
+                  src="../tabler-avatars-1.0.0/jpg/d447a9fd5010652f6c0911fbe9c662c6.jpg"
+                  alt="Jayson Guia"
+                  class="avatar-img"
+                />
+              </div>
+              <div class="history-info">
+                <div class="history-name">Jayson Guia</div>
+                <div class="history-details">Faculty - SACE</div>
+                <div class="history-time">June 7 - 00:00 am</div>
+                <div class="history-status">
+                  <span class="status-badge missed">Missed</span>
+                </div>
+                <div class="history-actions">
+                  <button class="see-more-btn">See More</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="history-item" data-status="completed">
+              <div class="history-avatar">
+                <img
+                  src="../tabler-avatars-1.0.0/jpg/c33237da3438494d1abc67166196484e.jpg"
+                  alt="Irene Balmes"
+                  class="avatar-img"
+                />
+              </div>
+              <div class="history-info">
+                <div class="history-name">Irene Balmes</div>
+                <div class="history-details">Faculty - SACE</div>
+                <div class="history-time">May 22 - 00:00 am</div>
+                <div class="history-status">
+                  <span class="status-badge completed">Completed</span>
+                </div>
+                <div class="history-actions">
+                  <button class="see-more-btn">See More</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="history-item" data-status="cancelled">
+              <div class="history-avatar">
+                <img
+                  src="../tabler-avatars-1.0.0/jpg/8940e8ea369def14e82f05a5fee994b9.jpg"
+                  alt="Carlo Torres"
+                  class="avatar-img"
+                />
+              </div>
+              <div class="history-info">
+                <div class="history-name">Carlo Torres</div>
+                <div class="history-details">Faculty - SACE</div>
+                <div class="history-time">May 4 - 00:00 am</div>
+                <div class="history-status">
+                  <span class="status-badge cancelled">Cancelled</span>
+                </div>
+                <div class="history-actions">
+                  <button class="see-more-btn">See More</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="history-item" data-status="completed">
+              <div class="history-avatar">
+                <img
+                  src="../tabler-avatars-1.0.0/jpg/78529e2ec8eb4a2eb2fb961e04915b0a.jpg"
+                  alt="Archie Menisis"
+                  class="avatar-img"
+                />
+              </div>
+              <div class="history-info">
+                <div class="history-name">Archie Menisis</div>
+                <div class="history-details">Faculty - SACE</div>
+                <div class="history-time">April 20 - 00:00 am</div>
+                <div class="history-status">
+                  <span class="status-badge completed">Completed</span>
+                </div>
+                <div class="history-actions">
+                  <button class="see-more-btn">See More</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="history-item" data-status="pending">
+              <div class="history-avatar">
+                <img
+                  src="../tabler-avatars-1.0.0/jpg/869f67a992bb6ca4cb657fb9fc634893.jpg"
+                  alt="Michael Joseph Aramil"
+                  class="avatar-img"
+                />
+              </div>
+              <div class="history-info">
+                <div class="history-name">Michael Joseph Aramil</div>
+                <div class="history-details">Faculty - SACE</div>
+                <div class="history-time">April 15 - 00:00 am</div>
+                <div class="history-status">
+                  <span class="status-badge pending">Pending</span>
+                </div>
+                <div class="history-actions">
+                  <button class="see-more-btn">See More</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="history-item" data-status="completed">
+              <div class="history-avatar">
+                <img
+                  src="../tabler-avatars-1.0.0/jpg/92770c61168481c94e1ba43df7615fd8.jpg"
+                  alt="Erwin De Castro"
+                  class="avatar-img"
+                />
+              </div>
+              <div class="history-info">
+                <div class="history-name">Erwin De Castro</div>
+                <div class="history-details">Faculty - SACE</div>
+                <div class="history-time">April 10 - 00:00 am</div>
+                <div class="history-status">
+                  <span class="status-badge completed">Completed</span>
+                </div>
+                <div class="history-actions">
+                  <button class="see-more-btn">See More</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="history-item" data-status="missed">
+              <div class="history-avatar">
+                <img
+                  src="../tabler-avatars-1.0.0/jpg/944c5ba154e0489274504f38d01bcfaf.jpg"
+                  alt="Joel Enriquez"
+                  class="avatar-img"
+                />
+              </div>
+              <div class="history-info">
+                <div class="history-name">Joel Enriquez</div>
+                <div class="history-details">Faculty - SACE</div>
+                <div class="history-time">March 28 - 00:00 am</div>
+                <div class="history-status">
+                  <span class="status-badge missed">Missed</span>
+                </div>
+                <div class="history-actions">
+                  <button class="see-more-btn">See More</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Edit Modal -->
+    <div
+      class="modal fade"
+      id="profileEditModal"
+      tabindex="-1"
+      aria-labelledby="profileEditModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="profileEditModalLabel">
+              Edit Profile Details
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="profile-edit-form">
+              <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <div class="input-group">
+                  <img
+                    src="../feather/user.svg"
+                    alt="User"
+                    class="input-icon"
+                  />
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="username"
+                    value="John Doe"
+                  />
+                </div>
+              </div>
+
+              <div class="department-notice">
+                <p class="notice-text">
+                  If you wish to change your department, first name, or last
+                  name. Please go to the nearest admin.
+                </p>
+                <p class="notice-link">
+                  <a href="#" class="text-primary"
+                    >See Moderator/ Admin List.</a
+                  >
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" id="saveProfileBtn">
+              Save
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter Modal -->
+    <div
+      class="modal fade"
+      id="filterModal"
+      tabindex="-1"
+      aria-labelledby="filterModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="filterModalLabel">Filter History</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="filter-modal-options">
+              <div class="filter-option selected" data-filter="all">
+                <img
+                  src="../feather/list.svg"
+                  alt="All"
+                  class="filter-option-icon"
+                />
+                <span>All</span>
+              </div>
+              <div class="filter-option" data-filter="pending">
+                <img
+                  src="../feather/clock.svg"
+                  alt="Pending"
+                  class="filter-option-icon"
+                />
+                <span>Pending</span>
+              </div>
+              <div class="filter-option" data-filter="cancelled">
+                <img
+                  src="../feather/x-circle.svg"
+                  alt="Cancelled"
+                  class="filter-option-icon"
+                />
+                <span>Cancelled</span>
+              </div>
+              <div class="filter-option" data-filter="missed">
+                <img
+                  src="../feather/alert-circle.svg"
+                  alt="Missed"
+                  class="filter-option-icon"
+                />
+                <span>Missed</span>
+              </div>
+              <div class="filter-option" data-filter="completed">
+                <img
+                  src="../feather/check-circle.svg"
+                  alt="Completed"
+                  class="filter-option-icon"
+                />
+                <span>Completed</span>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" id="filterModalBtn">
+              Apply Filter
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <script
