@@ -44,7 +44,7 @@ class StudentHome extends StatelessWidget {
             ),
             SizedBox(height: 10),
             Container(
-              height: 260,
+              height: 300,
               child: appointments.isEmpty
                 ? Center(
                     child: Text(
@@ -71,7 +71,7 @@ class StudentHome extends StatelessWidget {
                         },
                           child: Container(
                           width: 150,
-                          height: 160,
+                          height: 150,
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                             colors: [
@@ -191,7 +191,7 @@ class StudentHome extends StatelessWidget {
               height: 10,
             ),
             Container(
-              height: 150,
+              height: 120,
               child: recentProfessors.isEmpty 
                 ? Center(
                     child: Text(

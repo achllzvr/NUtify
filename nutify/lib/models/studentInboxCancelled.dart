@@ -14,6 +14,8 @@ class StudentInboxCancelled {
   static List<StudentInboxCancelled> getStudentInboxCancelled() {
     List<StudentInboxCancelled> studentInboxCancelled = [];
 
+    studentInboxCancelled.add(StudentInboxCancelled(name: 'Dr. Green', id: '003', timestamp: '2023-10-03 12:00', isSelected: false));
+
     return studentInboxCancelled;
   }
 
