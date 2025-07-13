@@ -587,7 +587,6 @@ body {
 
 /* History Section */
 .history-section {
-  background: #f0f0f0;
   border-radius: 20px;
   padding: 25px;
   margin-top: 2.5em;
@@ -596,109 +595,76 @@ body {
   transition: all 0.3s ease;
 }
 
-/* History List */
-.history-list {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  max-height: 750px;
-  overflow-y: auto;
-  padding-right: 8px;
-  margin-right: -8px;
-}
-
-/* Scrollbar Styling */
-.history-list::-webkit-scrollbar {
-  width: 6px;
-}
-
-.history-list::-webkit-scrollbar-track {
-  background: rgba(240, 240, 240, 0.5);
-  border-radius: 3px;
-}
-
-.history-list::-webkit-scrollbar-thumb {
-  background: rgba(53, 64, 142, 0.4);
-  border-radius: 3px;
-}
-
-.history-list::-webkit-scrollbar-thumb:hover {
-  background: rgba(53, 64, 142, 0.6);
-}
-
-/* History Items */
+/* Appointment Card Styles (copied from studenthome.css) */
+.appointment-item,
 .history-item {
   display: flex;
   align-items: center;
-  padding: 15px 20px;
-  margin: 0 2px;
+  padding: 12px 15px;
+  margin: 0 2px 24px 2px;
   background: #f0f0f0;
   border-radius: 15px;
   box-shadow: inset 8px 8px 15px rgba(0, 0, 0, 0.1),
     inset -8px -8px 15px rgba(255, 255, 255, 0.8);
   transition: all 0.3s ease;
-  gap: 15px;
 }
 
+.appointment-item:hover,
 .history-item:hover {
   box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.08),
     inset -5px -5px 10px rgba(255, 255, 255, 0.9);
 }
 
-.history-item.hidden {
-  display: none;
-}
-
-.history-avatar {
-  width: 60px;
-  height: 60px;
+.appointment-avatar {
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
-  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 32px;
   flex-shrink: 0;
 }
 
-.history-avatar .avatar-img {
-  width: 100%;
-  height: 100%;
+.avatar-img {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
   object-fit: cover;
 }
 
-.history-info {
+.appointment-info {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 4px;
 }
 
+.appointment-name,
 .history-name {
   font-family: "Montserrat", sans-serif;
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 20px;
+  font-weight: 700;
   color: #2c3e50;
-  margin: 0;
-  line-height: 1.2;
+  margin-bottom: 4px;
 }
 
+.appointment-details,
 .history-details {
-  font-size: 14px;
+  font-family: "Helvetica", sans-serif;
+  font-size: 15px;
   color: #7f8c8d;
-  margin: 0;
-  font-weight: 400;
+  margin-bottom: 2px;
 }
 
-.history-time {
-  font-size: 13px;
-  color: #95a5a6;
-  margin: 0;
-  font-weight: 400;
+.appointment-time {
+  font-family: "Helvetica", sans-serif;
+  font-size: 14px;
+  color: #b2b2b2;
 }
-
-.history-actions {
-  margin-top: 8px;
+.history-status-mobile {
+  display: none;
 }
-
 .see-more-btn {
-  background: #f0f0f0;
   border: none;
   border-radius: 15px;
   padding: 8px 15px;
@@ -707,7 +673,16 @@ body {
   cursor: pointer;
   box-shadow: 8px 8px 15px rgba(0, 0, 0, 0.1),
     -8px -8px 15px rgba(255, 255, 255, 0.8);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), color 0.2s ease-out,
+    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   font-family: "Helvetica", sans-serif;
+  transform: translateY(0);
+  position: relative;
+  overflow: hidden;
+  margin-top: 10px;
+  white-space: nowrap;
+  width: fit-content;
 }
 
 .see-more-btn:active {
@@ -715,297 +690,32 @@ body {
     inset -5px -5px 10px rgba(255, 255, 255, 0.8),
     0 0 20px rgba(127, 140, 141, 0.1);
   color: #5a6c7d;
+  transition: all 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-
-.history-status {
-  width: 100%;
-  display: flex;
-  justify-content: flex-start;
-  margin-bottom: 8px;
+/* Scrollable History Card List (copied from .faculty-list in studenthome.css) */
+.history-card-list {
+  max-height: 520px;
+  overflow-y: auto;
+  padding: 10px 0;
 }
 
-.status-badge {
-  width: 100%;
-  display: block;
-  text-align: center;
-  font-size: 15px;
-  padding: 12px 0;
-  margin-bottom: 0;
+.history-card-list::-webkit-scrollbar {
+  width: 6px;
 }
 
-.history-actions {
-  width: 100%;
-  display: flex;
-  justify-content: flex-end;
+.history-card-list::-webkit-scrollbar-track {
+  background: rgba(240, 240, 240, 0.5);
+  border-radius: 3px;
 }
 
-.see-more-btn {
-  width: 100%;
-  display: block;
-  font-size: 15px;
-  padding: 12px 0;
-  margin-top: 0;
+.history-card-list::-webkit-scrollbar-thumb {
+  background: rgba(53, 64, 142, 0.4);
+  border-radius: 3px;
 }
 
-@media (max-width: 576px) {
-  .history-status {
-    margin-bottom: 6px;
-  }
-  .status-badge {
-    font-size: 14px;
-    padding: 10px 0;
-  }
-  .see-more-btn {
-    font-size: 14px;
-    padding: 10px 0;
-  }
-}
-
-/* Status Badges */
-.status-badge {
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-family: "Helvetica", sans-serif;
-  box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.1),
-    -6px -6px 12px rgba(255, 255, 255, 0.8);
-  transition: all 0.3s ease;
-}
-
-.status-badge.pending {
-  background: #f39c12;
-  color: white;
-}
-
-.status-badge.completed {
-  background: #27ae60;
-  color: white;
-}
-
-.status-badge.cancelled {
-  background: #e74c3c;
-  color: white;
-}
-
-.status-badge.missed {
-  background: #e74c3c;
-  color: white;
-}
-
-/* Filter functionality */
-.history-item.hidden {
-  display: none;
-}
-
-/* Responsive Design */
-@media (max-width: 1024px) {
-  .header-subtitle {
-  font-family: "Helvetica", sans-serif;
-  font-size: 14px;
-  color: #7f8c8d;
-  margin: 4px 0 0 0;
-  font-weight: 400;
-}
-  .content-container {
-    padding: 0 10px;
-  }
-
-  .filter-tabs {
-    display: none;
-  }
-
-  .filter-mobile-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    background: #f0f0f0;
-    border: none;
-    border-radius: 15px;
-    padding: 10px 20px;
-    font-size: 16px;
-    color: #35408e;
-    cursor: pointer;
-    box-shadow: 8px 8px 15px rgba(0, 0, 0, 0.1),
-      -8px -8px 15px rgba(255, 255, 255, 0.8);
-    font-family: "Helvetica", sans-serif;
-    font-weight: 600;
-    margin-bottom: 20px;
-    transition: all 0.3s ease;
-    width: 100%;
-    max-width: 300px;
-  }
-
-  .filter-mobile-btn:active {
-    box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.1),
-      inset -5px -5px 10px rgba(255, 255, 255, 0.8);
-  }
-
-  .filter-mobile-btn .filter-icon {
-    width: 16px;
-    height: 16px;
-    filter: brightness(0) saturate(100%) invert(28%) sepia(80%) saturate(1000%)
-      hue-rotate(215deg) brightness(95%) contrast(90%);
-  }
-
-  .history-section {
-    padding: 20px;
-  }
-
-  .history-item {
-    padding: 12px 15px;
-    gap: 12px;
-  }
-
-  .history-avatar {
-    width: 50px;
-    height: 50px;
-  }
-
-  .history-name {
-    font-size: 15px;
-  }
-
-  .history-details {
-    font-size: 13px;
-  }
-
-  .history-time {
-    font-size: 12px;
-  }
-
-  .status-badge {
-    padding: 6px 12px;
-    font-size: 11px;
-  }
-}
-
-@media (min-width: 1025px) {
-  .filter-mobile-btn {
-    display: none;
-  }
-}
-
-@media (max-width: 576px) {
-  .top-header {
-    flex-direction: column;
-    height: 120px;
-    padding: 15px;
-    gap: 15px;
-  }
-
-  .header-left {
-    align-items: center;
-    text-align: center;
-  }
-
-  .header-title {
-    font-size: 20px;
-  }
-
-  .search-input-wrapper {
-    width: 100%;
-    max-width: 300px;
-  }
-
-  .main-content {
-    margin-top: 120px;
-    min-height: calc(100vh - 120px);
-  }
-
-  .history-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-
-  .history-avatar {
-    align-self: center;
-  }
-
-  .history-info {
-    text-align: center;
-    align-self: stretch;
-  }
-
-  .history-status {
-    align-self: center;
-  }
-
-  .filter-tabs {
-    gap: 0;
-    padding: 0;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    border-bottom: 1px solid #e8e8e8;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .filter-tabs::-webkit-scrollbar {
-    display: none;
-  }
-
-  .filter-btn {
-    padding: 12px 16px;
-    font-size: 12px;
-    min-width: auto;
-    flex: 1;
-    white-space: nowrap;
-  }
-}
-
-/* Mobile Responsive Rules for Sidebar */
-@media (max-width: 768px) {
-  .sidebar {
-    width: 60px;
-  }
-
-  .sidebar.expanded {
-    width: 100%;
-  }
-
-  .main-content {
-    margin-left: 60px;
-  }
-
-  .sidebar.expanded ~ .main-content {
-    margin-left: 0;
-  }
-
-  .sidebar.expanded ~ .top-header ~ .main-content {
-    margin-left: 0;
-  }
-
-  .top-header {
-    left: 60px;
-  }
-
-  .sidebar.expanded ~ .top-header {
-    left: 0;
-  }
-
-  .settings-dropdown {
-    left: 10px;
-    transform: translateX(0) translateY(5px) scale(0.95);
-  }
-
-  .sidebar.expanded .settings-dropdown {
-    left: 10px;
-    transform: translateX(0) translateY(5px) scale(0.95);
-  }
-
-  .settings-dropdown.show {
-    transform: translateX(0) translateY(0) scale(1);
-  }
-
-  .sidebar::before {
-    display: none;
-  }
+.history-card-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(53, 64, 142, 0.6);
 }
 
 #saveProfileBtn {
@@ -1176,4 +886,451 @@ body {
 
 #filterModalBtn:active::before {
   opacity: 1;
+}
+
+.history-status {
+  display: inline-block;
+  padding: 6px 0;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 14px;
+  margin-left: 24px;
+  width: 110px;
+  text-align: center;
+  box-shadow: 6px 6px 12px rgba(53, 64, 142, 0.1),
+    -6px -6px 12px rgba(255, 255, 255, 0.8);
+}
+
+.status-pending {
+  background: #ffd36b;
+  color: #7a5c00;
+}
+
+.status-missed {
+  background: #ff7a7a;
+  color: #fff;
+}
+
+.status-completed {
+  background: #4caf50;
+  color: #fff;
+}
+
+.status-cancelled {
+  background: #ff7a7a;
+  color: #fff;
+}
+
+/* Responsive adjustments for history cards */
+@media (max-width: 1024px) {
+  .appointment-avatar {
+    width: 50px;
+    height: 50px;
+    margin-right: 15px;
+  }
+  .avatar-img {
+    width: 100%;
+    height: 100%;
+  }
+  .appointment-name,
+  .history-name {
+    font-size: 15px;
+  }
+  .appointment-details,
+  .history-details {
+    font-size: 13px;
+  }
+  .appointment-time {
+    font-size: 12px;
+  }
+  .see-more-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: 12px;
+  }
+}
+
+@media (max-width: 576px) {
+  .appointment-item,
+  .history-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .appointment-avatar {
+    align-self: center;
+    margin-right: 0;
+    width: 40px;
+    height: 40px;
+  }
+  .avatar-img {
+    width: 100%;
+    height: 100%;
+  }
+  .appointment-info {
+    text-align: center;
+    align-self: stretch;
+  }
+  .see-more-btn {
+    padding: 5px 10px;
+    font-size: 11px;
+    border-radius: 10px;
+  }
+}
+
+/* History List */
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .header-subtitle {
+    font-family: "Helvetica", sans-serif;
+    font-size: 14px;
+    color: #7f8c8d;
+    margin: 4px 0 0 0;
+    font-weight: 400;
+  }
+  .content-container {
+    padding: 0 10px;
+  }
+
+  .filter-tabs {
+    display: none;
+  }
+
+  .filter-mobile-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #f0f0f0;
+    border: none;
+    border-radius: 15px;
+    padding: 10px 20px;
+    font-size: 16px;
+    color: #35408e;
+    cursor: pointer;
+    box-shadow: 8px 8px 15px rgba(0, 0, 0, 0.1),
+      -8px -8px 15px rgba(255, 255, 255, 0.8);
+    font-family: "Helvetica", sans-serif;
+    font-weight: 600;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .filter-mobile-btn:active {
+    box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.1),
+      inset -5px -5px 10px rgba(255, 255, 255, 0.8);
+  }
+
+  .filter-mobile-btn .filter-icon {
+    width: 16px;
+    height: 16px;
+    filter: brightness(0) saturate(100%) invert(28%) sepia(80%) saturate(1000%)
+      hue-rotate(215deg) brightness(95%) contrast(90%);
+  }
+
+  .history-section {
+    padding: 20px;
+  }
+
+  .history-item {
+    padding: 12px 15px;
+    gap: 12px;
+  }
+
+  .history-avatar {
+    width: 50px;
+    height: 50px;
+  }
+
+  .history-name {
+    font-size: 15px;
+  }
+
+  .history-details {
+    font-size: 13px;
+  }
+
+  .history-time {
+    font-size: 12px;
+  }
+
+  .status-badge {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .filter-mobile-btn {
+    display: none;
+  }
+}
+
+@media (max-width: 576px) {
+  .top-header {
+    flex-direction: column;
+    height: 120px;
+    padding: 15px;
+    gap: 15px;
+  }
+
+  .header-left {
+    align-items: center;
+    text-align: center;
+  }
+
+  .header-title {
+    font-size: 20px;
+  }
+
+  .search-input-wrapper {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .main-content {
+    margin-top: 120px;
+    min-height: calc(100vh - 120px);
+  }
+
+  .history-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .history-avatar {
+    align-self: center;
+  }
+
+  .history-info {
+    text-align: center;
+    align-self: stretch;
+  }
+
+  .filter-tabs {
+    gap: 0;
+    padding: 0;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    border-bottom: 1px solid #e8e8e8;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .filter-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .filter-btn {
+    padding: 12px 16px;
+    font-size: 12px;
+    min-width: auto;
+    flex: 1;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 768px) {
+  .history-status {
+    display: none;
+  }
+  .history-status-mobile {
+    margin-top: 10px !important;
+    display: block;
+    width: 100%;
+    margin: 0 0 8px 0;
+    text-align: center;
+    border-radius: 16px;
+    font-weight: 600;
+    font-size: 14px;
+    box-shadow: 6px 6px 12px rgba(53, 64, 142, 0.1),
+      -6px -6px 12px rgba(255, 255, 255, 0.8);
+    padding: 6px 0;
+  }
+  .status-pending.history-status-mobile {
+    background: #ffd36b;
+    color: #7a5c00;
+  }
+  .status-missed.history-status-mobile {
+    background: #ff7a7a;
+    color: #fff;
+  }
+  .status-completed.history-status-mobile {
+    background: #4caf50;
+    color: #fff;
+  }
+  .status-cancelled.history-status-mobile {
+    background: #ff7a7a;
+    color: #fff;
+  }
+  .sidebar {
+    width: 60px;
+  }
+
+  .sidebar.expanded {
+    width: 100%;
+  }
+
+  .main-content {
+    margin-left: 60px;
+  }
+
+  .sidebar.expanded ~ .main-content {
+    margin-left: 0;
+  }
+
+  .sidebar.expanded ~ .top-header ~ .main-content {
+    margin-left: 0;
+  }
+
+  .top-header {
+    left: 60px;
+  }
+
+  .sidebar.expanded ~ .top-header {
+    left: 0;
+  }
+
+  .settings-dropdown {
+    left: 10px;
+    transform: translateX(0) translateY(5px) scale(0.95);
+  }
+
+  .sidebar.expanded .settings-dropdown {
+    left: 10px;
+    transform: translateX(0) translateY(5px) scale(0.95);
+  }
+
+  .settings-dropdown.show {
+    transform: translateX(0) translateY(0) scale(1);
+  }
+
+  .sidebar::before {
+    display: none;
+  }
+
+  .see-more-btn {
+    padding: 8px 0;
+    font-size: 14px;
+    border-radius: 16px;
+    width: 100%;
+    display: block;
+    text-align: center;
+    margin-top: 5px;
+  }
+}
+
+@media (max-width: 1400px) {
+  .filter-mobile-btn {
+    width: 100%;
+    max-width: 100%;
+  }
+  .top-header {
+    padding-left: 10px;
+    padding-right: 10px;
+    flex-direction: row;
+    align-items: center;
+    height: 70px;
+    gap: 0;
+  }
+  .header-left {
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-right: 20px;
+  }
+  .header-title {
+    font-size: 1.2rem;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2px;
+  }
+  .header-subtitle {
+    font-size: 0.85rem;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .header-right {
+    flex: 1 1 0%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    min-width: 200px;
+  }
+  .search-input-wrapper {
+    width: 320px;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 1024px) {
+  .top-header {
+    flex-direction: row;
+    align-items: center;
+    height: 60px;
+    min-height: 60px;
+    padding: 10px 8px;
+    gap: 0;
+  }
+  .header-left {
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: 100%;
+    margin-right: 12px;
+  }
+  .header-title {
+    font-size: 1rem;
+    margin-bottom: 1px;
+  }
+  .header-subtitle {
+    font-size: 0.75rem;
+  }
+  .header-right {
+    flex: 1 1 0%;
+    min-width: 120px;
+  }
+  .search-input-wrapper {
+    width: 180px;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
+  .top-header {
+    flex-direction: column;
+    height: 120px;
+    padding: 15px;
+    gap: 10px;
+    align-items: stretch;
+  }
+  .header-left {
+    align-items: center;
+    text-align: center;
+    margin-right: 0;
+  }
+  .header-title {
+    font-size: 1rem;
+  }
+  .header-subtitle {
+    font-size: 0.7rem;
+  }
+  .header-right {
+    width: 100%;
+    justify-content: center;
+    min-width: 0;
+  }
+  .search-input-wrapper {
+    width: 100%;
+    max-width: 300px;
+  }
 }
