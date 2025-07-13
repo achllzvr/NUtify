@@ -2,9 +2,44 @@ import 'package:flutter/material.dart';
 import 'package:nutify/models/recentProfessorsModel.dart';
 import 'package:nutify/models/studentHomeAppointments.dart';
 import 'package:nutify/pages/studentInbox.dart';
+import 'package:nutify/models/studentSearch.dart';
 
-class StudentHome extends StatelessWidget {
+class StudentHome extends StatefulWidget {
   StudentHome({super.key});
+
+  @override
+  _StudentHomeState createState() => _StudentHomeState();
+}
+
+class _StudentHomeState extends State<StudentHome> {
+  final TextEditingController _searchController = TextEditingController();
+  List<StudentSearch> _searchResults = [];
+  bool _isSearching = false;
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _performSearch(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _isSearching = false;
+        _searchResults = [];
+      } else {
+        _isSearching = true;
+        // Get all professors from StudentSearch model
+        List<StudentSearch> allProfessors = StudentSearch.searchProfessors();
+        
+        // Filter professors based on search query (name or department)
+        _searchResults = allProfessors.where((professor) {
+          return professor.name.toLowerCase().contains(query.toLowerCase()) ||
+                 professor.department.toLowerCase().contains(query.toLowerCase());
+        }).toList();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,8 +52,9 @@ class StudentHome extends StatelessWidget {
       body: Column(
         children: [
           studentSearchBar(),
-          mostRecentProfessors(recentProfessors),
-          upcomingAppointments()
+          Expanded(
+            child: _isSearching ? searchResults() : mainContent(recentProfessors),
+          ),
         ],
       )
     );
@@ -275,6 +311,8 @@ class StudentHome extends StatelessWidget {
             ],
           ),
           child: TextField(
+            controller: _searchController,
+            onChanged: _performSearch,
             decoration: InputDecoration(
               filled: true,
               fillColor: Colors.white, 
@@ -288,10 +326,18 @@ class StudentHome extends StatelessWidget {
                 padding: const EdgeInsets.all(12),
                 child: Icon(Icons.search, color: Colors.grey),
               ),
-              suffixIcon: Container(
-                margin: const EdgeInsets.only(right: 12),
-                child: Icon(Icons.filter_list, color: Colors.grey),
-              ),
+              suffixIcon: _searchController.text.isNotEmpty
+                ? IconButton(
+                    icon: Icon(Icons.clear, color: Colors.grey),
+                    onPressed: () {
+                      _searchController.clear();
+                      _performSearch('');
+                    },
+                  )
+                : Container(
+                    margin: const EdgeInsets.only(right: 12),
+                    child: Icon(Icons.filter_list, color: Colors.grey),
+                  ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(20.0),
                 borderSide: BorderSide.none,
@@ -419,5 +465,158 @@ class StudentHome extends StatelessWidget {
     );
   }
 
+  Widget mainContent(List<RecentProfessor> recentProfessors) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          mostRecentProfessors(recentProfessors),
+          upcomingAppointments(),
+        ],
+      ),
+    );
+  }
 
+  Widget searchResults() {
+    if (_searchResults.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.search_off,
+              size: 80,
+              color: Colors.grey.shade400,
+            ),
+            SizedBox(height: 20),
+            Text(
+              'No professors found',
+              style: TextStyle(
+                fontFamily: 'Arimo',
+                fontSize: 18,
+                color: Colors.grey.shade600,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Try searching with a different name or department',
+              style: TextStyle(
+                fontFamily: 'Arimo',
+                fontSize: 14,
+                color: Colors.grey.shade500,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return ListView.separated(
+      padding: EdgeInsets.all(20.0),
+      itemCount: _searchResults.length,
+      separatorBuilder: (context, index) => SizedBox(height: 15),
+      itemBuilder: (context, index) {
+        var professor = _searchResults[index];
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                spreadRadius: 1,
+                blurRadius: 8,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    CircleAvatar(
+                      backgroundColor: Color(0xFF35408E),
+                      radius: 25,
+                      child: Text(
+                        professor.name.split(' ').map((n) => n[0]).take(2).join(),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Arimo',
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 15),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            professor.name,
+                            style: TextStyle(
+                              fontFamily: 'Arimo',
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            professor.department,
+                            style: TextStyle(
+                              fontFamily: 'Arimo',
+                              fontSize: 14,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 15),
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Color(0xFF35408E),
+                        Color(0xFF1A2049),
+                      ],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      print('Setting an appointment with professor id: ${professor.id}');
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      textStyle: const TextStyle(
+                        fontFamily: 'Arimo',
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: const Text('Set An Appointment'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 }
