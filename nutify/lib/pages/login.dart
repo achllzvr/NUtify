@@ -164,9 +164,9 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               );
 
-              // Navigate based on user type (1=Student, 2=Teacher, 3=Moderator)
-              int userType = responseData['user_type'];
-              if (userType == 1) {
+              // Navigate based on user type (student, teacher, moderator)
+              String userType = responseData['user_type'].toString().toLowerCase();
+              if (userType == 'student') {
                 // Student
                 Navigator.pushAndRemoveUntil(
                   context,
@@ -178,7 +178,7 @@ class _LoginPageState extends State<LoginPage> {
                 );
               } else {
                 // Show message for other account types (not implemented yet)
-                String userTypeName = userType == 2 ? 'Teacher' : 'Moderator';
+                String userTypeName = userType == 'teacher' ? 'Teacher' : 'Moderator';
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
@@ -339,7 +339,7 @@ class _LoginPageState extends State<LoginPage> {
             child: TextField(
               controller: _usernameController,
               decoration: InputDecoration(
-                hintText: 'Full Name (e.g., John Doe)',
+                hintText: 'Enter your ID number',
                 hintStyle: TextStyle(
                   fontFamily: 'Arimo',
                   color: Colors.grey.shade500,
