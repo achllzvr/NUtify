@@ -1,8 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:nutify/pages/studentHome.dart';
 
-class StudentInbox extends StatelessWidget {
+class StudentInbox extends StatefulWidget {
   StudentInbox({super.key});
+
+  @override
+  _StudentInboxState createState() => _StudentInboxState();
+}
+
+class _StudentInboxState extends State<StudentInbox> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 4, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +31,95 @@ class StudentInbox extends StatelessWidget {
       appBar: studentAppBar(context),
       body: Column(
         children: [
-
+          // Tab Bar
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.1),
+                  spreadRadius: 1,
+                  blurRadius: 3,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
+            child: TabBar(
+              controller: _tabController,
+              labelColor: Color(0xFFFFD418),
+              unselectedLabelColor: Colors.grey.shade600,
+              indicatorColor: Color(0xFFFFD418),
+              indicatorWeight: 3,
+              labelStyle: TextStyle(
+                fontFamily: 'Arimo',
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+              unselectedLabelStyle: TextStyle(
+                fontFamily: 'Arimo',
+                fontSize: 14,
+                fontWeight: FontWeight.normal,
+              ),
+              tabs: [
+                Tab(text: 'Pending'),
+                Tab(text: 'Cancelled'),
+                Tab(text: 'Missed'),
+                Tab(text: 'Completed'),
+              ],
+            ),
+          ),
+          // Tab Bar View
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                // Pending Tab
+                Center(
+                  child: Text(
+                    'Pending Appointments',
+                    style: TextStyle(
+                      fontFamily: 'Arimo',
+                      fontSize: 16,
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                ),
+                // Cancelled Tab
+                Center(
+                  child: Text(
+                    'Cancelled Appointments',
+                    style: TextStyle(
+                      fontFamily: 'Arimo',
+                      fontSize: 16,
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                ),
+                // Missed Tab
+                Center(
+                  child: Text(
+                    'Missed Appointments',
+                    style: TextStyle(
+                      fontFamily: 'Arimo',
+                      fontSize: 16,
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                ),
+                // Completed Tab
+                Center(
+                  child: Text(
+                    'Completed Appointments',
+                    style: TextStyle(
+                      fontFamily: 'Arimo',
+                      fontSize: 16,
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       )
     );
