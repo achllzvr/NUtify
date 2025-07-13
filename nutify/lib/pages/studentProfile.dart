@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nutify/pages/studentHome.dart';
 import 'package:nutify/pages/studentInbox.dart';
 import 'package:nutify/pages/login.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class StudentProfile extends StatefulWidget {
   StudentProfile({super.key});
@@ -430,8 +431,13 @@ class _StudentProfileState extends State<StudentProfile> {
                           ],
                         ),
                         child: ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
                             Navigator.of(context).pop(); // Close dialog
+                            
+                            // Clear SharedPreferences for persistent login
+                            SharedPreferences prefs = await SharedPreferences.getInstance();
+                            await prefs.clear(); // Clear all saved data
+                            
                             // Navigate to login page and clear navigation stack
                             Navigator.pushAndRemoveUntil(
                               context,

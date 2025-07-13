@@ -3,6 +3,7 @@ import 'package:nutify/models/recentProfessorsModel.dart';
 import 'package:nutify/models/studentHomeAppointments.dart';
 import 'package:nutify/pages/studentInbox.dart';
 import 'package:nutify/pages/studentProfile.dart';
+import 'package:nutify/pages/login.dart';
 import 'package:nutify/models/studentSearch.dart';
 
 class StudentHome extends StatefulWidget {
@@ -420,6 +421,7 @@ class _StudentHomeState extends State<StudentHome> {
       ),
 
       actions: [
+        // Profile button
         GestureDetector(
           onTap: () {
             // Check if already on StudentProfile page

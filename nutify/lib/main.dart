@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:nutify/pages/login.dart';
+import 'package:nutify/pages/studentHome.dart';
 import 'package:nutify/services/firebase_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,7 +43,100 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(fontFamily: 'Arimo'),
-      home: LoginPage(),
+      home: SplashScreen(), // Start with splash screen instead of LoginPage
+    );
+  }
+}
+
+// Add a splash screen to check login state
+class SplashScreen extends StatefulWidget {
+  @override
+  _SplashScreenState createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    checkLoginState();
+  }
+
+  Future<void> checkLoginState() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+    
+    await Future.delayed(Duration(seconds: 2)); // Optional splash delay
+    
+    if (isLoggedIn) {
+      String userType = prefs.getString('userType') ?? '';
+      
+      // Navigate to appropriate home screen based on user type
+      if (userType == 'student') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => StudentHome()),
+        );
+      } else {
+        // For teacher/moderator, go to login for now
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => LoginPage()),
+        );
+      }
+    } else {
+      // Not logged in, go to login page
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [const Color(0xFF35408E), const Color(0xFF1A2049)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                'assets/icons/NUtify_full_logo.png',
+                height: 100,
+                errorBuilder: (context, error, stackTrace) {
+                  return Text(
+                    'NUtify',
+                    style: TextStyle(
+                      fontFamily: 'Arimo',
+                      fontSize: 36,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  );
+                },
+              ),
+              SizedBox(height: 20),
+              CircularProgressIndicator(color: Colors.white),
+              SizedBox(height: 20),
+              Text(
+                'Loading...',
+                style: TextStyle(
+                  fontFamily: 'Arimo',
+                  fontSize: 16,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

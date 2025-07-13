@@ -3,6 +3,7 @@ import 'package:nutify/pages/studentHome.dart';
 import 'package:nutify/services/firebase_service.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   LoginPage({super.key});
@@ -142,6 +143,17 @@ class _LoginPageState extends State<LoginPage> {
           if (responseData['success'] == true) {
             // Login successful
             String userId = responseData['user_id'].toString();
+            String userType = responseData['user_type'].toString().toLowerCase();
+            String userFn = responseData['user_fn'].toString();
+            String userLn = responseData['user_ln'].toString();
+
+            // Save login state to SharedPreferences
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            await prefs.setBool('isLoggedIn', true);
+            await prefs.setString('userId', userId);
+            await prefs.setString('userType', userType);
+            await prefs.setString('userFn', userFn);
+            await prefs.setString('userLn', userLn);
 
             // Send FCM token to server for this specific user
             if (fcmToken != null && fcmToken.isNotEmpty) {
@@ -165,7 +177,6 @@ class _LoginPageState extends State<LoginPage> {
               );
 
               // Navigate based on user type (student, teacher, moderator)
-              String userType = responseData['user_type'].toString().toLowerCase();
               if (userType == 'student') {
                 // Student
                 Navigator.pushAndRemoveUntil(
@@ -576,5 +587,30 @@ class _LoginPageState extends State<LoginPage> {
 
     // Call the API login function
     loginUser();
+  }
+
+  Future<void> logout() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear(); // Clear all saved data
+    
+    // Navigate back to login
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => LoginPage()),
+      (Route<dynamic> route) => false,
+    );
+  }
+
+  // Static method for logout from other pages
+  static Future<void> logoutFromApp(BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear(); // Clear all saved data
+    
+    // Navigate back to login
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => LoginPage()),
+      (Route<dynamic> route) => false,
+    );
   }
 }
