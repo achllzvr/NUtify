@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nutify/models/recentProfessorsModel.dart';
 import 'package:nutify/models/studentHomeAppointments.dart';
+import 'package:nutify/pages/studentInbox.dart';
 
 class StudentHome extends StatelessWidget {
   StudentHome({super.key});
@@ -12,7 +13,7 @@ class StudentHome extends StatelessWidget {
     
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      appBar: studentAppBar(),
+      appBar: studentAppBar(context),
       body: Column(
         children: [
           studentSearchBar(),
@@ -300,7 +301,7 @@ class StudentHome extends StatelessWidget {
         );
   }
 
-  AppBar studentAppBar() {
+  AppBar studentAppBar(BuildContext context) {
     return AppBar(
       title: Container(
         margin: const EdgeInsets.only(left: 10.0),
@@ -357,13 +358,56 @@ class StudentHome extends StatelessWidget {
                 icon: const Icon(Icons.home, color: Color(0xFFFFD418),
                 ),
                 onPressed: () {
-                  // Handle home button tap
+                  // Check if already on StudentHome page
+                  if (ModalRoute.of(context)?.settings.name == '/studentHome' || 
+                      context.widget.runtimeType == StudentHome) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'You are already on the Home page',
+                          style: TextStyle(fontFamily: 'Arimo'),
+                        ),
+                        duration: Duration(seconds: 2),
+                        backgroundColor: Color(0xFF35408E),
+                      ),
+                    );
+                  } else {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => StudentHome(),
+                        settings: RouteSettings(name: '/studentHome'),
+                      ),
+                      (Route<dynamic> route) => false,
+                    );
+                  }
                 },
               ),
               IconButton(
                 icon: const Icon(Icons.inbox, color: Color(0xFFFFD418)),
                 onPressed: () {
-                  // Handle inbox button tap
+                  // Check if already on StudentInbox page
+                  if (ModalRoute.of(context)?.settings.name == '/studentInbox') {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'You are already on the Inbox page',
+                          style: TextStyle(fontFamily: 'Arimo'),
+                        ),
+                        duration: Duration(seconds: 2),
+                        backgroundColor: Color(0xFF35408E),
+                      ),
+                    );
+                  } else {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => StudentInbox(),
+                        settings: RouteSettings(name: '/studentInbox'),
+                      ),
+                      (Route<dynamic> route) => false,
+                    );
+                  }
                 },
               ),
             ],
