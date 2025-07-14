@@ -137,11 +137,25 @@ class _StudentHomeState extends State<StudentHome> {
                 separatorBuilder: (context, index) => SizedBox(height: 15),
                 itemBuilder: (context, index) {
                   var appointment = appointments[index];
+                  // Get initials for avatar
+                  String initials = appointment.name.split(' ').map((name) => name.isNotEmpty ? name[0] : '').take(2).join('').toUpperCase();
+                  
+                  // Generate color based on professor name
+                  List<Color> avatarColors = [
+                    Color(0xFF81C784), // Light green
+                    Color(0xFFFFB74D), // Light orange  
+                    Color(0xFF9575CD), // Light purple
+                    Color(0xFF4FC3F7), // Light blue
+                    Color(0xFFFFD54F), // Light yellow
+                    Color(0xFFFF8A65), // Light coral
+                  ];
+                  Color avatarColor = avatarColors[appointment.name.hashCode % avatarColors.length];
+                  
                   return Container(
                     padding: EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [const Color(0xFF35408E), const Color(0xFF1A2049)],
+                        colors: [Colors.white, Colors.grey.shade50],
                         begin: const FractionalOffset(0.0, 0.0),
                         end: const FractionalOffset(0.0, 1.0),
                         stops: [0.0, 1.0],
@@ -150,35 +164,92 @@ class _StudentHomeState extends State<StudentHome> {
                       borderRadius: BorderRadius.circular(15),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color.fromRGBO(0, 0, 0, 0.25),
-                          spreadRadius: 0,
-                          blurRadius: 4,
-                          offset: Offset(2, 2),
+                          color: Colors.black.withOpacity(0.08),
+                          spreadRadius: 1,
+                          blurRadius: 10,
+                          offset: Offset(0, 3),
                         ),
                       ],
                     ),
-                    child: Row(
+                    child: Column(
                       children: [
-                        Container(
-                          width: 50,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          child: Icon(
-                            Icons.person,
-                            color: Colors.white,
-                            size: 30,
-                          ),
+                        Row(
+                          children: [
+                            Container(
+                              width: 60,
+                              height: 60,
+                              decoration: BoxDecoration(
+                                color: avatarColor,
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  initials,
+                                  style: TextStyle(
+                                    fontFamily: 'Arimo',
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 15),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    appointment.name,
+                                    style: TextStyle(
+                                      fontFamily: 'Arimo',
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  SizedBox(height: 5),
+                                  Text(
+                                    '${appointment.scheduleDate} ${appointment.scheduleTime}',
+                                    style: TextStyle(
+                                      fontFamily: 'Arimo',
+                                      fontSize: 14,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                        SizedBox(width: 15),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                appointment.name,
+                        SizedBox(height: 15),
+                        SizedBox(
+                          width: double.infinity,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [Color(0xFFFFD418), Color(0xFFFFE566)],
+                                begin: const FractionalOffset(0.0, 0.0),
+                                end: const FractionalOffset(0.0, 1.0),
+                                stops: [0.0, 1.0],
+                                tileMode: TileMode.clamp,
+                              ),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: ElevatedButton(
+                              onPressed: () {
+                                // TODO: Navigate to appointment details
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.transparent,
+                                shadowColor: Colors.transparent,
+                                padding: EdgeInsets.symmetric(vertical: 15),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: Text(
+                                'View Details',
                                 style: TextStyle(
                                   fontFamily: 'Arimo',
                                   fontSize: 16,
@@ -186,37 +257,7 @@ class _StudentHomeState extends State<StudentHome> {
                                   color: Colors.white,
                                 ),
                               ),
-                              SizedBox(height: 5),
-                              Text(
-                                '${appointment.scheduleDate} at ${appointment.scheduleTime}',
-                                style: TextStyle(
-                                  fontFamily: 'Arimo',
-                                  fontSize: 14,
-                                  color: Colors.white.withOpacity(0.9),
-                                ),
-                              ),
-                              SizedBox(height: 8),
-                              Container(
-                                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: appointment.status == 'accepted' 
-                                      ? Color(0xFFFFD418).withOpacity(0.9)
-                                      : Colors.orange.withOpacity(0.9),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Text(
-                                  appointment.status.toUpperCase(),
-                                  style: TextStyle(
-                                    fontFamily: 'Arimo',
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color: appointment.status == 'accepted' 
-                                        ? Color(0xFF35408E)
-                                        : Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
                         ),
                       ],
@@ -280,7 +321,7 @@ class _StudentHomeState extends State<StudentHome> {
                         print('Professor ID: $professorId, Name: $professorName');
                       },
                       child: Container(
-                        width: 100,
+                        width: 140, // Made wider
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [const Color(0xFF35408E), const Color(0xFF1A2049)],
@@ -573,11 +614,14 @@ class _StudentHomeState extends State<StudentHome> {
       separatorBuilder: (context, index) => SizedBox(height: 15),
       itemBuilder: (context, index) {
         var professor = _searchResults[index];
+        // Get initials for avatar
+        String initials = professor.name.split(' ').map((name) => name.isNotEmpty ? name[0] : '').take(2).join('').toUpperCase();
+        
         return Container(
           padding: EdgeInsets.all(20),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [const Color(0xFF35408E), const Color(0xFF1A2049)],
+              colors: [Colors.white, Colors.grey.shade50],
               begin: const FractionalOffset(0.0, 0.0),
               end: const FractionalOffset(0.0, 1.0),
               stops: [0.0, 1.0],
@@ -586,10 +630,10 @@ class _StudentHomeState extends State<StudentHome> {
             borderRadius: BorderRadius.circular(15),
             boxShadow: [
               BoxShadow(
-                color: const Color.fromRGBO(0, 0, 0, 0.25),
-                spreadRadius: 0,
-                blurRadius: 4,
-                offset: Offset(2, 2),
+                color: const Color.fromRGBO(0, 0, 0, 0.08),
+                spreadRadius: 1,
+                blurRadius: 10,
+                offset: Offset(0, 3),
               ),
             ],
           ),
@@ -602,13 +646,25 @@ class _StudentHomeState extends State<StudentHome> {
                     width: 50,
                     height: 50,
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      gradient: LinearGradient(
+                        colors: [const Color(0xFF35408E), const Color(0xFF1A2049)],
+                        begin: const FractionalOffset(0.0, 0.0),
+                        end: const FractionalOffset(0.0, 1.0),
+                        stops: [0.0, 1.0],
+                        tileMode: TileMode.clamp,
+                      ),
                       borderRadius: BorderRadius.circular(25),
                     ),
-                    child: Icon(
-                      Icons.person,
-                      color: Colors.white,
-                      size: 30,
+                    child: Center(
+                      child: Text(
+                        initials,
+                        style: TextStyle(
+                          fontFamily: 'Arimo',
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                   ),
                   SizedBox(width: 15),
@@ -622,7 +678,7 @@ class _StudentHomeState extends State<StudentHome> {
                             fontFamily: 'Arimo',
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: Colors.black,
                           ),
                         ),
                         SizedBox(height: 5),
@@ -631,7 +687,7 @@ class _StudentHomeState extends State<StudentHome> {
                           style: TextStyle(
                             fontFamily: 'Arimo',
                             fontSize: 14,
-                            color: Colors.white.withOpacity(0.9),
+                            color: Colors.grey[600],
                           ),
                         ),
                       ],
@@ -642,28 +698,41 @@ class _StudentHomeState extends State<StudentHome> {
               SizedBox(height: 15),
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Access the professor ID here
-                    String professorId = professor.id;
-                    String professorName = professor.name;
-                    print('Setting appointment with Professor ID: $professorId, Name: $professorName');
-                    // TODO: Navigate to appointment booking page
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: const Color(0xFF35408E),
-                    padding: EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [const Color(0xFF35408E), const Color(0xFF1A2049)],
+                      begin: const FractionalOffset(0.0, 0.0),
+                      end: const FractionalOffset(0.0, 1.0),
+                      stops: [0.0, 1.0],
+                      tileMode: TileMode.clamp,
                     ),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Text(
-                    'Set An Appointment',
-                    style: TextStyle(
-                      fontFamily: 'Arimo',
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Access the professor ID here
+                      String professorId = professor.id;
+                      String professorName = professor.name;
+                      print('Setting appointment with Professor ID: $professorId, Name: $professorName');
+                      // TODO: Navigate to appointment booking page
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Text(
+                      'Set An Appointment',
+                      style: TextStyle(
+                        fontFamily: 'Arimo',
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
