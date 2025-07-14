@@ -69,7 +69,7 @@ body {
   position: fixed;
   left: 0;
   top: 0;
-  width: 80px;
+  width: 80px; /* was 60px */
   height: 100vh;
   background: linear-gradient(180deg, #35408e 0%, #1a2049 100%);
   z-index: 1000;
@@ -338,7 +338,7 @@ body {
 .top-header {
   position: fixed;
   top: 0;
-  left: 80px;
+  left: 80px; 
   right: 0;
   height: 80px;
   background: #ffffff;
@@ -447,7 +447,7 @@ body {
 }
 
 .main-content {
-  margin-left: 80px;
+  margin-left: 80px; /* was 60px */
   margin-top: 80px;
   min-height: calc(100vh - 80px);
   padding: 20px;
@@ -455,27 +455,14 @@ body {
 }
 
 .sidebar.expanded ~ .top-header ~ .main-content {
-  margin-left: 250px;
+  margin-left: 250px; /* was 250px */
 }
+
 
 .sidebar::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 80px;
-  width: calc(100vw - 80px);
-  height: 100vh;
-  background-color: #1c1d1e;
-  opacity: 0;
-  z-index: 999;
-  pointer-events: none;
-  transition: all 0.3s ease;
-}
-
-.sidebar.expanded::before {
-  left: 250px;
-  width: calc(100vw - 250px);
-  opacity: 0.8;
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 
 .sidebar-icon {
@@ -559,30 +546,34 @@ body {
   background: rgba(53, 64, 142, 0.08);
 }
 
-/* Sliding indicator positions */
 .filter-tabs[data-active="all"]::after {
-  width: 20%;
+  width: 16.66%;
   left: 0;
 }
 
 .filter-tabs[data-active="pending"]::after {
-  width: 20%;
-  left: 20%;
+  width: 16.66%;
+  left: 16.66%;
 }
 
 .filter-tabs[data-active="cancelled"]::after {
-  width: 20%;
-  left: 40%;
+  width: 16.66%;
+  left: 33.32%;
 }
 
 .filter-tabs[data-active="missed"]::after {
-  width: 20%;
-  left: 60%;
+  width: 16.66%;
+  left: 49.98%;
+}
+
+.filter-tabs[data-active="declined"]::after {
+  width: 16.66%;
+  left: 66.64%;
 }
 
 .filter-tabs[data-active="completed"]::after {
-  width: 20%;
-  left: 80%;
+  width: 16.66%;
+  left: 83.3%;
 }
 
 /* History Section */
@@ -595,7 +586,6 @@ body {
   transition: all 0.3s ease;
 }
 
-/* Appointment Card Styles (copied from studenthome.css) */
 .appointment-item,
 .history-item {
   display: flex;
@@ -665,9 +655,11 @@ body {
   display: none;
 }
 .see-more-btn {
+  width: 13%;
+  margin-top: 5px;
   border: none;
   border-radius: 15px;
-  padding: 8px 15px;
+  padding: 5px 12px;
   font-size: 14px;
   color: #7f8c8d;
   cursor: pointer;
@@ -680,9 +672,6 @@ body {
   transform: translateY(0);
   position: relative;
   overflow: hidden;
-  margin-top: 10px;
-  white-space: nowrap;
-  width: fit-content;
 }
 
 .see-more-btn:active {
@@ -693,7 +682,6 @@ body {
   transition: all 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-/* Scrollable History Card List (copied from .faculty-list in studenthome.css) */
 .history-card-list {
   max-height: 520px;
   overflow-y: auto;
@@ -921,65 +909,39 @@ body {
   color: #fff;
 }
 
-/* Responsive adjustments for history cards */
+.status-declined {
+  background: #ff7a7a;
+  color: #fff;
+}
+
+.filter-mobile-btn {
+  display: none;
+}
+
 @media (max-width: 1024px) {
-  .appointment-avatar {
-    width: 50px;
-    height: 50px;
-    margin-right: 15px;
-  }
-  .avatar-img {
+  .filter-mobile-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #f0f0f0;
+    border: none;
+    border-radius: 15px;
+    padding: 10px 20px;
+    font-size: 16px;
+    color: #35408e;
+    cursor: pointer;
+    box-shadow: 8px 8px 15px rgba(0, 0, 0, 0.1),
+      -8px -8px 15px rgba(255, 255, 255, 0.8);
+    font-family: "Helvetica", sans-serif;
+    font-weight: 600;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
     width: 100%;
-    height: 100%;
-  }
-  .appointment-name,
-  .history-name {
-    font-size: 15px;
-  }
-  .appointment-details,
-  .history-details {
-    font-size: 13px;
-  }
-  .appointment-time {
-    font-size: 12px;
-  }
-  .see-more-btn {
-    padding: 6px 12px;
-    font-size: 12px;
-    border-radius: 12px;
+    max-width: none;
   }
 }
 
-@media (max-width: 576px) {
-  .appointment-item,
-  .history-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-  .appointment-avatar {
-    align-self: center;
-    margin-right: 0;
-    width: 40px;
-    height: 40px;
-  }
-  .avatar-img {
-    width: 100%;
-    height: 100%;
-  }
-  .appointment-info {
-    text-align: center;
-    align-self: stretch;
-  }
-  .see-more-btn {
-    padding: 5px 10px;
-    font-size: 11px;
-    border-radius: 10px;
-  }
-}
-
-/* History List */
-/* Responsive Design */
 @media (max-width: 1024px) {
   .header-subtitle {
     font-family: "Helvetica", sans-serif;
@@ -1015,234 +977,7 @@ body {
     margin-bottom: 20px;
     transition: all 0.3s ease;
     width: 100%;
-    max-width: 300px;
-  }
-
-  .filter-mobile-btn:active {
-    box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.1),
-      inset -5px -5px 10px rgba(255, 255, 255, 0.8);
-  }
-
-  .filter-mobile-btn .filter-icon {
-    width: 16px;
-    height: 16px;
-    filter: brightness(0) saturate(100%) invert(28%) sepia(80%) saturate(1000%)
-      hue-rotate(215deg) brightness(95%) contrast(90%);
-  }
-
-  .history-section {
-    padding: 20px;
-  }
-
-  .history-item {
-    padding: 12px 15px;
-    gap: 12px;
-  }
-
-  .history-avatar {
-    width: 50px;
-    height: 50px;
-  }
-
-  .history-name {
-    font-size: 15px;
-  }
-
-  .history-details {
-    font-size: 13px;
-  }
-
-  .history-time {
-    font-size: 12px;
-  }
-
-  .status-badge {
-    padding: 6px 12px;
-    font-size: 11px;
-  }
-}
-
-@media (min-width: 1025px) {
-  .filter-mobile-btn {
-    display: none;
-  }
-}
-
-@media (max-width: 576px) {
-  .appointment-item,
-  .history-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-  .appointment-avatar {
-    align-self: center;
-    margin-right: 0;
-    width: 40px;
-    height: 40px;
-  }
-  .avatar-img {
-    width: 100%;
-    height: 100%;
-  }
-  .appointment-info {
-    text-align: center;
-    align-self: stretch;
-  }
-  .see-more-btn {
-    padding: 5px 10px;
-    font-size: 11px;
-    border-radius: 10px;
-  }
-  .filter-tabs {
-    gap: 0;
-    padding: 0;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    border-bottom: 1px solid #e8e8e8;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  .filter-tabs::-webkit-scrollbar {
-    display: none;
-  }
-  .filter-btn {
-    padding: 12px 16px;
-    font-size: 12px;
-    min-width: auto;
-    flex: 1;
-    white-space: nowrap;
-  }
-}
-
-/* Remove these header-related media queries:
-@media (max-width: 1400px) { ... .top-header ... .header-left ... .header-title ... .header-subtitle ... .header-right ... .search-input-wrapper ... }
-@media (max-width: 1024px) { ... .top-header ... .header-left ... .header-title ... .header-subtitle ... .header-right ... .search-input-wrapper ... }
-@media (max-width: 576px) { ... .top-header ... .header-left ... .header-title ... .header-subtitle ... .header-right ... .search-input-wrapper ... }
-*/
-
-@media (max-width: 768px) {
-  .history-status {
-    display: none;
-  }
-  .history-status-mobile {
-    margin-top: 10px !important;
-    display: block;
-    width: 100%;
-    margin: 0 0 8px 0;
-    text-align: center;
-    border-radius: 16px;
-    font-weight: 600;
-    font-size: 14px;
-    box-shadow: 6px 6px 12px rgba(53, 64, 142, 0.1),
-      -6px -6px 12px rgba(255, 255, 255, 0.8);
-    padding: 6px 0;
-  }
-  .status-pending.history-status-mobile {
-    background: #ffd36b;
-    color: #7a5c00;
-  }
-  .status-missed.history-status-mobile {
-    background: #ff7a7a;
-    color: #fff;
-  }
-  .status-completed.history-status-mobile {
-    background: #4caf50;
-    color: #fff;
-  }
-  .status-cancelled.history-status-mobile {
-    background: #ff7a7a;
-    color: #fff;
-  }
-  .sidebar {
-    width: 60px;
-  }
-
-  .sidebar.expanded {
-    width: 100%;
-  }
-
-  .main-content {
-    margin-left: 60px;
-  }
-
-  .sidebar.expanded ~ .main-content {
-    margin-left: 0;
-  }
-
-  .sidebar.expanded ~ .top-header ~ .main-content {
-    margin-left: 0;
-  }
-
-  .top-header {
-    left: 60px;
-  }
-
-  .sidebar.expanded ~ .top-header {
-    left: 0;
-  }
-
-  .settings-dropdown {
-    left: 10px;
-    transform: translateX(0) translateY(5px) scale(0.95);
-  }
-
-  .sidebar.expanded .settings-dropdown {
-    left: 10px;
-    transform: translateX(0) translateY(5px) scale(0.95);
-  }
-
-  .settings-dropdown.show {
-    transform: translateX(0) translateY(0) scale(1);
-  }
-
-  .sidebar::before {
-    display: none;
-  }
-
-  .see-more-btn {
-    padding: 8px 0;
-    font-size: 14px;
-    border-radius: 16px;
-    width: 100%;
-    display: block;
-    text-align: center;
-    margin-top: 5px;
-  }
-}
-
-@media (max-width: 1400px) {
-  .filter-mobile-btn {
-    width: 100%;
-    max-width: 100%;
-  }
-}
-
-@media (max-width: 1024px) {
-  .filter-tabs {
-    display: none;
-  }
-
-  .filter-mobile-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    background: #f0f0f0;
-    border: none;
-    border-radius: 15px;
-    padding: 10px 20px;
-    font-size: 16px;
-    color: #35408e;
-    cursor: pointer;
-    box-shadow: 8px 8px 15px rgba(0, 0, 0, 0.1),
-      -8px -8px 15px rgba(255, 255, 255, 0.8);
-    font-family: "Helvetica", sans-serif;
-    font-weight: 600;
-    margin-bottom: 20px;
-    transition: all 0.3s ease;
-    width: 100%;
-    max-width: 300px;
+    max-width: none;
   }
 
   .filter-mobile-btn:active {
@@ -1315,29 +1050,12 @@ body {
     font-size: 11px;
     border-radius: 10px;
   }
-  .filter-tabs {
-    gap: 0;
-    padding: 0;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    border-bottom: 1px solid #e8e8e8;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  .filter-tabs::-webkit-scrollbar {
-    display: none;
-  }
-  .filter-btn {
-    padding: 12px 16px;
-    font-size: 12px;
-    min-width: auto;
-    flex: 1;
-    white-space: nowrap;
-  }
 }
 
-/* Responsive Header Styles (copied from studenthome.css) */
 @media (max-width: 1024px) {
+  .see-more-btn {
+    width: 25%;
+  }
   .header-title {
     font-size: 28px;
   }
@@ -1356,6 +1074,15 @@ body {
 }
 
 @media (max-width: 768px) {
+  .see-more-btn {
+    padding: 8px 0;
+    font-size: 14px;
+    border-radius: 16px;
+    width: 100%;
+    display: block;
+    text-align: center;
+    margin-top: 5px;
+  }
   .top-header {
     left: 60px;
     padding: 0 15px;
@@ -1379,11 +1106,53 @@ body {
     justify-content: center;
     align-items: flex-start;
   }
+  .sidebar {
+    width: 60px;
+  }
+  .sidebar.expanded {
+    width: 100%;
+  }
   .sidebar.expanded ~ .top-header {
     left: 0;
   }
   .sidebar.expanded ~ .top-header ~ .main-content {
     margin-left: 0;
+  }
+
+  .history-status {
+    display: none !important;
+  }
+  .history-status-mobile {
+    display: block !important;
+    width: 100%;
+    margin: 0 0 8px 0;
+    text-align: center;
+    border-radius: 16px;
+    font-weight: 600;
+    font-size: 10px;
+    box-shadow: 6px 6px 12px rgba(53, 64, 142, 0.1),
+      -6px -6px 12px rgba(255, 255, 255, 0.8);
+    padding: 4px 0;
+  }
+  .status-pending.history-status-mobile {
+    background: #ffd36b;
+    color: #7a5c00;
+  }
+  .status-missed.history-status-mobile {
+    background: #ff7a7a;
+    color: #fff;
+  }
+  .status-completed.history-status-mobile {
+    background: #4caf50;
+    color: #fff;
+  }
+  .status-cancelled.history-status-mobile {
+    background: #ff7a7a;
+    color: #fff;
+  }
+  .status-declined.history-status-mobile {
+    background: #ff7a7a;
+    color: #fff;
   }
 }
 
@@ -1413,146 +1182,114 @@ body {
     justify-content: center;
     align-items: flex-start;
   }
-}
-    transform: translateX(0) translateY(0) scale(1);
-  }
 
   .sidebar::before {
     display: none;
   }
-
-  .see-more-btn {
-    padding: 8px 0;
-    font-size: 14px;
-    border-radius: 16px;
-    width: 100%;
-    display: block;
-    text-align: center;
-    margin-top: 5px;
-  }
 }
 
-@media (max-width: 1400px) {
-  .filter-mobile-btn {
-    width: 100%;
-    max-width: 100%;
-  }
+.modal-header,
+.modal-footer {
+  border: none !important;
+  box-shadow: none !important;
+  
 }
 
-@media (max-width: 1024px) {
-  .filter-tabs {
-    display: none;
-  }
+.history-details-modal-content {
+  background: linear-gradient(145deg, #ffffff, #d7d7d7);
+  border-radius: 20px;
+  border: none !important;
+}
 
-  .filter-mobile-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    background: #f0f0f0;
-    border: none;
-    border-radius: 15px;
-    padding: 10px 20px;
-    font-size: 16px;
-    color: #35408e;
-    cursor: pointer;
-    box-shadow: 8px 8px 15px rgba(0, 0, 0, 0.1),
-      -8px -8px 15px rgba(255, 255, 255, 0.8);
-    font-family: "Helvetica", sans-serif;
-    font-weight: 600;
-    margin-bottom: 20px;
-    transition: all 0.3s ease;
-    width: 100%;
-    max-width: 300px;
-  }
+.history-details-modal-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  padding: 12px 0;
+}
 
-  .filter-mobile-btn:active {
-    box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.1),
-      inset -5px -5px 10px rgba(255, 255, 255, 0.8);
-  }
+.history-details-modal-title {
+  font-family: "Montserrat", sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2c3e50;
+  text-align: center;
+}
 
-  .filter-mobile-btn .filter-icon {
-    width: 16px;
-    height: 16px;
-    filter: brightness(0) saturate(100%) invert(28%) sepia(80%) saturate(1000%)
-      hue-rotate(215deg) brightness(95%) contrast(90%);
-  }
 
-  .history-section {
-    padding: 20px;
-  }
+.history-details-modal-time {
+  font-family: "Helvetica", sans-serif;
+  font-size: 1rem;
+  color: #2c3e50;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 1em;
+}
 
-  .history-item {
-    padding: 12px 15px;
-    gap: 12px;
-  }
+.history-details-modal-status {
+  width: 100%;
+  max-width: 320px;
+  padding: 10px 0;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 0;
+  box-shadow: 6px 6px 12px rgba(53, 64, 142, 0.1), -6px -6px 12px rgba(255, 255, 255, 0.8);
+}
 
-  .history-avatar {
-    width: 50px;
-    height: 50px;
-  }
+.history-details-modal-status.completed,
+.history-details-modal-status.accepted {
+  background: #4caf50;
+  color: #fff;
+}
 
-  .history-name {
-    font-size: 15px;
-  }
+.history-details-modal-status.pending {
+  background: #e8e8e8;
+  color: #7f8c8d;
+}
 
-  .history-details {
-    font-size: 13px;
-  }
+.history-details-modal-status.missed,
+.history-details-modal-status.cancelled,
+.history-details-modal-status.declined {
+  background: #ff7a7a;
+  color: #fff;
+}
 
-  .history-time {
-    font-size: 12px;
-  }
+.history-details-modal-status.accepted {
+  background: #4caf50;
+  color: #fff;
+}
 
-  .status-badge {
-    padding: 6px 12px;
-    font-size: 11px;
-  }
+.history-details-modal-status.requested,
+.history-details-modal-status.accepted-secondary {
+  background: #e8e8e8;
+  color: #7f8c8d;
+}
+
+.history-details-modal-status.secondary {
+  background: #e8e8e8;
+  color: #7f8c8d;
+}
+
+.history-details-modal-status.secondary:contains("Pending -") {
+  background: #ffd36b;
+  color: #7a5c00;
+}
+
+.history-details-modal-status {
+  margin-bottom: 10px;
 }
 
 @media (max-width: 576px) {
-  .appointment-item,
-  .history-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
+  .history-details-modal-content {
+    border-radius: 12px;
   }
-  .appointment-avatar {
-    align-self: center;
-    margin-right: 0;
-    width: 40px;
-    height: 40px;
+  .history-details-modal-title {
+    font-size: 1.3rem;
   }
-  .avatar-img {
-    width: 100%;
-    height: 100%;
-  }
-  .appointment-info {
-    text-align: center;
-    align-self: stretch;
-  }
-  .see-more-btn {
-    padding: 5px 10px;
-    font-size: 11px;
-    border-radius: 10px;
-  }
-  .filter-tabs {
-    gap: 0;
-    padding: 0;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    border-bottom: 1px solid #e8e8e8;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  .filter-tabs::-webkit-scrollbar {
-    display: none;
-  }
-  .filter-btn {
-    padding: 12px 16px;
-    font-size: 12px;
-    min-width: auto;
-    flex: 1;
-    white-space: nowrap;
+  .history-details-modal-body {
+    gap: 12px;
   }
 }

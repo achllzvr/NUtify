@@ -275,7 +275,8 @@ document.addEventListener("DOMContentLoaded", function () {
           .textContent.toLowerCase();
 
         const matchesFilter =
-          filterValue === "all" || itemStatus === filterValue;
+          filterValue === "all" ||
+          itemStatus === filterValue; // "declined" is now supported
         const matchesSearch =
           !searchTerm ||
           name.includes(searchTerm) ||
@@ -310,4 +311,136 @@ document.addEventListener("DOMContentLoaded", function () {
       filterHistoryItems(activeFilterValue, searchTerm);
     });
   }
+
+  // On studenthistory.html, activate filter from query param if present
+  if (window.location.pathname.includes("studenthistory.html")) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const filterParam = urlParams.get("filter");
+    if (filterParam) {
+      // Activate the correct filter tab/button
+      const filterBtn = document.querySelector(
+        `.filter-btn[data-filter="${filterParam}"]`
+      );
+      if (filterBtn) {
+        filterBtn.click();
+      }
+      // For mobile modal filter, also select the correct option
+      const filterOption = document.querySelector(
+        `.filter-option[data-filter="${filterParam}"]`
+      );
+      if (filterOption) {
+        filterOption.classList.add("selected");
+      }
+    }
+  }
+
+  // See More modal functionality
+  const seeMoreBtns = document.querySelectorAll(".see-more-btn");
+  const historyDetailsModal = document.getElementById("historyDetailsModal");
+  const historyDetailsModalBody = document.querySelector(".history-details-modal-body");
+
+  //status mapping for modal
+  const statusModalMap = {
+    pending: {
+      main: { text: "-", class: "pending" },
+      secondary: [
+        { text: "-", class: "secondary" },
+        { text: "Pending - June 11; 6:00 pm", class: "secondary" }
+      ]
+    },
+    completed: {
+      main: { text: "Completed - June 13; 9:23 am", class: "completed" },
+      secondary: [
+        { text: "Accepted - June 12; 12:00 am", class: "secondary" },
+        { text: "Pending - June 11; 6:00 pm", class: "secondary" }
+      ]
+    },
+    accepted: {
+      main: { text: "Accepted - June 13; 9:23 am", class: "accepted" },
+      secondary: [
+        { text: "Pending - June 11; 6:00 pm", class: "secondary" }
+      ]
+    },
+    missed: {
+      main: { text: "Missed - June 13; 9:23 am", class: "missed" },
+      secondary: [
+        { text: "Accepted - June 12; 12:00 am", class: "secondary" },
+        { text: "Pending - June 11; 6:00 pm", class: "secondary" }
+      ]
+    },
+    declined: {
+      main: { text: "-", class: "pending" },
+      secondary: [
+        { text: "Declined - June 13; 9:23 am", class: "declined" },
+        { text: "Pending - June 11; 6:00 pm", class: "secondary" }
+      ]
+    },
+    cancelled: {
+      main: { text: "Cancelled - June 13; 9:23 am", class: "cancelled" },
+      secondary: [
+        { text: "Accepted - June 12; 12:00 am", class: "secondary" },
+        { text: "Pending - June 11; 6:00 pm", class: "secondary" }
+      ]
+    }
+  };
+
+  seeMoreBtns.forEach((btn) => {
+    btn.addEventListener("click", function () {
+      const item = btn.closest(".history-item");
+      const status = item.getAttribute("data-status");
+      const name = item.querySelector(".history-name").textContent;
+      const details = item.querySelector(".history-details").textContent;
+      const time = item.querySelector(".appointment-time").textContent;
+
+      // Modal content logic
+      let modalHtml = `
+        <div class="history-details-modal-title">${name}</div>
+        <div class="history-details-modal-time">${time}</div>
+      `;
+
+      // Pick modal status mapping
+      let modalStatus = statusModalMap[status] || statusModalMap["pending"];
+      //if status is accepted, use accepted mapping
+      if (status === "completed") {
+        // completed
+        modalStatus = statusModalMap.completed;
+      } else if (status === "missed") {
+        modalStatus = statusModalMap.missed;
+      } else if (status === "declined") {
+        modalStatus = statusModalMap.declined;
+      } else if (status === "cancelled") {
+        modalStatus = statusModalMap.cancelled;
+      } else if (status === "pending") {
+        modalStatus = statusModalMap.pending;
+      }
+
+      // Main status
+      modalHtml += `<div class="history-details-modal-status ${modalStatus.main.class}">${modalStatus.main.text}</div>`;
+
+      // Secondary statuses
+      if (modalStatus.secondary && modalStatus.secondary.length) {
+        modalStatus.secondary.forEach((sec) => {
+          modalHtml += `<div class="history-details-modal-status ${sec.class}">${sec.text}</div>`;
+        });
+      }
+
+      // Set modal body
+      if (historyDetailsModalBody) {
+        historyDetailsModalBody.innerHTML = modalHtml;
+      }
+
+      // Set modal background same as profile details modal
+      if (historyDetailsModal) {
+        const modalDialog = historyDetailsModal.querySelector('.modal-dialog');
+        if (modalDialog) {
+          modalDialog.classList.add('profile-modal-bg');
+        }
+      }
+
+      // Show modal
+      const modalInstance = new bootstrap.Modal(historyDetailsModal);
+      modalInstance.show();
+    });
+  });
 });
+ 

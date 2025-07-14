@@ -493,7 +493,6 @@ body {
   transition: all 0.3s ease;
 }
 
-/* Faculty Section Specific Styling */
 .faculty-section {
   padding: 25px 20px 25px 25px;
 }
@@ -551,7 +550,7 @@ body {
 /* Faculty List Scrollable */
 .faculty-list {
   max-height: 720px;
-  overflow-y: auto;
+  overflow-y: scroll;
   padding-right: 8px;
   margin-right: -8px;
 }
@@ -571,8 +570,10 @@ body {
   border-radius: 3px;
 }
 
-.faculty-list::-webkit-scrollbar-thumb:hover {
-  background: rgba(53, 64, 142, 0.6);
+.faculty-list::-webkit-scrollbar-button {
+  display: none;
+  height: 0;
+  width: 0;
 }
 
 .appointment-item,
@@ -586,6 +587,14 @@ body {
   box-shadow: inset 8px 8px 15px rgba(0, 0, 0, 0.1),
     inset -8px -8px 15px rgba(255, 255, 255, 0.8);
   transition: all 0.3s ease;
+}
+
+.faculty-item {
+  min-height: 72px;
+  height: 77px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
 }
 
 .appointment-item:hover,
@@ -957,54 +966,67 @@ body {
   }
 }
 
-#saveProfileBtn {
-  position: relative;
+/* Schedule Modal Styles */
+.schedule-times-container {
+  margin: 20px 0 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.schedule-time-card {
+  background: #ededed;
+  border-radius: 10px;
+  padding: 12px 24px;
+  font-size: 16px;
+  color: #222;
+  font-family: "Helvetica", sans-serif;
+  font-weight: 500;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.07),
+    -2px -2px 8px rgba(255, 255, 255, 0.7);
+  margin-bottom: 10px;
+  text-align: center;
+  height: 48px; /* fixed height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  min-width: 0;
   width: 100%;
-  padding: 10px;
-  border: none;
-  border-radius: 30px;
+  cursor: pointer;
+  transition: box-shadow 0.2s, background 0.2s;
+}
+
+.schedule-time-card.selected {
+  box-shadow: inset 6px 6px 12px #d1d1d1, inset -6px -6px 12px #ffffff;
+  background: #e0e0e0;
+}
+
+.schedule-btn {
   background: linear-gradient(145deg, #3c489f, #323c86);
   box-shadow: 6px 6px 12px rgba(53, 64, 142, 0.2),
     -6px -6px 12px rgba(255, 255, 255, 0.8);
   color: white;
   font-size: 18px;
   font-weight: 600;
-  cursor: pointer;
+  border-radius: 30px;
+  padding: 10px 0;
+  width: 100%;
   transition: all 0.3s ease-in-out;
   font-family: "Helvetica", sans-serif;
-  overflow: hidden;
 }
 
-#saveProfileBtn::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 30px;
+.schedule-btn:active {
   box-shadow: inset 15px 15px 30px #35408e, inset -15px -15px 30px #3b469c;
-  opacity: 0;
-  transition: opacity 0.25s ease-in-out;
-  pointer-events: none;
 }
 
-#saveProfileBtn:active::before {
-  opacity: 1;
-}
-
-.input-group {
-  position: relative;
-  margin-bottom: 25px;
-}
-
-.input-icon {
-  position: absolute;
-  left: 25px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 22px;
-  height: 22px;
-  filter: brightness(0) saturate(100%) invert(65%) sepia(0%) saturate(0%)
-    hue-rotate(0deg) brightness(95%) contrast(90%);
-  z-index: 1;
+@media (max-width: 576px) {
+  .schedule-time-card {
+    font-size: 14px;
+    padding: 10px 12px;
+  }
 }
 
 #username {
@@ -1041,7 +1063,102 @@ body {
   outline: none !important;
   box-shadow: none !important;
 }
-
+.modal-header,
+.modal-footer {
+  border: none !important;
+  box-shadow: none !important;
+}
 .modal-content {
   background: linear-gradient(145deg, #ffffff, #d7d7d7);
 }
+
+.modal-content,
+.modal-header,
+.modal-footer {
+  border: none !important;
+  border-color: transparent !important;
+  box-shadow: none;
+}
+
+/* Success Modal Styles */
+#successModal .modal-content {
+  border-radius: 20px;
+  background: #f8f8f8;
+  box-shadow: 0 4px 32px rgba(44, 62, 80, 0.13);
+}
+
+#successModal .modal-body {
+  text-align: center;
+  padding: 40px 30px 30px 30px;
+}
+
+#successModal h4 {
+  font-weight: 700;
+  margin-bottom: 18px;
+}
+
+#successModal .btn-primary {
+  background: #35408e;
+  border: none;
+  border-radius: 30px;
+  font-size: 20px;
+  padding: 12px 0;
+  width: 100%;
+  font-weight: 600;
+  box-shadow: 2px 2px 8px rgba(53, 64, 142, 0.08);
+}
+
+#successModal .btn-primary:active {
+  background: #2a3273;
+}
+
+.input-group {
+  position: relative;
+  margin-bottom: 25px;
+}
+
+.input-icon {
+  position: absolute;
+  left: 25px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 22px;
+  filter: brightness(0) saturate(100%) invert(65%) sepia(0%) saturate(0%)
+    hue-rotate(0deg) brightness(95%) contrast(90%);
+  z-index: 1;
+}
+
+#saveProfileBtn {
+  position: relative;
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 30px;
+  background: linear-gradient(145deg, #3c489f, #323c86);
+  box-shadow: 6px 6px 12px rgba(53, 64, 142, 0.2),
+    -6px -6px 12px rgba(255, 255, 255, 0.8);
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  font-family: "Helvetica", sans-serif;
+  overflow: hidden;
+}
+
+#saveProfileBtn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 30px;
+  box-shadow: inset 15px 15px 30px #35408e, inset -15px -15px 30px #3b469c;
+  opacity: 0;
+  transition: opacity 0.25s ease-in-out;
+  pointer-events: none;
+}
+
+#saveProfileBtn:active::before {
+  opacity: 1;
+}
+
