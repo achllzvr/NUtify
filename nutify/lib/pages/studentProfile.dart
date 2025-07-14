@@ -12,6 +12,27 @@ class StudentProfile extends StatefulWidget {
 }
 
 class _StudentProfileState extends State<StudentProfile> {
+  String userName = 'Loading...'; // Default placeholder
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserName();
+  }
+
+  Future<void> _loadUserName() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String firstName = prefs.getString('userFn') ?? '';
+    String lastName = prefs.getString('userLn') ?? '';
+    
+    setState(() {
+      userName = '$firstName $lastName'.trim();
+      if (userName.isEmpty) {
+        userName = 'Student'; // Fallback if no name is stored
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,21 +99,12 @@ class _StudentProfileState extends State<StudentProfile> {
                         ),
                         SizedBox(height: 15),
                         Text(
-                          'John Doe',
+                          userName,
                           style: TextStyle(
                             fontFamily: 'Arimo',
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
                             color: Color(0xFF2C3E50),
-                          ),
-                        ),
-                        SizedBox(height: 5),
-                        Text(
-                          'john.doe@student.edu',
-                          style: TextStyle(
-                            fontFamily: 'Arimo',
-                            fontSize: 16,
-                            color: Colors.grey.shade600,
                           ),
                         ),
                       ],
@@ -106,6 +118,16 @@ class _StudentProfileState extends State<StudentProfile> {
                     Color(0xFF4CAF50),
                     () {
                       print('Edit Profile Details tapped');
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Feature not yet implemented',
+                            style: TextStyle(fontFamily: 'Arimo'),
+                          ),
+                          duration: Duration(seconds: 2),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
                     },
                   ),
                   SizedBox(height: 15),
@@ -115,6 +137,16 @@ class _StudentProfileState extends State<StudentProfile> {
                     Color(0xFFFF9800),
                     () {
                       print('Forgot Password tapped');
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Feature not yet implemented',
+                            style: TextStyle(fontFamily: 'Arimo'),
+                          ),
+                          duration: Duration(seconds: 2),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
                     },
                   ),
                   SizedBox(height: 15),
