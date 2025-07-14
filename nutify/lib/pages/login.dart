@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nutify/pages/studentHome.dart';
+import 'package:nutify/pages/register.dart';
 import 'package:nutify/services/firebase_service.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -479,7 +480,10 @@ class _LoginPageState extends State<LoginPage> {
   GestureDetector loginRegister() {
     return GestureDetector(
       onTap: () {
-        // Navigate to register page when implemented
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => RegisterPage()),
+        );
       },
       child: Text(
         "Don't have an account? Register",
