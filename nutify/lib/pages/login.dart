@@ -123,6 +123,7 @@ class _LoginPageState extends State<LoginPage> {
       final Map<String, dynamic> requestBody = {
         'username': username, // API expects full name like "John Doe"
         'password': password,
+        'account_type': _selectedAccountType.toLowerCase(), // Include selected account type
         'fcm_token': fcmToken ?? '', // Include FCM token in login request
       };
       // Make HTTP POST request with JSON body
@@ -204,17 +205,27 @@ class _LoginPageState extends State<LoginPage> {
             }
           } else {
             // Login failed
-            String errorMessage =
-                responseData['message'] ?? 'Invalid credentials';
+            String errorMessage = responseData['message'] ?? 'Invalid credentials';
+            String errorType = responseData['error_type'] ?? '';
+            
             if (mounted) {
+              Color snackBarColor;
+              
+              // Use different colors for different error types
+              if (errorType == 'account_type_mismatch') {
+                snackBarColor = Colors.orange;
+              } else {
+                snackBarColor = Colors.red;
+              }
+              
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
                     errorMessage,
                     style: TextStyle(fontFamily: 'Arimo'),
                   ),
-                  backgroundColor: Colors.red,
-                  duration: Duration(seconds: 3),
+                  backgroundColor: snackBarColor,
+                  duration: Duration(seconds: 4),
                 ),
               );
             }
