@@ -43,34 +43,23 @@ class StudentHomeAppointments {
         return [];
       }
 
+      print('Using user ID for home appointments: $userId');
+
       final response = await http.post(
-        Uri.parse('https://nutify.site/api.php?action=studentFetchInbox'),
+        Uri.parse('https://nutify.site/api.php?action=getStudentHomeAppointments'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({'userID': userId}),
       );
+
+      print('Student Home Appointments Response status: ${response.statusCode}');
+      print('Student Home Appointments Response body: ${response.body}');
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         
         if (data['success'] == true && data['appointments'] != null) {
           List<dynamic> appointments = data['appointments'];
-          
-          // Filter for upcoming appointments (accepted or pending status)
-          List<StudentHomeAppointments> upcomingAppointments = appointments
-              .where((appointment) => 
-                  appointment['status'] == 'accepted' || 
-                  appointment['status'] == 'pending')
-              .map((appointment) => StudentHomeAppointments.fromJson(appointment))
-              .toList();
-          
-          // Sort by schedule date/time
-          upcomingAppointments.sort((a, b) {
-            DateTime dateA = DateTime.tryParse('${a.scheduleDate} ${a.scheduleTime}') ?? DateTime.now();
-            DateTime dateB = DateTime.tryParse('${b.scheduleDate} ${b.scheduleTime}') ?? DateTime.now();
-            return dateA.compareTo(dateB);
-          });
-          
-          return upcomingAppointments;
+          return appointments.map((appointment) => StudentHomeAppointments.fromJson(appointment)).toList();
         }
       }
     } catch (e) {

@@ -138,16 +138,22 @@ class _StudentHomeState extends State<StudentHome> {
                 itemBuilder: (context, index) {
                   var appointment = appointments[index];
                   return Container(
-                    padding: EdgeInsets.all(15),
+                    padding: EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      gradient: LinearGradient(
+                        colors: [const Color(0xFF35408E), const Color(0xFF1A2049)],
+                        begin: const FractionalOffset(0.0, 0.0),
+                        end: const FractionalOffset(0.0, 1.0),
+                        stops: [0.0, 1.0],
+                        tileMode: TileMode.clamp,
+                      ),
                       borderRadius: BorderRadius.circular(15),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.08),
-                          spreadRadius: 1,
-                          blurRadius: 10,
-                          offset: Offset(0, 3),
+                          color: const Color.fromRGBO(0, 0, 0, 0.25),
+                          spreadRadius: 0,
+                          blurRadius: 4,
+                          offset: Offset(2, 2),
                         ),
                       ],
                     ),
@@ -157,12 +163,12 @@ class _StudentHomeState extends State<StudentHome> {
                           width: 50,
                           height: 50,
                           decoration: BoxDecoration(
-                            color: Colors.blue.withOpacity(0.1),
+                            color: Colors.white.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(25),
                           ),
                           child: Icon(
                             Icons.person,
-                            color: Colors.blue,
+                            color: Colors.white,
                             size: 30,
                           ),
                         ),
@@ -176,7 +182,8 @@ class _StudentHomeState extends State<StudentHome> {
                                 style: TextStyle(
                                   fontFamily: 'Arimo',
                                   fontSize: 16,
-                                  fontWeight: FontWeight.w600,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
                                 ),
                               ),
                               SizedBox(height: 5),
@@ -185,16 +192,16 @@ class _StudentHomeState extends State<StudentHome> {
                                 style: TextStyle(
                                   fontFamily: 'Arimo',
                                   fontSize: 14,
-                                  color: Colors.grey[600],
+                                  color: Colors.white.withOpacity(0.9),
                                 ),
                               ),
-                              SizedBox(height: 3),
+                              SizedBox(height: 8),
                               Container(
                                 padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                 decoration: BoxDecoration(
                                   color: appointment.status == 'accepted' 
-                                      ? Colors.green.withOpacity(0.1)
-                                      : Colors.orange.withOpacity(0.1),
+                                      ? Color(0xFFFFD418).withOpacity(0.9)
+                                      : Colors.orange.withOpacity(0.9),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Text(
@@ -202,10 +209,10 @@ class _StudentHomeState extends State<StudentHome> {
                                   style: TextStyle(
                                     fontFamily: 'Arimo',
                                     fontSize: 12,
-                                    fontWeight: FontWeight.w500,
+                                    fontWeight: FontWeight.w600,
                                     color: appointment.status == 'accepted' 
-                                        ? Colors.green[700]
-                                        : Colors.orange[700],
+                                        ? Color(0xFF35408E)
+                                        : Colors.white,
                                   ),
                                 ),
                               ),

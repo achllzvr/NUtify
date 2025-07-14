@@ -34,30 +34,23 @@ class RecentProfessor {
         return [];
       }
 
+      print('Using user ID for recent professors: $userId');
+
       final response = await http.post(
-        Uri.parse('https://nutify.site/api.php?action=studentFetchHistory'),
+        Uri.parse('https://nutify.site/api.php?action=getRecentProfessors'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({'userID': userId}),
       );
 
+      print('Recent Professors Response status: ${response.statusCode}');
+      print('Recent Professors Response body: ${response.body}');
+
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         
-        if (data['success'] == true && data['appointments'] != null) {
-          List<dynamic> appointments = data['appointments'];
-          
-          // Get unique teachers from recent appointments
-          Map<String, RecentProfessor> uniqueTeachers = {};
-          
-          for (var appointment in appointments) {
-            String teacherId = appointment['teacher_id']?.toString() ?? '';
-            if (teacherId.isNotEmpty && !uniqueTeachers.containsKey(teacherId)) {
-              uniqueTeachers[teacherId] = RecentProfessor.fromJson(appointment);
-            }
-          }
-          
-          // Return up to 5 most recent professors
-          return uniqueTeachers.values.take(5).toList();
+        if (data['success'] == true && data['professors'] != null) {
+          List<dynamic> professors = data['professors'];
+          return professors.map((professor) => RecentProfessor.fromJson(professor)).toList();
         }
       }
     } catch (e) {
