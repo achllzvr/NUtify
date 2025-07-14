@@ -699,15 +699,22 @@ class _RegisterPageState extends State<RegisterPage> {
           Icons.keyboard_arrow_down,
           color: Colors.grey.shade600,
         ),
+        dropdownColor: Colors.white,
+        menuMaxHeight: 200,
+        borderRadius: BorderRadius.circular(12.0),
         items: _departments.map((String department) {
           return DropdownMenuItem<String>(
             value: department,
-            child: Text(
-              department,
-              style: TextStyle(
-                fontFamily: 'Arimo',
-                fontSize: 16,
-                color: Color(0xFF2C3E50),
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+              child: Text(
+                department,
+                style: TextStyle(
+                  fontFamily: 'Arimo',
+                  fontSize: 16,
+                  color: Color(0xFF2C3E50),
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
           );
@@ -852,16 +859,52 @@ class _RegisterPageState extends State<RegisterPage> {
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return AlertDialog(
-          content: Row(
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(width: 20),
-              Text(
-                'Submitting registration...',
-                style: TextStyle(fontFamily: 'Arimo'),
-              ),
-            ],
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  spreadRadius: 2,
+                  blurRadius: 15,
+                  offset: Offset(0, 5),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF35408E)),
+                  strokeWidth: 3,
+                ),
+                SizedBox(height: 20),
+                Text(
+                  'Submitting registration...',
+                  style: TextStyle(
+                    fontFamily: 'Arimo',
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF2C3E50),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Please wait while we process your request',
+                  style: TextStyle(
+                    fontFamily: 'Arimo',
+                    fontSize: 14,
+                    color: Colors.grey.shade600,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -895,16 +938,102 @@ class _RegisterPageState extends State<RegisterPage> {
           final Map<String, dynamic> responseData = json.decode(response.body);
           
           if (responseData['success'] == true) {
-            // Registration successful
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  responseData['message'] ?? 'Registration successful!',
-                  style: TextStyle(fontFamily: 'Arimo'),
-                ),
-                backgroundColor: Colors.green,
-                duration: Duration(seconds: 4),
-              ),
+            // Registration successful - show success dialog
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext context) {
+                return Dialog(
+                  backgroundColor: Colors.transparent,
+                  child: Container(
+                    padding: EdgeInsets.all(25),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          spreadRadius: 2,
+                          blurRadius: 15,
+                          offset: Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 60,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            color: Colors.green.shade100,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.check_circle,
+                            color: Colors.green,
+                            size: 40,
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        Text(
+                          'Registration Successful!',
+                          style: TextStyle(
+                            fontFamily: 'Arimo',
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF2C3E50),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: 12),
+                        Text(
+                          responseData['message'] ?? 'Your account is pending verification.',
+                          style: TextStyle(
+                            fontFamily: 'Arimo',
+                            fontSize: 14,
+                            color: Colors.grey.shade600,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: 25),
+                        Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Color(0xFF35408E), Color(0xFF1A2049)],
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(context).pop(); // Close success dialog
+                              Navigator.pop(context); // Go back to login page
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              textStyle: const TextStyle(
+                                fontFamily: 'Arimo',
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 0,
+                            ),
+                            child: Text('Return to Login'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
             );
 
             // Clear the form
@@ -917,11 +1046,6 @@ class _RegisterPageState extends State<RegisterPage> {
               _selectedDepartment = null;
               _emailValidationMessage = '';
               _emailExists = false;
-            });
-
-            // Navigate back to login page after delay
-            Future.delayed(Duration(seconds: 2), () {
-              Navigator.pop(context);
             });
 
           } else {
