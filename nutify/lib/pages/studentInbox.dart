@@ -64,516 +64,580 @@ class _StudentInboxState extends State<StudentInbox>
   }
 
   Widget buildPendingTab() {
-    List<StudentInboxPending> pendingAppointments =
-        StudentInboxPending.getStudentInboxPendings();
+    return FutureBuilder<List<StudentInboxPending>>(
+      future: StudentInboxPending.getStudentInboxPendings(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+        
+        List<StudentInboxPending> pendingAppointments = snapshot.data ?? [];
 
-    if (pendingAppointments.isEmpty) {
-      return Center(
-        child: Text(
-          'No pending appointments',
-          style: TextStyle(
-            fontFamily: 'Arimo',
-            fontSize: 16,
-            color: Colors.grey.shade600,
-            fontStyle: FontStyle.italic,
-          ),
-        ),
-      );
-    }
+        if (pendingAppointments.isEmpty) {
+          return Center(
+            child: Text(
+              'No pending appointments',
+              style: TextStyle(
+                fontFamily: 'Arimo',
+                fontSize: 16,
+                color: Colors.grey.shade600,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          );
+        }
 
-    return ListView.builder(
-      padding: EdgeInsets.all(16),
-      itemCount: pendingAppointments.length,
-      itemBuilder: (context, index) {
-        var appointment = pendingAppointments[index];
-        return Card(
-          margin: EdgeInsets.only(bottom: 12),
-          elevation: 2,
-          color: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Padding(
-            padding: EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+        return ListView.builder(
+          padding: EdgeInsets.all(16),
+          itemCount: pendingAppointments.length,
+          itemBuilder: (context, index) {
+            var appointment = pendingAppointments[index];
+            return Card(
+              margin: EdgeInsets.only(bottom: 12),
+              elevation: 2,
+              color: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Color(0xFF87CEEB), // Pastel sky blue
-                            Color(0xFF4682B4), // Steel blue
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(Icons.pending, color: Colors.white),
-                    ),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            appointment.name,
-                            style: TextStyle(
-                              fontFamily: 'Arimo',
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                    Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Color(0xFF87CEEB), // Pastel sky blue
+                                Color(0xFF4682B4), // Steel blue
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
                             ),
+                            shape: BoxShape.circle,
                           ),
-                          SizedBox(height: 4),
-                          Text(
-                            appointment.timestamp,
+                          child: Icon(Icons.pending, color: Colors.white),
+                        ),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                appointment.name,
+                                style: TextStyle(
+                                  fontFamily: 'Arimo',
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                appointment.department,
+                                style: TextStyle(
+                                  fontFamily: 'Arimo',
+                                  fontSize: 12,
+                                  color: Colors.grey.shade600,
+                                ),
+                              ),
+                              Text(
+                                '${appointment.day} • ${appointment.startTime} - ${appointment.endTime}',
+                                style: TextStyle(
+                                  fontFamily: 'Arimo',
+                                  fontSize: 12,
+                                  color: Colors.grey.shade600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Color(0xFF87CEEB), // Pastel sky blue
+                              Color(0xFF4682B4), // Steel blue
+                            ],
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                          ),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            print(
+                              'View Details clicked for pending appointment ID: ${appointment.appointmentId}',
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            foregroundColor: Colors.white,
+                            padding: EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: Text(
+                            'View Details',
                             style: TextStyle(
                               fontFamily: 'Arimo',
                               fontSize: 14,
-                              color: Colors.grey.shade600,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
-                        ],
+                        ),
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Color(0xFF87CEEB), // Pastel sky blue
-                          Color(0xFF4682B4), // Steel blue
-                        ],
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                      ),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        print(
-                          'View Details clicked for pending appointment ID: ${appointment.id}',
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.transparent,
-                        foregroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        elevation: 0,
-                      ),
-                      child: Text(
-                        'View Details',
-                        style: TextStyle(
-                          fontFamily: 'Arimo',
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         );
       },
     );
   }
 
   Widget buildCancelledTab() {
-    List<StudentInboxCancelled> cancelledAppointments =
-        StudentInboxCancelled.getStudentInboxCancelled();
+    return FutureBuilder<List<StudentInboxCancelled>>(
+      future: StudentInboxCancelled.getStudentInboxCancelled(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+        
+        List<StudentInboxCancelled> cancelledAppointments = snapshot.data ?? [];
 
-    if (cancelledAppointments.isEmpty) {
-      return Center(
-        child: Text(
-          'No cancelled appointments',
-          style: TextStyle(
-            fontFamily: 'Arimo',
-            fontSize: 16,
-            color: Colors.grey.shade600,
-            fontStyle: FontStyle.italic,
-          ),
-        ),
-      );
-    }
+        if (cancelledAppointments.isEmpty) {
+          return Center(
+            child: Text(
+              'No cancelled appointments',
+              style: TextStyle(
+                fontFamily: 'Arimo',
+                fontSize: 16,
+                color: Colors.grey.shade600,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          );
+        }
 
-    return ListView.builder(
-      padding: EdgeInsets.all(16),
-      itemCount: cancelledAppointments.length,
-      itemBuilder: (context, index) {
-        var appointment = cancelledAppointments[index];
-        return Card(
-          margin: EdgeInsets.only(bottom: 12),
-          elevation: 2,
-          color: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Padding(
-            padding: EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+        return ListView.builder(
+          padding: EdgeInsets.all(16),
+          itemCount: cancelledAppointments.length,
+          itemBuilder: (context, index) {
+            var appointment = cancelledAppointments[index];
+            return Card(
+              margin: EdgeInsets.only(bottom: 12),
+              elevation: 2,
+              color: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Color(0xFFB22222), // Deep red
-                            Color(0xFF8B0000), // Dark red
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(Icons.cancel, color: Colors.white),
-                    ),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            appointment.name,
-                            style: TextStyle(
-                              fontFamily: 'Arimo',
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                    Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Color(0xFFB22222), // Deep red
+                                Color(0xFF8B0000), // Dark red
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
                             ),
+                            shape: BoxShape.circle,
                           ),
-                          SizedBox(height: 4),
-                          Text(
-                            appointment.timestamp,
+                          child: Icon(Icons.cancel, color: Colors.white),
+                        ),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                appointment.name,
+                                style: TextStyle(
+                                  fontFamily: 'Arimo',
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                appointment.department,
+                                style: TextStyle(
+                                  fontFamily: 'Arimo',
+                                  fontSize: 12,
+                                  color: Colors.grey.shade600,
+                                ),
+                              ),
+                              Text(
+                                '${appointment.day} • ${appointment.startTime} - ${appointment.endTime}',
+                                style: TextStyle(
+                                  fontFamily: 'Arimo',
+                                  fontSize: 12,
+                                  color: Colors.grey.shade600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Color(0xFFB22222), // Deep red
+                              Color(0xFF8B0000), // Dark red
+                            ],
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                          ),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            print(
+                              'View Details clicked for cancelled appointment ID: ${appointment.appointmentId}',
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            foregroundColor: Colors.white,
+                            padding: EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: Text(
+                            'View Details',
                             style: TextStyle(
                               fontFamily: 'Arimo',
                               fontSize: 14,
-                              color: Colors.grey.shade600,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
-                        ],
+                        ),
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Color(0xFFB22222), // Deep red
-                          Color(0xFF8B0000), // Dark red
-                        ],
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                      ),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        print(
-                          'View Details clicked for cancelled appointment ID: ${appointment.id}',
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.transparent,
-                        foregroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        elevation: 0,
-                      ),
-                      child: Text(
-                        'View Details',
-                        style: TextStyle(
-                          fontFamily: 'Arimo',
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         );
       },
     );
   }
 
   Widget buildMissedTab() {
-    List<StudentInboxMissed> missedAppointments =
-        StudentInboxMissed.getStudentInboxMissed();
+    return FutureBuilder<List<StudentInboxMissed>>(
+      future: StudentInboxMissed.getStudentInboxMissed(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+        
+        List<StudentInboxMissed> missedAppointments = snapshot.data ?? [];
 
-    if (missedAppointments.isEmpty) {
-      return Center(
-        child: Text(
-          'No missed appointments',
-          style: TextStyle(
-            fontFamily: 'Arimo',
-            fontSize: 16,
-            color: Colors.grey.shade600,
-            fontStyle: FontStyle.italic,
-          ),
-        ),
-      );
-    }
+        if (missedAppointments.isEmpty) {
+          return Center(
+            child: Text(
+              'No missed appointments',
+              style: TextStyle(
+                fontFamily: 'Arimo',
+                fontSize: 16,
+                color: Colors.grey.shade600,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          );
+        }
 
-    return ListView.builder(
-      padding: EdgeInsets.all(16),
-      itemCount: missedAppointments.length,
-      itemBuilder: (context, index) {
-        var appointment = missedAppointments[index];
-        return Card(
-          margin: EdgeInsets.only(bottom: 12),
-          elevation: 2,
-          color: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Padding(
-            padding: EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+        return ListView.builder(
+          padding: EdgeInsets.all(16),
+          itemCount: missedAppointments.length,
+          itemBuilder: (context, index) {
+            var appointment = missedAppointments[index];
+            return Card(
+              margin: EdgeInsets.only(bottom: 12),
+              elevation: 2,
+              color: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Color(0xFFFF8C00), // Yellow-orange
-                            Color(0xFFFF4500), // Orange red
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(Icons.schedule, color: Colors.white),
-                    ),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            appointment.name,
-                            style: TextStyle(
-                              fontFamily: 'Arimo',
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                    Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Color(0xFFFF8C00), // Yellow-orange
+                                Color(0xFFFF4500), // Orange red
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
                             ),
+                            shape: BoxShape.circle,
                           ),
-                          SizedBox(height: 4),
-                          Text(
-                            appointment.timestamp,
+                          child: Icon(Icons.schedule, color: Colors.white),
+                        ),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                appointment.name,
+                                style: TextStyle(
+                                  fontFamily: 'Arimo',
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                appointment.department,
+                                style: TextStyle(
+                                  fontFamily: 'Arimo',
+                                  fontSize: 12,
+                                  color: Colors.grey.shade600,
+                                ),
+                              ),
+                              Text(
+                                '${appointment.day} • ${appointment.startTime} - ${appointment.endTime}',
+                                style: TextStyle(
+                                  fontFamily: 'Arimo',
+                                  fontSize: 12,
+                                  color: Colors.grey.shade600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Color(0xFFFF8C00), // Yellow-orange
+                              Color(0xFFFF4500), // Orange red
+                            ],
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                          ),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            print(
+                              'View Details clicked for missed appointment ID: ${appointment.appointmentId}',
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            foregroundColor: Colors.white,
+                            padding: EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: Text(
+                            'View Details',
                             style: TextStyle(
                               fontFamily: 'Arimo',
                               fontSize: 14,
-                              color: Colors.grey.shade600,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
-                        ],
+                        ),
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Color(0xFFFF8C00), // Yellow-orange
-                          Color(0xFFFF4500), // Orange red
-                        ],
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                      ),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        print(
-                          'View Details clicked for missed appointment ID: ${appointment.id}',
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.transparent,
-                        foregroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        elevation: 0,
-                      ),
-                      child: Text(
-                        'View Details',
-                        style: TextStyle(
-                          fontFamily: 'Arimo',
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         );
       },
     );
   }
 
   Widget buildCompletedTab() {
-    List<StudentInboxCompleted> completedAppointments =
-        StudentInboxCompleted.getStudentInboxCompleted();
+    return FutureBuilder<List<StudentInboxCompleted>>(
+      future: StudentInboxCompleted.getStudentInboxCompleted(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+        
+        List<StudentInboxCompleted> completedAppointments = snapshot.data ?? [];
 
-    if (completedAppointments.isEmpty) {
-      return Center(
-        child: Text(
-          'No completed appointments',
-          style: TextStyle(
-            fontFamily: 'Arimo',
-            fontSize: 16,
-            color: Colors.grey.shade600,
-            fontStyle: FontStyle.italic,
-          ),
-        ),
-      );
-    }
+        if (completedAppointments.isEmpty) {
+          return Center(
+            child: Text(
+              'No completed appointments',
+              style: TextStyle(
+                fontFamily: 'Arimo',
+                fontSize: 16,
+                color: Colors.grey.shade600,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          );
+        }
 
-    return ListView.builder(
-      padding: EdgeInsets.all(16),
-      itemCount: completedAppointments.length,
-      itemBuilder: (context, index) {
-        var appointment = completedAppointments[index];
-        return Card(
-          margin: EdgeInsets.only(bottom: 12),
-          elevation: 2,
-          color: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Padding(
-            padding: EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+        return ListView.builder(
+          padding: EdgeInsets.all(16),
+          itemCount: completedAppointments.length,
+          itemBuilder: (context, index) {
+            var appointment = completedAppointments[index];
+            return Card(
+              margin: EdgeInsets.only(bottom: 12),
+              elevation: 2,
+              color: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Color(0xFF228B22), // Green
-                            Color(0xFF006400), // Dark green
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(Icons.check_circle, color: Colors.white),
-                    ),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            appointment.name,
-                            style: TextStyle(
-                              fontFamily: 'Arimo',
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                    Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Color(0xFF228B22), // Green
+                                Color(0xFF006400), // Dark green
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
                             ),
+                            shape: BoxShape.circle,
                           ),
-                          SizedBox(height: 4),
-                          Text(
-                            appointment.timestamp,
+                          child: Icon(Icons.check_circle, color: Colors.white),
+                        ),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                appointment.name,
+                                style: TextStyle(
+                                  fontFamily: 'Arimo',
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                appointment.department,
+                                style: TextStyle(
+                                  fontFamily: 'Arimo',
+                                  fontSize: 12,
+                                  color: Colors.grey.shade600,
+                                ),
+                              ),
+                              Text(
+                                '${appointment.day} • ${appointment.startTime} - ${appointment.endTime}',
+                                style: TextStyle(
+                                  fontFamily: 'Arimo',
+                                  fontSize: 12,
+                                  color: Colors.grey.shade600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Color(0xFF228B22), // Green
+                              Color(0xFF006400), // Dark green
+                            ],
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                          ),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            print(
+                              'View Details clicked for completed appointment ID: ${appointment.appointmentId}',
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            foregroundColor: Colors.white,
+                            padding: EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: Text(
+                            'View Details',
                             style: TextStyle(
                               fontFamily: 'Arimo',
                               fontSize: 14,
-                              color: Colors.grey.shade600,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
-                        ],
+                        ),
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Color(0xFF228B22), // Green
-                          Color(0xFF006400), // Dark green
-                        ],
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                      ),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        print(
-                          'View Details clicked for completed appointment ID: ${appointment.id}',
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.transparent,
-                        foregroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        elevation: 0,
-                      ),
-                      child: Text(
-                        'View Details',
-                        style: TextStyle(
-                          fontFamily: 'Arimo',
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         );
       },
     );
