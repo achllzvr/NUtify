@@ -674,7 +674,7 @@ class _StudentInboxState extends State<StudentInbox>
         ),
         tabs: [
           Tab(text: 'Pending'),
-          Tab(text: 'Cancelled'),
+          Tab(text: 'Declined'),
           Tab(text: 'Missed'),
           Tab(text: 'Completed'),
         ],

@@ -238,6 +238,7 @@ class _StudentHomeState extends State<StudentHome> {
                             ),
                             child: ElevatedButton(
                               onPressed: () {
+                                print('Viewing Details of Appointment: ${appointment.id}');
                                 // TODO: Navigate to appointment details
                               },
                               style: ElevatedButton.styleFrom(
