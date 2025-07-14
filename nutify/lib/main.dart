@@ -43,12 +43,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(fontFamily: 'Arimo'),
-      home: SplashScreen(), // Start with splash screen instead of LoginPage
+      home: SplashScreen(),
     );
   }
 }
 
-// Add a splash screen to check login state
+// Splash Screen to check login state and navigate accordingly
 class SplashScreen extends StatefulWidget {
   @override
   _SplashScreenState createState() => _SplashScreenState();

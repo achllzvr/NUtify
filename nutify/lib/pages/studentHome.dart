@@ -16,7 +16,30 @@ class StudentHome extends StatefulWidget {
 class _StudentHomeState extends State<StudentHome> {
   final TextEditingController _searchController = TextEditingController();
   List<StudentSearch> _searchResults = [];
+  List<StudentSearch> _allProfessors = [];
   bool _isSearching = false;
+  bool _isLoadingProfessors = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfessors();
+  }
+
+  Future<void> _loadProfessors() async {
+    try {
+      List<StudentSearch> professors = await StudentSearch.searchProfessors();
+      setState(() {
+        _allProfessors = professors;
+        _isLoadingProfessors = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoadingProfessors = false;
+      });
+      print('Error loading professors: $e');
+    }
+  }
 
   @override
   void dispose() {
@@ -31,11 +54,8 @@ class _StudentHomeState extends State<StudentHome> {
         _searchResults = [];
       } else {
         _isSearching = true;
-        // Get all professors from StudentSearch model
-        List<StudentSearch> allProfessors = StudentSearch.searchProfessors();
-
         // Filter professors based on search query (name or department)
-        _searchResults = allProfessors.where((professor) {
+        _searchResults = _allProfessors.where((professor) {
           return professor.name.toLowerCase().contains(query.toLowerCase()) ||
               professor.department.toLowerCase().contains(query.toLowerCase());
         }).toList();
@@ -45,10 +65,6 @@ class _StudentHomeState extends State<StudentHome> {
 
   @override
   Widget build(BuildContext context) {
-    // Get the recent professors data
-    List<RecentProfessor> recentProfessors =
-        RecentProfessor.getRecentProfessors();
-
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: studentAppBar(context),
@@ -58,17 +74,24 @@ class _StudentHomeState extends State<StudentHome> {
           Expanded(
             child: _isSearching
                 ? searchResults()
-                : mainContent(recentProfessors),
+                : FutureBuilder<List<RecentProfessor>>(
+                    future: RecentProfessor.getRecentProfessors(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      }
+                      
+                      List<RecentProfessor> recentProfessors = snapshot.data ?? [];
+                      return mainContent(recentProfessors);
+                    },
+                  ),
           ),
         ],
       ),
     );
   }
 
-  Column upcomingAppointments() {
-    List<dynamic> appointments =
-        StudentHomeAppointments.getStudentHomeAppointments();
-
+  Widget upcomingAppointments() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -86,156 +109,116 @@ class _StudentHomeState extends State<StudentHome> {
         ),
         SizedBox(height: 5),
         Expanded(
-          child: appointments.isEmpty
-              ? Center(
+          child: FutureBuilder<List<StudentHomeAppointments>>(
+            future: StudentHomeAppointments.getStudentHomeAppointments(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              }
+              
+              List<StudentHomeAppointments> appointments = snapshot.data ?? [];
+              
+              if (appointments.isEmpty) {
+                return Center(
                   child: Text(
                     'No upcoming appointments',
                     style: TextStyle(
                       fontFamily: 'Arimo',
-                      fontSize: 16,
-                      color: Colors.grey.shade600,
-                      fontStyle: FontStyle.italic,
+                      fontSize: 14,
+                      color: Colors.grey,
                     ),
                   ),
-                )
-              : ListView.separated(
-                  scrollDirection: Axis.vertical,
-                  separatorBuilder: (context, index) => SizedBox(height: 15),
-                  padding: EdgeInsets.all(20.0),
-                  itemCount: appointments.length,
-                  itemBuilder: (context, index) {
-                    var appointment = appointments[index];
-
-                    // Define pastel colors for avatars
-                    List<Color> pastelColors = [
-                      Color(0xFFFFB3BA), // Pastel Pink
-                      Color(0xFFFFDFBA), // Pastel Peach
-                      Color(0xFFFFFFBA), // Pastel Yellow
-                      Color(0xFFBAFFC9), // Pastel Green
-                      Color(0xFFBAE1FF), // Pastel Blue
-                      Color(0xFFE0BAFF), // Pastel Purple
-                      Color(0xFFFFBAE3), // Pastel Magenta
-                      Color(0xFFBAFFE9), // Pastel Mint
-                      Color(0xFFF0E6FF), // Pastel Lavender
-                      Color(0xFFE6F7FF), // Pastel Sky Blue
-                    ];
-
-                    // Use appointment ID to ensure consistent color for same appointment
-                    Color avatarColor =
-                        pastelColors[appointment.id.hashCode %
-                            pastelColors.length];
-
-                    return Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.08),
-                            spreadRadius: 1,
-                            blurRadius: 8,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                CircleAvatar(
-                                  backgroundColor: avatarColor,
-                                  radius: 25,
-                                  child: Text(
-                                    appointment.name
-                                        .split(' ')
-                                        .map((n) => n[0])
-                                        .take(2)
-                                        .join(),
-                                    style: TextStyle(
-                                      color: Colors.black87,
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily: 'Arimo',
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(width: 15),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        appointment.name,
-                                        style: TextStyle(
-                                          fontFamily: 'Arimo',
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black87,
-                                        ),
-                                      ),
-                                      SizedBox(height: 4),
-                                      Text(
-                                        appointment.timestamp,
-                                        style: TextStyle(
-                                          fontFamily: 'Arimo',
-                                          fontSize: 14,
-                                          color: Colors.grey.shade600,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 15),
-                            Container(
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    const Color.fromARGB(255, 237, 194, 3),
-                                    const Color.fromARGB(255, 242, 213, 86),
-                                  ],
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  // Handle view details button press
-                                  print(
-                                    'View Details for appointment ID: ${appointment.id}',
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.transparent,
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 12,
-                                  ),
-                                  textStyle: const TextStyle(
-                                    fontFamily: 'Arimo',
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  elevation: 0,
-                                ),
-                                child: const Text('View Details'),
-                              ),
-                            ),
-                          ],
+                );
+              }
+              
+              return ListView.separated(
+                padding: EdgeInsets.all(20.0),
+                itemCount: appointments.length,
+                separatorBuilder: (context, index) => SizedBox(height: 15),
+                itemBuilder: (context, index) {
+                  var appointment = appointments[index];
+                  return Container(
+                    padding: EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(15),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.08),
+                          spreadRadius: 1,
+                          blurRadius: 10,
+                          offset: Offset(0, 3),
                         ),
-                      ),
-                    );
-                  },
-                ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: Colors.blue.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          child: Icon(
+                            Icons.person,
+                            color: Colors.blue,
+                            size: 30,
+                          ),
+                        ),
+                        SizedBox(width: 15),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                appointment.name,
+                                style: TextStyle(
+                                  fontFamily: 'Arimo',
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              SizedBox(height: 5),
+                              Text(
+                                '${appointment.scheduleDate} at ${appointment.scheduleTime}',
+                                style: TextStyle(
+                                  fontFamily: 'Arimo',
+                                  fontSize: 14,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                              SizedBox(height: 3),
+                              Container(
+                                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: appointment.status == 'accepted' 
+                                      ? Colors.green.withOpacity(0.1)
+                                      : Colors.orange.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  appointment.status.toUpperCase(),
+                                  style: TextStyle(
+                                    fontFamily: 'Arimo',
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    color: appointment.status == 'accepted' 
+                                        ? Colors.green[700]
+                                        : Colors.orange[700],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
+          ),
         ),
       ],
     );
@@ -265,7 +248,7 @@ class _StudentHomeState extends State<StudentHome> {
                     'No recent professors',
                     style: TextStyle(
                       fontFamily: 'Arimo',
-                      fontSize: 16,
+                      fontSize: 14,
                       color: Colors.grey.shade600,
                       fontStyle: FontStyle.italic,
                     ),
@@ -287,50 +270,54 @@ class _StudentHomeState extends State<StudentHome> {
                         // Access the professor ID here
                         String professorId = recentProfessors[index].id;
                         String professorName = recentProfessors[index].name;
-
-                        print(
-                          'Tapped on professor: $professorName (ID: $professorId)',
-                        );
+                        print('Professor ID: $professorId, Name: $professorName');
                       },
                       child: Container(
-                        width: 150,
+                        width: 100,
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: index % 2 == 0
-                                ? [Color(0xFF1A2049), Color(0xFF35408E)]
-                                : [Color(0xFF35408E), Color(0xFF1A2049)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
+                            colors: [const Color(0xFF35408E), const Color(0xFF1A2049)],
+                            begin: const FractionalOffset(0.0, 0.0),
+                            end: const FractionalOffset(0.0, 1.0),
+                            stops: [0.0, 1.0],
+                            tileMode: TileMode.clamp,
                           ),
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(15),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color.fromARGB(
-                                255,
-                                0,
-                                0,
-                                0,
-                              ).withOpacity(0.2),
-                              spreadRadius: 2,
+                              color: const Color.fromRGBO(0, 0, 0, 0.25),
+                              spreadRadius: 0,
                               blurRadius: 4,
-                              offset: Offset(
-                                0,
-                                3,
-                              ), // changes position of shadow
+                              offset: Offset(2, 2),
                             ),
                           ],
                         ),
                         child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
                               recentProfessors[index].name,
                               style: TextStyle(
                                 fontFamily: 'Arimo',
-                                fontSize: 16,
+                                fontSize: 14,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            SizedBox(height: 5),
+                            Text(
+                              recentProfessors[index].department,
+                              style: TextStyle(
+                                fontFamily: 'Arimo',
+                                fontSize: 10,
+                                color: Colors.white.withOpacity(0.9),
+                              ),
+                              textAlign: TextAlign.center,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ],
                         ),
@@ -368,10 +355,10 @@ class _StudentHomeState extends State<StudentHome> {
             fontSize: 16,
           ),
           prefixIcon: Padding(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.only(left: 15.0, right: 10.0),
             child: Icon(Icons.search, color: Colors.grey),
           ),
-          suffixIcon: _searchController.text.isNotEmpty
+          suffixIcon: _isSearching && _searchController.text.isNotEmpty
               ? IconButton(
                   icon: Icon(Icons.clear, color: Colors.grey),
                   onPressed: () {
@@ -379,18 +366,19 @@ class _StudentHomeState extends State<StudentHome> {
                     _performSearch('');
                   },
                 )
-              : Container(
-                  margin: const EdgeInsets.only(right: 12),
-                  child: Icon(Icons.filter_list, color: Colors.grey),
-                ),
+              : null,
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20.0),
+            borderRadius: BorderRadius.circular(30),
             borderSide: BorderSide.none,
           ),
         ),
       ),
     );
   }
+
+
+
+
 
   AppBar studentAppBar(BuildContext context) {
     return AppBar(
@@ -538,6 +526,10 @@ class _StudentHomeState extends State<StudentHome> {
   }
 
   Widget searchResults() {
+    if (_isLoadingProfessors) {
+      return Center(child: CircularProgressIndicator());
+    }
+    
     if (_searchResults.isEmpty) {
       return Center(
         child: Column(
@@ -575,105 +567,101 @@ class _StudentHomeState extends State<StudentHome> {
       itemBuilder: (context, index) {
         var professor = _searchResults[index];
         return Container(
+          padding: EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
+            gradient: LinearGradient(
+              colors: [const Color(0xFF35408E), const Color(0xFF1A2049)],
+              begin: const FractionalOffset(0.0, 0.0),
+              end: const FractionalOffset(0.0, 1.0),
+              stops: [0.0, 1.0],
+              tileMode: TileMode.clamp,
+            ),
+            borderRadius: BorderRadius.circular(15),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.08),
-                spreadRadius: 1,
-                blurRadius: 8,
-                offset: Offset(0, 2),
+                color: const Color.fromRGBO(0, 0, 0, 0.25),
+                spreadRadius: 0,
+                blurRadius: 4,
+                offset: Offset(2, 2),
               ),
             ],
           ),
-          child: Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    CircleAvatar(
-                      backgroundColor: Color(0xFF35408E),
-                      radius: 25,
-                      child: Text(
-                        professor.name
-                            .split(' ')
-                            .map((n) => n[0])
-                            .take(2)
-                            .join(),
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Arimo',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    child: Icon(
+                      Icons.person,
+                      color: Colors.white,
+                      size: 30,
+                    ),
+                  ),
+                  SizedBox(width: 15),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          professor.name,
+                          style: TextStyle(
+                            fontFamily: 'Arimo',
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
-                      ),
-                    ),
-                    SizedBox(width: 15),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            professor.name,
-                            style: TextStyle(
-                              fontFamily: 'Arimo',
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
+                        SizedBox(height: 5),
+                        Text(
+                          professor.department,
+                          style: TextStyle(
+                            fontFamily: 'Arimo',
+                            fontSize: 14,
+                            color: Colors.white.withOpacity(0.9),
                           ),
-                          SizedBox(height: 4),
-                          Text(
-                            professor.department,
-                            style: TextStyle(
-                              fontFamily: 'Arimo',
-                              fontSize: 14,
-                              color: Colors.grey.shade600,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                SizedBox(height: 15),
-                Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Color(0xFF35408E), Color(0xFF1A2049)],
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                    ),
-                    borderRadius: BorderRadius.circular(8),
                   ),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      print(
-                        'Setting an appointment with professor id: ${professor.id}',
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      textStyle: const TextStyle(
-                        fontFamily: 'Arimo',
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      elevation: 0,
+                ],
+              ),
+              SizedBox(height: 15),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    // Access the professor ID here
+                    String professorId = professor.id;
+                    String professorName = professor.name;
+                    print('Setting appointment with Professor ID: $professorId, Name: $professorName');
+                    // TODO: Navigate to appointment booking page
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: const Color(0xFF35408E),
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Text('Set An Appointment'),
+                  ),
+                  child: Text(
+                    'Set An Appointment',
+                    style: TextStyle(
+                      fontFamily: 'Arimo',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         );
       },
