@@ -127,6 +127,12 @@ class _LoginPageState extends State<LoginPage> {
         'account_type': _selectedAccountType.toLowerCase(), // Include selected account type
         'fcm_token': fcmToken ?? '', // Include FCM token in login request
       };
+      
+      // Debug print for request data
+      print('Login Request URL: $url');
+      print('Login Request Body: $requestBody');
+      print('FCM Token: $fcmToken');
+      
       // Make HTTP POST request with JSON body
       final response = await http.post(
         Uri.parse(url),
@@ -137,10 +143,16 @@ class _LoginPageState extends State<LoginPage> {
         body: json.encode(requestBody),
       );
 
+      // Debug prints for response details
+      print('Login Response Status Code: ${response.statusCode}');
+      print('Login Response Body: ${response.body}');
+      print('Login Response Headers: ${response.headers}');
+
       if (response.statusCode == 200) {
         try {
           // Parse JSON response
           final Map<String, dynamic> responseData = json.decode(response.body);
+          print('Parsed Response Data: $responseData');
 
           if (responseData['success'] == true) {
             // Login successful
@@ -209,6 +221,11 @@ class _LoginPageState extends State<LoginPage> {
             String errorMessage = responseData['message'] ?? 'Invalid credentials';
             String errorType = responseData['error_type'] ?? '';
             
+            // Debug prints for login failure
+            print('Login Failed - Error Message: $errorMessage');
+            print('Login Failed - Error Type: $errorType');
+            print('Login Failed - Full Response: $responseData');
+            
             if (mounted) {
               Color snackBarColor;
               
@@ -232,6 +249,8 @@ class _LoginPageState extends State<LoginPage> {
             }
           }
         } catch (jsonError) {
+          print('JSON Parsing Error: $jsonError');
+          print('Raw Response Body: ${response.body}');
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -247,6 +266,9 @@ class _LoginPageState extends State<LoginPage> {
         }
       } else {
         // HTTP error
+        print('HTTP Error - Status Code: ${response.statusCode}');
+        print('HTTP Error - Response Body: ${response.body}');
+        print('HTTP Error - Response Headers: ${response.headers}');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -262,6 +284,8 @@ class _LoginPageState extends State<LoginPage> {
       }
     } catch (e) {
       // Network or other error
+      print('Network/Other Error: $e');
+      print('Error Type: ${e.runtimeType}');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
