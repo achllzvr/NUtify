@@ -1,3 +1,7 @@
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+
 class TeacherInboxMissed {
   final String id;
   final String studentName;
@@ -15,27 +19,53 @@ class TeacherInboxMissed {
 
   factory TeacherInboxMissed.fromJson(Map<String, dynamic> json) {
     return TeacherInboxMissed(
-      id: json['id'] ?? '',
-      studentName: json['student_name'] ?? '',
-      department: json['department'] ?? '',
-      scheduleDate: json['schedule_date'] ?? '',
-      scheduleTime: json['schedule_time'] ?? '',
+      id: json['id']?.toString() ?? '',
+      studentName: json['student_name']?.toString() ?? '',
+      department: json['department']?.toString() ?? '',
+      scheduleDate: json['schedule_date']?.toString() ?? '',
+      scheduleTime: json['schedule_time']?.toString() ?? '',
     );
   }
 
   static Future<List<TeacherInboxMissed>> getTeacherInboxMisseds() async {
-    // TODO: Implement API call to fetch teacher's missed appointments
-    // For now, return mock data
-    await Future.delayed(Duration(seconds: 1)); // Simulate network delay
-    
-    return [
-      TeacherInboxMissed(
-        id: '1',
-        studentName: 'Sarah Wilson',
-        department: 'SACE',
-        scheduleDate: 'June 8',
-        scheduleTime: '10:00 am',
-      ),
-    ];
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? userId = prefs.getString('userId');
+      
+      if (userId == null) {
+        print('No user ID found in session');
+        return [];
+      }
+
+      print('Using teacher ID for missed appointments: $userId');
+
+      final response = await http.post(
+        Uri.parse('https://nutify.site/api.php?action=getTeacherInboxMissed'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'teacher_id': userId,
+        }),
+      );
+
+      print('Teacher missed appointments API response: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        
+        if (responseData['status'] == 'success') {
+          final List<dynamic> appointmentsJson = responseData['data'] ?? [];
+          return appointmentsJson.map((json) => TeacherInboxMissed.fromJson(json)).toList();
+        } else {
+          print('API Error: ${responseData['message']}');
+          return [];
+        }
+      } else {
+        print('HTTP Error: ${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      print('Error fetching teacher missed appointments: $e');
+      return [];
+    }
   }
 }

@@ -1,3 +1,7 @@
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+
 class TeacherInboxCompleted {
   final String id;
   final String studentName;
@@ -15,34 +19,53 @@ class TeacherInboxCompleted {
 
   factory TeacherInboxCompleted.fromJson(Map<String, dynamic> json) {
     return TeacherInboxCompleted(
-      id: json['id'] ?? '',
-      studentName: json['student_name'] ?? '',
-      department: json['department'] ?? '',
-      scheduleDate: json['schedule_date'] ?? '',
-      scheduleTime: json['schedule_time'] ?? '',
+      id: json['id']?.toString() ?? '',
+      studentName: json['student_name']?.toString() ?? '',
+      department: json['department']?.toString() ?? '',
+      scheduleDate: json['schedule_date']?.toString() ?? '',
+      scheduleTime: json['schedule_time']?.toString() ?? '',
     );
   }
 
   static Future<List<TeacherInboxCompleted>> getTeacherInboxCompleteds() async {
-    // TODO: Implement API call to fetch teacher's completed appointments
-    // For now, return mock data
-    await Future.delayed(Duration(seconds: 1)); // Simulate network delay
-    
-    return [
-      TeacherInboxCompleted(
-        id: '1',
-        studentName: 'Michael Brown',
-        department: 'SACE',
-        scheduleDate: 'June 5',
-        scheduleTime: '3:00 pm',
-      ),
-      TeacherInboxCompleted(
-        id: '2',
-        studentName: 'Emily Davis',
-        department: 'SACE',
-        scheduleDate: 'June 7',
-        scheduleTime: '1:30 pm',
-      ),
-    ];
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? userId = prefs.getString('userId');
+      
+      if (userId == null) {
+        print('No user ID found in session');
+        return [];
+      }
+
+      print('Using teacher ID for completed appointments: $userId');
+
+      final response = await http.post(
+        Uri.parse('https://nutify.site/api.php?action=getTeacherInboxCompleted'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'teacher_id': userId,
+        }),
+      );
+
+      print('Teacher completed appointments API response: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        
+        if (responseData['status'] == 'success') {
+          final List<dynamic> appointmentsJson = responseData['data'] ?? [];
+          return appointmentsJson.map((json) => TeacherInboxCompleted.fromJson(json)).toList();
+        } else {
+          print('API Error: ${responseData['message']}');
+          return [];
+        }
+      } else {
+        print('HTTP Error: ${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      print('Error fetching teacher completed appointments: $e');
+      return [];
+    }
   }
 }
