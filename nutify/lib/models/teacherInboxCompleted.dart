@@ -1,14 +1,14 @@
 class TeacherInboxCompleted {
   final String id;
   final String studentName;
-  final String faculty;
+  final String department;
   final String scheduleDate;
   final String scheduleTime;
 
   TeacherInboxCompleted({
     required this.id,
     required this.studentName,
-    required this.faculty,
+    required this.department,
     required this.scheduleDate,
     required this.scheduleTime,
   });
@@ -17,7 +17,7 @@ class TeacherInboxCompleted {
     return TeacherInboxCompleted(
       id: json['id'] ?? '',
       studentName: json['student_name'] ?? '',
-      faculty: json['faculty'] ?? '',
+      department: json['department'] ?? '',
       scheduleDate: json['schedule_date'] ?? '',
       scheduleTime: json['schedule_time'] ?? '',
     );
@@ -32,14 +32,14 @@ class TeacherInboxCompleted {
       TeacherInboxCompleted(
         id: '1',
         studentName: 'Michael Brown',
-        faculty: 'SACE',
+        department: 'SACE',
         scheduleDate: 'June 5',
         scheduleTime: '3:00 pm',
       ),
       TeacherInboxCompleted(
         id: '2',
         studentName: 'Emily Davis',
-        faculty: 'SACE',
+        department: 'SACE',
         scheduleDate: 'June 7',
         scheduleTime: '1:30 pm',
       ),

@@ -46,7 +46,6 @@ class _TeacherInboxState extends State<TeacherInbox>
   Widget _buildNavigationalTabs() {
     return Container(
       color: Colors.white,
-      padding: EdgeInsets.symmetric(horizontal: 16),
       child: TabBar(
         controller: _tabController,
         labelColor: Color(0xFFFFD418),
@@ -65,7 +64,7 @@ class _TeacherInboxState extends State<TeacherInbox>
         ),
         tabs: [
           Tab(text: 'Pending'),
-          Tab(text: 'Cancelled'),
+          Tab(text: 'Declined'),
           Tab(text: 'Missed'),
           Tab(text: 'Completed'),
         ],
@@ -79,7 +78,7 @@ class _TeacherInboxState extends State<TeacherInbox>
         controller: _tabController,
         children: [
           _buildPendingTab(),
-          _buildCancelledTab(),
+          _buildDeclinedTab(),
           _buildMissedTab(),
           _buildCompletedTab(),
         ],
@@ -109,7 +108,7 @@ class _TeacherInboxState extends State<TeacherInbox>
             var appointment = pendingAppointments[index];
             return _buildAppointmentCard(
               appointment.studentName,
-              appointment.faculty,
+              appointment.department,
               appointment.scheduleDate,
               appointment.scheduleTime,
               'pending',
@@ -121,7 +120,7 @@ class _TeacherInboxState extends State<TeacherInbox>
     );
   }
 
-  Widget _buildCancelledTab() {
+  Widget _buildDeclinedTab() {
     return FutureBuilder<List<TeacherInboxCancelled>>(
       future: TeacherInboxCancelled.getTeacherInboxCancelleds(),
       builder: (context, snapshot) {
@@ -129,24 +128,24 @@ class _TeacherInboxState extends State<TeacherInbox>
           return Center(child: CircularProgressIndicator());
         }
         
-        List<TeacherInboxCancelled> cancelledAppointments = snapshot.data ?? [];
+        List<TeacherInboxCancelled> declinedAppointments = snapshot.data ?? [];
 
-        if (cancelledAppointments.isEmpty) {
-          return _buildEmptyState('No cancelled appointments');
+        if (declinedAppointments.isEmpty) {
+          return _buildEmptyState('No declined appointments');
         }
 
         return ListView.separated(
           padding: EdgeInsets.all(16),
-          itemCount: cancelledAppointments.length,
+          itemCount: declinedAppointments.length,
           separatorBuilder: (context, index) => SizedBox(height: 12),
           itemBuilder: (context, index) {
-            var appointment = cancelledAppointments[index];
+            var appointment = declinedAppointments[index];
             return _buildAppointmentCard(
               appointment.studentName,
-              appointment.faculty,
+              appointment.department,
               appointment.scheduleDate,
               appointment.scheduleTime,
-              'cancelled',
+              'declined',
               appointment.id,
             );
           },
@@ -177,7 +176,7 @@ class _TeacherInboxState extends State<TeacherInbox>
             var appointment = missedAppointments[index];
             return _buildAppointmentCard(
               appointment.studentName,
-              appointment.faculty,
+              appointment.department,
               appointment.scheduleDate,
               appointment.scheduleTime,
               'missed',
@@ -211,7 +210,7 @@ class _TeacherInboxState extends State<TeacherInbox>
             var appointment = completedAppointments[index];
             return _buildAppointmentCard(
               appointment.studentName,
-              appointment.faculty,
+              appointment.department,
               appointment.scheduleDate,
               appointment.scheduleTime,
               'completed',
@@ -239,7 +238,7 @@ class _TeacherInboxState extends State<TeacherInbox>
 
   Widget _buildAppointmentCard(
     String studentName,
-    String faculty,
+    String department,
     String scheduleDate,
     String scheduleTime,
     String status,
@@ -248,132 +247,133 @@ class _TeacherInboxState extends State<TeacherInbox>
     // Get initials for avatar
     String initials = studentName.split(' ').map((name) => name.isNotEmpty ? name[0] : '').take(2).join('').toUpperCase();
     
-    // Generate color based on student name
-    List<Color> avatarColors = [
-      Color(0xFF81C784), // Light green
-      Color(0xFFFFB74D), // Light orange  
-      Color(0xFF9575CD), // Light purple
-      Color(0xFF4FC3F7), // Light blue
-      Color(0xFFFFD54F), // Light yellow
-      Color(0xFFFF8A65), // Light coral
-    ];
-    Color avatarColor = avatarColors[studentName.hashCode % avatarColors.length];
+    // Get status-specific icon and colors
+    IconData statusIcon;
+    List<Color> statusColors;
+    
+    switch (status) {
+      case 'pending':
+        statusIcon = Icons.pending;
+        statusColors = [Color(0xFF87CEEB), Color(0xFF4682B4)]; // Sky blue
+        break;
+      case 'declined':
+        statusIcon = Icons.cancel;
+        statusColors = [Color(0xFFFFB74D), Color(0xFFFF8A65)]; // Orange
+        break;
+      case 'missed':
+        statusIcon = Icons.error;
+        statusColors = [Color(0xFFFF8A80), Color(0xFFE57373)]; // Red
+        break;
+      case 'completed':
+        statusIcon = Icons.check_circle;
+        statusColors = [Color(0xFF81C784), Color(0xFF66BB6A)]; // Green
+        break;
+      default:
+        statusIcon = Icons.info;
+        statusColors = [Color(0xFF87CEEB), Color(0xFF4682B4)];
+    }
 
-    return Container(
-      padding: EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.white, Colors.grey.shade50],
-          begin: const FractionalOffset(0.0, 0.0),
-          end: const FractionalOffset(0.0, 1.0),
-          stops: [0.0, 1.0],
-          tileMode: TileMode.clamp,
-        ),
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            spreadRadius: 1,
-            blurRadius: 10,
-            offset: Offset(0, 3),
-          ),
-        ],
+    return Card(
+      margin: EdgeInsets.only(bottom: 12),
+      elevation: 2,
+      color: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
       ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  color: avatarColor,
-                  borderRadius: BorderRadius.circular(30),
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: statusColors,
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(statusIcon, color: Colors.white),
                 ),
-                child: Center(
+                SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        studentName,
+                        style: TextStyle(
+                          fontFamily: 'Arimo',
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        department,
+                        style: TextStyle(
+                          fontFamily: 'Arimo',
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                      Text(
+                        '$scheduleDate • $scheduleTime',
+                        style: TextStyle(
+                          fontFamily: 'Arimo',
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: statusColors,
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: ElevatedButton(
+                  onPressed: () {
+                    print('View Details clicked for $status appointment ID: $appointmentId');
+                    // TODO: Navigate to appointment details
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    elevation: 0,
+                  ),
                   child: Text(
-                    initials,
+                    'View Details',
                     style: TextStyle(
                       fontFamily: 'Arimo',
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
                     ),
-                  ),
-                ),
-              ),
-              SizedBox(width: 15),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      studentName,
-                      style: TextStyle(
-                        fontFamily: 'Arimo',
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                    SizedBox(height: 2),
-                    Text(
-                      'Faculty - $faculty',
-                      style: TextStyle(
-                        fontFamily: 'Arimo',
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                    SizedBox(height: 3),
-                    Text(
-                      '$scheduleDate - $scheduleTime',
-                      style: TextStyle(
-                        fontFamily: 'Arimo',
-                        fontSize: 14,
-                        color: Color(0xFF35408E),
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 15),
-          SizedBox(
-            width: double.infinity,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.grey.shade200,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: ElevatedButton(
-                onPressed: () {
-                  print('Viewing Details of $status Appointment: $appointmentId');
-                  // TODO: Navigate to appointment details
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                  padding: EdgeInsets.symmetric(vertical: 15),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                child: Text(
-                  'See More',
-                  style: TextStyle(
-                    fontFamily: 'Arimo',
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey[700],
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -383,7 +383,7 @@ class _TeacherInboxState extends State<TeacherInbox>
       title: Container(
         margin: const EdgeInsets.only(left: 10.0),
         child: const Text(
-          'History',
+          'Inbox',
           style: TextStyle(
             fontFamily: 'Arimo',
             fontSize: 24,
@@ -481,7 +481,7 @@ class _TeacherInboxState extends State<TeacherInbox>
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                          'You are already on the History page',
+                          'You are already on the Inbox page',
                           style: TextStyle(fontFamily: 'Arimo'),
                         ),
                         duration: Duration(seconds: 2),

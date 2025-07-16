@@ -71,9 +71,9 @@ class _TeacherHomeState extends State<TeacherHome> {
               }
               
               return ListView.separated(
-                padding: EdgeInsets.all(20.0),
+                padding: EdgeInsets.all(16),
                 itemCount: appointments.length,
-                separatorBuilder: (context, index) => SizedBox(height: 15),
+                separatorBuilder: (context, index) => SizedBox(height: 12),
                 itemBuilder: (context, index) {
                   var appointment = appointments[index];
                   return _buildAppointmentCard(appointment);
@@ -90,132 +90,123 @@ class _TeacherHomeState extends State<TeacherHome> {
     // Get initials for avatar
     String initials = appointment.studentName.split(' ').map((name) => name.isNotEmpty ? name[0] : '').take(2).join('').toUpperCase();
     
-    // Generate color based on student name
-    List<Color> avatarColors = [
-      Color(0xFF81C784), // Light green
-      Color(0xFFFFB74D), // Light orange  
-      Color(0xFF9575CD), // Light purple
-      Color(0xFF4FC3F7), // Light blue
-      Color(0xFFFFD54F), // Light yellow
-      Color(0xFFFF8A65), // Light coral
-    ];
-    Color avatarColor = avatarColors[appointment.studentName.hashCode % avatarColors.length];
-    
-    return Container(
-      padding: EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.white, Colors.grey.shade50],
-          begin: const FractionalOffset(0.0, 0.0),
-          end: const FractionalOffset(0.0, 1.0),
-          stops: [0.0, 1.0],
-          tileMode: TileMode.clamp,
-        ),
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            spreadRadius: 1,
-            blurRadius: 10,
-            offset: Offset(0, 3),
-          ),
-        ],
+    return Card(
+      margin: EdgeInsets.only(bottom: 12),
+      elevation: 2,
+      color: Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
       ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  color: avatarColor,
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: Center(
-                  child: Text(
-                    initials,
-                    style: TextStyle(
-                      fontFamily: 'Arimo',
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Color(0xFF87CEEB), // Pastel sky blue
+                        Color(0xFF4682B4), // Steel blue
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                     ),
+                    shape: BoxShape.circle,
                   ),
-                ),
-              ),
-              SizedBox(width: 15),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      appointment.studentName,
-                      style: TextStyle(
-                        fontFamily: 'Arimo',
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                    SizedBox(height: 2),
-                    Text(
-                      'Faculty - ${appointment.faculty}',
-                      style: TextStyle(
-                        fontFamily: 'Arimo',
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                    SizedBox(height: 3),
-                    Text(
-                      '${appointment.scheduleDate} - ${appointment.scheduleTime}',
+                  child: Center(
+                    child: Text(
+                      initials,
                       style: TextStyle(
                         fontFamily: 'Arimo',
                         fontSize: 14,
-                        color: Color(0xFF35408E),
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 15),
-          SizedBox(
-            width: double.infinity,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.grey.shade200,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: ElevatedButton(
-                onPressed: () {
-                  print('Viewing Details of Appointment: ${appointment.id}');
-                  // TODO: Navigate to appointment details
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                  padding: EdgeInsets.symmetric(vertical: 15),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                child: Text(
-                  'See More',
-                  style: TextStyle(
-                    fontFamily: 'Arimo',
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey[700],
+                SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        appointment.studentName,
+                        style: TextStyle(
+                          fontFamily: 'Arimo',
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        appointment.department,
+                        style: TextStyle(
+                          fontFamily: 'Arimo',
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                      Text(
+                        '${appointment.scheduleDate} • ${appointment.scheduleTime}',
+                        style: TextStyle(
+                          fontFamily: 'Arimo',
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Color(0xFF87CEEB), // Pastel sky blue
+                      Color(0xFF4682B4), // Steel blue
+                    ],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: ElevatedButton(
+                  onPressed: () {
+                    print('View Details clicked for appointment ID: ${appointment.id}');
+                    // TODO: Navigate to appointment details
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: Text(
+                    'View Details',
+                    style: TextStyle(
+                      fontFamily: 'Arimo',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -323,7 +314,7 @@ class _TeacherHomeState extends State<TeacherHome> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                          'You are already on the History page',
+                          'You are already on the Inbox page',
                           style: TextStyle(fontFamily: 'Arimo'),
                         ),
                         duration: Duration(seconds: 2),

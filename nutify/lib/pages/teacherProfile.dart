@@ -34,50 +34,189 @@ class _TeacherProfileState extends State<TeacherProfile> {
   }
 
   Future<void> _handleLogout() async {
-    bool confirmLogout = await showDialog(
+    // Show a confirmation dialog first
+    showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            'Confirm Logout',
-            style: TextStyle(fontFamily: 'Arimo'),
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
           ),
-          content: Text(
-            'Are you sure you want to logout?',
-            style: TextStyle(fontFamily: 'Arimo'),
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: EdgeInsets.all(25),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.15),
+                  spreadRadius: 3,
+                  blurRadius: 20,
+                  offset: Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Logout Icon with gradient background
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: [
+                        Color(0xFFF44336).withOpacity(0.1),
+                        Color(0xFFE53935).withOpacity(0.1),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.logout_outlined,
+                    color: Color(0xFFF44336),
+                    size: 30,
+                  ),
+                ),
+                SizedBox(height: 20),
+                // Title
+                Text(
+                  'Logout',
+                  style: TextStyle(
+                    fontFamily: 'Arimo',
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2C3E50),
+                  ),
+                ),
+                SizedBox(height: 10),
+                // Content
+                Text(
+                  'Are you sure you want to logout?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: 'Arimo',
+                    fontSize: 16,
+                    color: Colors.grey.shade600,
+                    height: 1.4,
+                  ),
+                ),
+                SizedBox(height: 25),
+                // Action Buttons
+                Row(
+                  children: [
+                    // Cancel Button
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.grey.shade200,
+                              Colors.grey.shade300,
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.3),
+                              spreadRadius: 1,
+                              blurRadius: 6,
+                              offset: Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop(); // Close dialog
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            foregroundColor: Colors.grey.shade700,
+                            padding: EdgeInsets.symmetric(vertical: 14),
+                            textStyle: TextStyle(
+                              fontFamily: 'Arimo',
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: Text('Cancel'),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 12),
+                    // Logout Button
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Color(0xFFF44336), Color(0xFFE53935)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0xFFF44336).withOpacity(0.4),
+                              spreadRadius: 1,
+                              blurRadius: 8,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            Navigator.of(context).pop(); // Close dialog
+                            
+                            // Clear SharedPreferences for persistent login
+                            SharedPreferences prefs = await SharedPreferences.getInstance();
+                            await prefs.clear(); // Clear all saved data
+                            
+                            // Navigate to login page and clear navigation stack
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => LoginPage(),
+                                settings: RouteSettings(name: '/login'),
+                              ),
+                              (Route<dynamic> route) => false,
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            foregroundColor: Colors.white,
+                            padding: EdgeInsets.symmetric(vertical: 14),
+                            textStyle: TextStyle(
+                              fontFamily: 'Arimo',
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: Text('Logout'),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: Text(
-                'Cancel',
-                style: TextStyle(fontFamily: 'Arimo', color: Colors.grey),
-              ),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: Text(
-                'Logout',
-                style: TextStyle(fontFamily: 'Arimo', color: Colors.red),
-              ),
-            ),
-          ],
         );
       },
-    ) ?? false;
-
-    if (confirmLogout) {
-      // Clear user session data
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.clear();
-      
-      // Navigate to login page
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => LoginPage()),
-        (Route<dynamic> route) => false,
-      );
-    }
+    );
   }
 
   @override
@@ -326,34 +465,6 @@ class _TeacherProfileState extends State<TeacherProfile> {
           ),
         ),
       ),
-      actions: [
-        // Profile button - highlighted since we're on profile page
-        GestureDetector(
-          onTap: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  'You are already on the Profile page',
-                  style: TextStyle(fontFamily: 'Arimo'),
-                ),
-                duration: Duration(seconds: 2),
-                backgroundColor: Color(0xFF35408E),
-              ),
-            );
-          },
-          child: Container(
-            margin: const EdgeInsets.only(right: 25.0),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: Color(0xFFFFD418), width: 2),
-            ),
-            child: CircleAvatar(
-              backgroundImage: AssetImage('assets/icons/profile.png'),
-              backgroundColor: Colors.transparent,
-            ),
-          ),
-        ),
-      ],
       // Nav bar below text and profile icon
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(50.0),
@@ -394,7 +505,7 @@ class _TeacherProfileState extends State<TeacherProfile> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                          'You are already on the History page',
+                          'You are already on the Inbox page',
                           style: TextStyle(fontFamily: 'Arimo'),
                         ),
                         duration: Duration(seconds: 2),

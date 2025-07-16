@@ -1,14 +1,14 @@
 class TeacherInboxCancelled {
   final String id;
   final String studentName;
-  final String faculty;
+  final String department;
   final String scheduleDate;
   final String scheduleTime;
 
   TeacherInboxCancelled({
     required this.id,
     required this.studentName,
-    required this.faculty,
+    required this.department,
     required this.scheduleDate,
     required this.scheduleTime,
   });
@@ -17,7 +17,7 @@ class TeacherInboxCancelled {
     return TeacherInboxCancelled(
       id: json['id'] ?? '',
       studentName: json['student_name'] ?? '',
-      faculty: json['faculty'] ?? '',
+      department: json['department'] ?? '',
       scheduleDate: json['schedule_date'] ?? '',
       scheduleTime: json['schedule_time'] ?? '',
     );
@@ -32,7 +32,7 @@ class TeacherInboxCancelled {
       TeacherInboxCancelled(
         id: '1',
         studentName: 'Robert Johnson',
-        faculty: 'SACE',
+        department: 'SACE',
         scheduleDate: 'June 10',
         scheduleTime: '2:00 pm',
       ),
