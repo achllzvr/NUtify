@@ -547,33 +547,32 @@ body {
 }
 
 .filter-tabs[data-active="all"]::after {
-  width: 16.66%;
+  width: 14.28%;
   left: 0;
 }
-
 .filter-tabs[data-active="pending"]::after {
-  width: 16.66%;
-  left: 16.66%;
+  width: 14.28%;
+  left: 14.28%;
 }
-
-.filter-tabs[data-active="cancelled"]::after {
-  width: 16.66%;
-  left: 33.32%;
+.filter-tabs[data-active="accepted"]::after {
+  width: 14.28%;
+  left: 28.56%;
 }
-
-.filter-tabs[data-active="missed"]::after {
-  width: 16.66%;
-  left: 49.98%;
-}
-
-.filter-tabs[data-active="declined"]::after {
-  width: 16.66%;
-  left: 66.64%;
-}
-
 .filter-tabs[data-active="completed"]::after {
-  width: 16.66%;
-  left: 83.3%;
+  width: 14.28%;
+  left: 42.84%;
+}
+.filter-tabs[data-active="missed"]::after {
+  width: 14.28%;
+  left: 57.12%;
+}
+.filter-tabs[data-active="cancelled"]::after {
+  width: 14.28%;
+  left: 71.4%;
+}
+.filter-tabs[data-active="declined"]::after {
+  width: 14.28%;
+  left: 85.68%;
 }
 
 /* History Section */
@@ -911,6 +910,12 @@ body {
 
 .status-declined {
   background: #ff7a7a;
+  color: #fff;
+}
+
+/* Desktop status badge */
+.status-accepted {
+  background: #4caf50;
   color: #fff;
 }
 

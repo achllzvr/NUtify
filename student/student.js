@@ -19,23 +19,52 @@ document.addEventListener("DOMContentLoaded", function () {
 
   loadSidebarState();
 
-  //Sidebar toggle on
-  menuToggle.addEventListener("click", function () {
-    sidebar.classList.toggle("expanded");
-    saveSidebarState();
-  });
+  // Sidebar toggle on (chevron icon)
+  function attachChevronListener() {
+    const chevron = document.getElementById("menuToggle");
+    if (chevron) {
+      chevron.onclick = function () {
+        sidebar.classList.toggle("expanded");
+        saveSidebarState();
+      };
+    }
+  }
+  attachChevronListener();
 
-  //Sidebar toggle off
-  menuToggleBurger.addEventListener("click", function () {
-    sidebar.classList.toggle("expanded");
-    saveSidebarState();
-  });
+  // Re-attach chevron listener on sidebar expand/collapse (for dynamic DOM)
+  sidebar.addEventListener("transitionend", attachChevronListener);
 
-  //Settings dropdown toggle on
-  settingsToggle.addEventListener("click", function (e) {
-    e.stopPropagation();
-    settingsDropdown.classList.toggle("show");
-  });
+  // Sidebar toggle on (burger icon)
+  // Fix: Attach event even if burger icon is hidden initially
+  function attachBurgerListener() {
+    const burger = document.getElementById("menuToggleBurger");
+    if (burger) {
+      burger.onclick = function () {
+        sidebar.classList.toggle("expanded");
+        saveSidebarState();
+      };
+    }
+  }
+  attachBurgerListener();
+
+  // Re-attach burger listener on sidebar expand/collapse (for dynamic DOM)
+  sidebar.addEventListener("transitionend", attachBurgerListener);
+
+  // Settings dropdown toggle on
+  // Fix: Attach event even if settings icon is hidden initially
+  function attachSettingsListener() {
+    const settings = document.getElementById("settingsToggle");
+    if (settings) {
+      settings.onclick = function (e) {
+        e.stopPropagation();
+        settingsDropdown.classList.toggle("show");
+      };
+    }
+  }
+  attachSettingsListener();
+
+  // Re-attach settings listener on sidebar expand/collapse (for dynamic DOM)
+  sidebar.addEventListener("transitionend", attachSettingsListener);
 
   //Close dropdown when clicking outside
   document.addEventListener("click", function (e) {
@@ -356,8 +385,9 @@ document.addEventListener("DOMContentLoaded", function () {
       ]
     },
     accepted: {
-      main: { text: "Accepted - June 13; 9:23 am", class: "accepted" },
+      main: { text: "-", class: "pending" },
       secondary: [
+        { text: "Accepted - June 13; 9:23 am", class: "accepted" },
         { text: "Pending - June 11; 6:00 pm", class: "secondary" }
       ]
     },
@@ -424,23 +454,19 @@ document.addEventListener("DOMContentLoaded", function () {
         });
       }
 
-      // Set modal body
       if (historyDetailsModalBody) {
         historyDetailsModalBody.innerHTML = modalHtml;
       }
-
-      // Set modal background same as profile details modal
+ 
       if (historyDetailsModal) {
         const modalDialog = historyDetailsModal.querySelector('.modal-dialog');
         if (modalDialog) {
           modalDialog.classList.add('profile-modal-bg');
         }
       }
-
-      // Show modal
+   
       const modalInstance = new bootstrap.Modal(historyDetailsModal);
       modalInstance.show();
     });
   });
 });
- 

@@ -171,7 +171,7 @@
           <!-- Completed Sessions -->
           <div class="appointment-section">
             <div class="section-header">
-              <h2>Your Completed Sessions</h2>
+              <h2>Your Most Recent</h2>
               <button class="see-more-btn" id="seeMoreCompletedBtn">
                 See More
               </button>
@@ -662,11 +662,10 @@
           if (successModal) successModal.hide();
         });
 
-      // See More for Upcoming Appointments: go to history with pending filter
       document
         .getElementById("seeMoreUpcomingBtn")
         .addEventListener("click", function () {
-          window.location.href = "studenthistory.html?filter=pending";
+          window.location.href = "studenthistory.html?filter=accepted";
         });
 
       // See More for Completed Sessions: go to history with completed filter
