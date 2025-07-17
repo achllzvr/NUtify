@@ -222,6 +222,20 @@ class _TeacherInboxState extends State<TeacherInbox>
     );
   }
 
+  // Helper method to get darker gradient colors for status buttons
+  List<Color> _getDarkerStatusColors(String status) {
+    switch (status) {
+      case 'declined':
+        return [Color(0xFFFF9800), Color(0xFFE65100)]; // Darker Orange
+      case 'missed':
+        return [Color(0xFFF44336), Color(0xFFB71C1C)]; // Darker Red
+      case 'completed':
+        return [Color(0xFF4CAF50), Color(0xFF2E7D32)]; // Darker Green
+      default:
+        return [Color(0xFF2196F3), Color(0xFF0D47A1)]; // Darker Blue
+    }
+  }
+
   Widget _buildEmptyState(String message) {
     return Center(
       child: Text(
@@ -349,11 +363,18 @@ class _TeacherInboxState extends State<TeacherInbox>
                       child: Container(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [Color(0xFF81C784), Color(0xFF66BB6A)], // Green
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
+                            colors: [Color(0xFF87CEEB), Color(0xFF4682B4)], // Same blue as card
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
                           ),
                           borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0xFF87CEEB).withOpacity(0.3),
+                              blurRadius: 8,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
                         ),
                         child: ElevatedButton(
                           onPressed: () {
@@ -385,11 +406,18 @@ class _TeacherInboxState extends State<TeacherInbox>
                       child: Container(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [Color(0xFFFF8A80), Color(0xFFE57373)], // Red
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
+                            colors: [Color(0xFFFFB74D), Color(0xFFFF8A65)], // Same orange as declined card
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
                           ),
                           borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color(0xFFFFB74D).withOpacity(0.3),
+                              blurRadius: 8,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
                         ),
                         child: ElevatedButton(
                           onPressed: () {
@@ -424,11 +452,18 @@ class _TeacherInboxState extends State<TeacherInbox>
                   child: Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: statusColors,
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
+                        colors: _getDarkerStatusColors(status),
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
                       ),
                       borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: _getDarkerStatusColors(status)[0].withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
                     ),
                     child: ElevatedButton(
                       onPressed: () {

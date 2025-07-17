@@ -228,13 +228,18 @@ class _StudentHomeState extends State<StudentHome> {
                           child: Container(
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
-                                colors: [Color(0xFFFFD418), Color(0xFFFFE566)],
-                                begin: const FractionalOffset(0.0, 0.0),
-                                end: const FractionalOffset(0.0, 1.0),
-                                stops: [0.0, 1.0],
-                                tileMode: TileMode.clamp,
+                                colors: [Color(0xFFFFB000), Color(0xFFFF8F00)], // Darker Yellow/Orange
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
                               ),
                               borderRadius: BorderRadius.circular(10),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Color(0xFFFFB000).withOpacity(0.3),
+                                  blurRadius: 8,
+                                  offset: Offset(0, 4),
+                                ),
+                              ],
                             ),
                             child: ElevatedButton(
                               onPressed: () {
@@ -248,6 +253,7 @@ class _StudentHomeState extends State<StudentHome> {
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
+                                elevation: 0,
                               ),
                               child: Text(
                                 'View Details',

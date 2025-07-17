@@ -163,14 +163,18 @@ class _StudentInboxState extends State<StudentInbox>
                       child: Container(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [
-                              Color(0xFF87CEEB), // Pastel sky blue
-                              Color(0xFF4682B4), // Steel blue
-                            ],
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
+                            colors: _getDarkerStatusColors('pending'),
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
                           ),
                           borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: _getDarkerStatusColors('pending')[0].withOpacity(0.3),
+                              blurRadius: 8,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
                         ),
                         child: ElevatedButton(
                           onPressed: () {
@@ -308,14 +312,18 @@ class _StudentInboxState extends State<StudentInbox>
                       child: Container(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [
-                              Color(0xFFB22222), // Deep red
-                              Color(0xFF8B0000), // Dark red
-                            ],
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
+                            colors: _getDarkerStatusColors('declined'),
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
                           ),
                           borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: _getDarkerStatusColors('declined')[0].withOpacity(0.3),
+                              blurRadius: 8,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
                         ),
                         child: ElevatedButton(
                           onPressed: () {
@@ -453,14 +461,18 @@ class _StudentInboxState extends State<StudentInbox>
                       child: Container(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [
-                              Color(0xFFFF8C00), // Yellow-orange
-                              Color(0xFFFF4500), // Orange red
-                            ],
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
+                            colors: _getDarkerStatusColors('missed'),
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
                           ),
                           borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: _getDarkerStatusColors('missed')[0].withOpacity(0.3),
+                              blurRadius: 8,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
                         ),
                         child: ElevatedButton(
                           onPressed: () {
@@ -598,14 +610,18 @@ class _StudentInboxState extends State<StudentInbox>
                       child: Container(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [
-                              Color(0xFF228B22), // Green
-                              Color(0xFF006400), // Dark green
-                            ],
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
+                            colors: _getDarkerStatusColors('completed'),
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
                           ),
                           borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: _getDarkerStatusColors('completed')[0].withOpacity(0.3),
+                              blurRadius: 8,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
                         ),
                         child: ElevatedButton(
                           onPressed: () {
@@ -641,6 +657,22 @@ class _StudentInboxState extends State<StudentInbox>
         );
       },
     );
+  }
+
+  // Helper method to get darker gradient colors for status buttons
+  List<Color> _getDarkerStatusColors(String status) {
+    switch (status) {
+      case 'pending':
+        return [Color(0xFF2196F3), Color(0xFF0D47A1)]; // Darker Blue
+      case 'declined':
+        return [Color(0xFFF44336), Color(0xFFB71C1C)]; // Darker Red
+      case 'missed':
+        return [Color(0xFFFF9800), Color(0xFFE65100)]; // Darker Orange
+      case 'completed':
+        return [Color(0xFF4CAF50), Color(0xFF2E7D32)]; // Darker Green
+      default:
+        return [Color(0xFF2196F3), Color(0xFF0D47A1)]; // Darker Blue
+    }
   }
 
   Container navigationalTabs() {

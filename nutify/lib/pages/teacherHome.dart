@@ -177,11 +177,18 @@ class _TeacherHomeState extends State<TeacherHome> {
                     child: Container(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          colors: [Color(0xFF81C784), Color(0xFF66BB6A)], // Green
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
+                          colors: [Color(0xFF4CAF50), Color(0xFF2E7D32)], // Darker Green
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
                         borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0xFF4CAF50).withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: Offset(0, 4),
+                          ),
+                        ],
                       ),
                       child: ElevatedButton(
                         onPressed: () {
@@ -213,11 +220,18 @@ class _TeacherHomeState extends State<TeacherHome> {
                     child: Container(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          colors: [Color(0xFFFF8A80), Color(0xFFE57373)], // Red
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
+                          colors: [Color(0xFFF44336), Color(0xFFB71C1C)], // Darker Red
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
                         borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color(0xFFF44336).withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: Offset(0, 4),
+                          ),
+                        ],
                       ),
                       child: ElevatedButton(
                         onPressed: () {
