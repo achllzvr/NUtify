@@ -3,33 +3,27 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class StudentHomeAppointments {
-  final String name;
   final String id;
-  final String timestamp;
-  final String status;
+  final String teacherName;
+  final String department;
   final String scheduleDate;
   final String scheduleTime;
-  final bool isSelected;
 
   StudentHomeAppointments({
-    required this.name,
     required this.id,
-    required this.timestamp,
-    required this.status,
+    required this.teacherName,
+    required this.department,
     required this.scheduleDate,
     required this.scheduleTime,
-    this.isSelected = false,
   });
 
   factory StudentHomeAppointments.fromJson(Map<String, dynamic> json) {
     return StudentHomeAppointments(
-      name: '${json['teacher_fn'] ?? ''} ${json['teacher_ln'] ?? ''}'.trim(),
-      id: json['appointment_id']?.toString() ?? '',
-      timestamp: json['created_at'] ?? '',
-      status: json['status'] ?? 'pending',
-      scheduleDate: json['schedule_date'] ?? '',
-      scheduleTime: json['schedule_time'] ?? '',
-      isSelected: false,
+      id: json['id']?.toString() ?? '',
+      teacherName: json['teacher_name']?.toString() ?? '',
+      department: json['department']?.toString() ?? '',
+      scheduleDate: json['schedule_date']?.toString() ?? '',
+      scheduleTime: json['schedule_time']?.toString() ?? '',
     );
   }
 

@@ -3,38 +3,27 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class StudentInboxMissed {
-  final String name;
   final String id;
-  final String timestamp;
+  final String teacherName;
   final String department;
-  final String appointmentId;
-  final String day;
-  final String startTime;
-  final String endTime;
-  final bool isSelected;
+  final String scheduleDate;
+  final String scheduleTime;
 
   StudentInboxMissed({
-    required this.name,
     required this.id,
-    required this.timestamp,
+    required this.teacherName,
     required this.department,
-    required this.appointmentId,
-    required this.day,
-    required this.startTime,
-    required this.endTime,
-    this.isSelected = false,
+    required this.scheduleDate,
+    required this.scheduleTime,
   });
 
   factory StudentInboxMissed.fromJson(Map<String, dynamic> json) {
     return StudentInboxMissed(
-      name: json['teacher_full_name'] ?? '${json['teacher_fn'] ?? ''} ${json['teacher_ln'] ?? ''}'.trim(),
-      id: json['teacher_id']?.toString() ?? '',
-      timestamp: json['created_at'] ?? '',
-      department: json['department'] ?? 'No Department Assigned',
-      appointmentId: json['appointment_id']?.toString() ?? '',
-      day: json['day_of_week'] ?? '',
-      startTime: json['start_time'] ?? '',
-      endTime: json['end_time'] ?? '',
+      id: json['id']?.toString() ?? '',
+      teacherName: json['teacher_name']?.toString() ?? '',
+      department: json['department']?.toString() ?? '',
+      scheduleDate: json['schedule_date']?.toString() ?? '',
+      scheduleTime: json['schedule_time']?.toString() ?? '',
     );
   }
 

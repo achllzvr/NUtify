@@ -128,7 +128,7 @@ class _StudentInboxState extends State<StudentInbox>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                appointment.name,
+                                appointment.teacherName,
                                 style: TextStyle(
                                   fontFamily: 'Arimo',
                                   fontSize: 16,
@@ -145,7 +145,7 @@ class _StudentInboxState extends State<StudentInbox>
                                 ),
                               ),
                               Text(
-                                '${appointment.day} • ${appointment.startTime} - ${appointment.endTime}',
+                                '${appointment.scheduleDate} • ${appointment.scheduleTime}',
                                 style: TextStyle(
                                   fontFamily: 'Arimo',
                                   fontSize: 12,
@@ -175,7 +175,7 @@ class _StudentInboxState extends State<StudentInbox>
                         child: ElevatedButton(
                           onPressed: () {
                             print(
-                              'View Details clicked for pending appointment ID: ${appointment.appointmentId}',
+                              'View Details clicked for pending appointment ID: ${appointment.id}',
                             );
                           },
                           style: ElevatedButton.styleFrom(
@@ -273,7 +273,7 @@ class _StudentInboxState extends State<StudentInbox>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                appointment.name,
+                                appointment.teacherName,
                                 style: TextStyle(
                                   fontFamily: 'Arimo',
                                   fontSize: 16,
@@ -290,7 +290,7 @@ class _StudentInboxState extends State<StudentInbox>
                                 ),
                               ),
                               Text(
-                                '${appointment.day} • ${appointment.startTime} - ${appointment.endTime}',
+                                '${appointment.scheduleDate} • ${appointment.scheduleTime}',
                                 style: TextStyle(
                                   fontFamily: 'Arimo',
                                   fontSize: 12,
@@ -320,7 +320,7 @@ class _StudentInboxState extends State<StudentInbox>
                         child: ElevatedButton(
                           onPressed: () {
                             print(
-                              'View Details clicked for cancelled appointment ID: ${appointment.appointmentId}',
+                              'View Details clicked for cancelled appointment ID: ${appointment.id}',
                             );
                           },
                           style: ElevatedButton.styleFrom(
@@ -418,7 +418,7 @@ class _StudentInboxState extends State<StudentInbox>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                appointment.name,
+                                appointment.teacherName,
                                 style: TextStyle(
                                   fontFamily: 'Arimo',
                                   fontSize: 16,
@@ -435,7 +435,7 @@ class _StudentInboxState extends State<StudentInbox>
                                 ),
                               ),
                               Text(
-                                '${appointment.day} • ${appointment.startTime} - ${appointment.endTime}',
+                                '${appointment.scheduleDate} • ${appointment.scheduleTime}',
                                 style: TextStyle(
                                   fontFamily: 'Arimo',
                                   fontSize: 12,
@@ -465,7 +465,7 @@ class _StudentInboxState extends State<StudentInbox>
                         child: ElevatedButton(
                           onPressed: () {
                             print(
-                              'View Details clicked for missed appointment ID: ${appointment.appointmentId}',
+                              'View Details clicked for missed appointment ID: ${appointment.id}',
                             );
                           },
                           style: ElevatedButton.styleFrom(
@@ -563,7 +563,7 @@ class _StudentInboxState extends State<StudentInbox>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                appointment.name,
+                                appointment.teacherName,
                                 style: TextStyle(
                                   fontFamily: 'Arimo',
                                   fontSize: 16,
@@ -580,7 +580,7 @@ class _StudentInboxState extends State<StudentInbox>
                                 ),
                               ),
                               Text(
-                                '${appointment.day} • ${appointment.startTime} - ${appointment.endTime}',
+                                '${appointment.scheduleDate} • ${appointment.scheduleTime}',
                                 style: TextStyle(
                                   fontFamily: 'Arimo',
                                   fontSize: 12,
@@ -610,7 +610,7 @@ class _StudentInboxState extends State<StudentInbox>
                         child: ElevatedButton(
                           onPressed: () {
                             print(
-                              'View Details clicked for completed appointment ID: ${appointment.appointmentId}',
+                              'View Details clicked for completed appointment ID: ${appointment.id}',
                             );
                           },
                           style: ElevatedButton.styleFrom(

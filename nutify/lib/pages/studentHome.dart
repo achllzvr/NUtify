@@ -138,7 +138,7 @@ class _StudentHomeState extends State<StudentHome> {
                 itemBuilder: (context, index) {
                   var appointment = appointments[index];
                   // Get initials for avatar
-                  String initials = appointment.name.split(' ').map((name) => name.isNotEmpty ? name[0] : '').take(2).join('').toUpperCase();
+                  String initials = appointment.teacherName.split(' ').map((name) => name.isNotEmpty ? name[0] : '').take(2).join('').toUpperCase();
                   
                   // Generate color based on professor name
                   List<Color> avatarColors = [
@@ -149,7 +149,7 @@ class _StudentHomeState extends State<StudentHome> {
                     Color(0xFFFFD54F), // Light yellow
                     Color(0xFFFF8A65), // Light coral
                   ];
-                  Color avatarColor = avatarColors[appointment.name.hashCode % avatarColors.length];
+                  Color avatarColor = avatarColors[appointment.teacherName.hashCode % avatarColors.length];
                   
                   return Container(
                     padding: EdgeInsets.all(20),
@@ -200,7 +200,7 @@ class _StudentHomeState extends State<StudentHome> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    appointment.name,
+                                    appointment.teacherName,
                                     style: TextStyle(
                                       fontFamily: 'Arimo',
                                       fontSize: 18,
@@ -210,7 +210,7 @@ class _StudentHomeState extends State<StudentHome> {
                                   ),
                                   SizedBox(height: 5),
                                   Text(
-                                    '${appointment.scheduleDate} ${appointment.scheduleTime}',
+                                    '${appointment.scheduleDate} • ${appointment.scheduleTime}',
                                     style: TextStyle(
                                       fontFamily: 'Arimo',
                                       fontSize: 14,
