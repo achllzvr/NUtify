@@ -192,8 +192,14 @@ class _TeacherHomeState extends State<TeacherHome> {
                       ),
                       child: ElevatedButton(
                         onPressed: () {
-                          print('Mark as Completed clicked for appointment ID: ${appointment.id}');
-                          // TODO: Implement mark as completed logic
+                          _showStatusConfirmationDialog(
+                            context,
+                            'completed',
+                            appointment.id,
+                            () {
+                              // TODO: Implement mark as completed logic
+                            },
+                          );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.transparent,
@@ -235,8 +241,14 @@ class _TeacherHomeState extends State<TeacherHome> {
                       ),
                       child: ElevatedButton(
                         onPressed: () {
-                          print('Mark as Missed clicked for appointment ID: ${appointment.id}');
-                          // TODO: Implement mark as missed logic
+                          _showStatusConfirmationDialog(
+                            context,
+                            'missed',
+                            appointment.id,
+                            () {
+                              // TODO: Implement mark as missed logic
+                            },
+                          );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.transparent,
@@ -265,6 +277,217 @@ class _TeacherHomeState extends State<TeacherHome> {
         ),
       ),
     );
+  }
+
+  // Confirmation dialog method
+  Future<void> _showStatusConfirmationDialog(BuildContext context, String status, String appointmentId, VoidCallback onConfirm) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: EdgeInsets.all(25),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.15),
+                  spreadRadius: 3,
+                  blurRadius: 20,
+                  offset: Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Status Icon with gradient background
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: [
+                        _getStatusColor(status).withOpacity(0.1),
+                        _getStatusColor(status).withOpacity(0.1),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  child: Icon(
+                    _getStatusIcon(status),
+                    color: _getStatusColor(status),
+                    size: 30,
+                  ),
+                ),
+                SizedBox(height: 20),
+                // Title
+                Text(
+                  'Confirm Action',
+                  style: TextStyle(
+                    fontFamily: 'Arimo',
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2C3E50),
+                  ),
+                ),
+                SizedBox(height: 10),
+                // Content
+                Text(
+                  'Are you sure you want to mark this appointment as $status?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: 'Arimo',
+                    fontSize: 16,
+                    color: Colors.grey.shade600,
+                    height: 1.4,
+                  ),
+                ),
+                SizedBox(height: 25),
+                // Action Buttons
+                Row(
+                  children: [
+                    // Cancel Button
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.grey.shade200,
+                              Colors.grey.shade300,
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.3),
+                              spreadRadius: 1,
+                              blurRadius: 6,
+                              offset: Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop(); // Close dialog
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            foregroundColor: Colors.grey.shade700,
+                            padding: EdgeInsets.symmetric(vertical: 14),
+                            textStyle: TextStyle(
+                              fontFamily: 'Arimo',
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: Text('Cancel'),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 12),
+                    // Continue Button
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [_getStatusColor(status), _getDarkerStatusColor(status)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: _getStatusColor(status).withOpacity(0.4),
+                              spreadRadius: 1,
+                              blurRadius: 8,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop(); // Close dialog
+                            print('$status confirmation dialog for appointment id: $appointmentId');
+                            onConfirm();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            foregroundColor: Colors.white,
+                            padding: EdgeInsets.symmetric(vertical: 14),
+                            textStyle: TextStyle(
+                              fontFamily: 'Arimo',
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: Text('Continue'),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // Helper method to get status color for dialogs
+  Color _getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'completed':
+        return Color(0xFF4CAF50); // Green
+      case 'missed':
+        return Color(0xFFF44336); // Red
+      default:
+        return Color(0xFF4CAF50); // Default green
+    }
+  }
+
+  // Helper method to get status icons for dialogs
+  IconData _getStatusIcon(String status) {
+    switch (status.toLowerCase()) {
+      case 'completed':
+        return Icons.task_alt_outlined;
+      case 'missed':
+        return Icons.error_outline;
+      default:
+        return Icons.check_circle_outline;
+    }
+  }
+
+  // Helper method to get darker status colors for gradients
+  Color _getDarkerStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'completed':
+        return Color(0xFF2E7D32); // Darker Green
+      case 'missed':
+        return Color(0xFFB71C1C); // Darker Red
+      default:
+        return Color(0xFF2E7D32); // Default darker green
+    }
   }
 
   AppBar _buildTeacherAppBar(BuildContext context) {

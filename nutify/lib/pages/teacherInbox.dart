@@ -222,17 +222,210 @@ class _TeacherInboxState extends State<TeacherInbox>
     );
   }
 
-  // Helper method to get darker gradient colors for status buttons
-  List<Color> _getDarkerStatusColors(String status) {
-    switch (status) {
+  // Confirmation dialog method
+  Future<void> _showStatusConfirmationDialog(BuildContext context, String status, String appointmentId, VoidCallback onConfirm) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: EdgeInsets.all(25),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.15),
+                  spreadRadius: 3,
+                  blurRadius: 20,
+                  offset: Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Status Icon with gradient background
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: [
+                        _getStatusColors(status)[0].withOpacity(0.1),
+                        _getStatusColors(status)[1].withOpacity(0.1),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  child: Icon(
+                    _getStatusIcon(status),
+                    color: _getStatusColors(status)[0],
+                    size: 30,
+                  ),
+                ),
+                SizedBox(height: 20),
+                // Title
+                Text(
+                  'Confirm Action',
+                  style: TextStyle(
+                    fontFamily: 'Arimo',
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2C3E50),
+                  ),
+                ),
+                SizedBox(height: 10),
+                // Content
+                Text(
+                  'Are you sure you want to mark this appointment as $status?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: 'Arimo',
+                    fontSize: 16,
+                    color: Colors.grey.shade600,
+                    height: 1.4,
+                  ),
+                ),
+                SizedBox(height: 25),
+                // Action Buttons
+                Row(
+                  children: [
+                    // Cancel Button
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.grey.shade200,
+                              Colors.grey.shade300,
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.3),
+                              spreadRadius: 1,
+                              blurRadius: 6,
+                              offset: Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop(); // Close dialog
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            foregroundColor: Colors.grey.shade700,
+                            padding: EdgeInsets.symmetric(vertical: 14),
+                            textStyle: TextStyle(
+                              fontFamily: 'Arimo',
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: Text('Cancel'),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 12),
+                    // Continue Button
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [_getStatusColors(status)[0], _getStatusColors(status)[1]],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: _getStatusColors(status)[0].withOpacity(0.4),
+                              spreadRadius: 1,
+                              blurRadius: 8,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop(); // Close dialog
+                            print('$status confirmation dialog for appointment id: $appointmentId');
+                            onConfirm();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            foregroundColor: Colors.white,
+                            padding: EdgeInsets.symmetric(vertical: 14),
+                            textStyle: TextStyle(
+                              fontFamily: 'Arimo',
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: Text('Continue'),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // Helper method to get status colors for dialogs
+  List<Color> _getStatusColors(String status) {
+    switch (status.toLowerCase()) {
+      case 'accepted':
+        return [Color(0xFF87CEEB), Color(0xFF4682B4)]; // Blue
       case 'declined':
-        return [Color(0xFFFF9800), Color(0xFFE65100)]; // Darker Orange
-      case 'missed':
-        return [Color(0xFFF44336), Color(0xFFB71C1C)]; // Darker Red
+        return [Color(0xFFFFB74D), Color(0xFFFF8A65)]; // Orange
       case 'completed':
-        return [Color(0xFF4CAF50), Color(0xFF2E7D32)]; // Darker Green
+        return [Color(0xFF4CAF50), Color(0xFF2E7D32)]; // Green
+      case 'missed':
+        return [Color(0xFFF44336), Color(0xFFB71C1C)]; // Red
       default:
-        return [Color(0xFF2196F3), Color(0xFF0D47A1)]; // Darker Blue
+        return [Color(0xFF87CEEB), Color(0xFF4682B4)]; // Default blue
+    }
+  }
+
+  // Helper method to get status icons for dialogs
+  IconData _getStatusIcon(String status) {
+    switch (status.toLowerCase()) {
+      case 'accepted':
+        return Icons.check_circle_outline;
+      case 'declined':
+        return Icons.cancel_outlined;
+      case 'completed':
+        return Icons.task_alt_outlined;
+      case 'missed':
+        return Icons.error_outline;
+      default:
+        return Icons.info_outline;
     }
   }
 
@@ -378,8 +571,14 @@ class _TeacherInboxState extends State<TeacherInbox>
                         ),
                         child: ElevatedButton(
                           onPressed: () {
-                            print('Accept clicked for appointment ID: $appointmentId');
-                            // TODO: Implement accept logic
+                            _showStatusConfirmationDialog(
+                              context,
+                              'accepted',
+                              appointmentId,
+                              () {
+                                // TODO: Implement accept logic
+                              },
+                            );
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.transparent,
@@ -421,8 +620,14 @@ class _TeacherInboxState extends State<TeacherInbox>
                         ),
                         child: ElevatedButton(
                           onPressed: () {
-                            print('Decline clicked for appointment ID: $appointmentId');
-                            // TODO: Implement decline logic
+                            _showStatusConfirmationDialog(
+                              context,
+                              'declined',
+                              appointmentId,
+                              () {
+                                // TODO: Implement decline logic
+                              },
+                            );
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.transparent,
@@ -447,54 +652,72 @@ class _TeacherInboxState extends State<TeacherInbox>
                   ],
                 )
               else
-                SizedBox(
-                  width: double.infinity,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: _getDarkerStatusColors(status),
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                          color: _getDarkerStatusColors(status)[0].withOpacity(0.3),
-                          blurRadius: 8,
-                          offset: Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        print('View Details clicked for $status appointment ID: $appointmentId');
-                        // TODO: Navigate to appointment details
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.transparent,
-                        foregroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
+                // Show view details button for non-pending appointments
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: _getDarkerStatusColors(status),
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
                           borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: _getDarkerStatusColors(status)[0].withOpacity(0.3),
+                              blurRadius: 8,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
                         ),
-                        elevation: 0,
-                      ),
-                      child: Text(
-                        'View Details',
-                        style: TextStyle(
-                          fontFamily: 'Arimo',
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            print('View Details clicked for $status appointment ID: $appointmentId');
+                            // TODO: Navigate to appointment details
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            foregroundColor: Colors.white,
+                            padding: EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: Text(
+                            'View Details',
+                            style: TextStyle(
+                              fontFamily: 'Arimo',
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  // Helper method to get darker gradient colors for status buttons
+  List<Color> _getDarkerStatusColors(String status) {
+    switch (status) {
+      case 'declined':
+        return [Color(0xFFFF9800), Color(0xFFE65100)]; // Darker Orange
+      case 'missed':
+        return [Color(0xFFF44336), Color(0xFFB71C1C)]; // Darker Red
+      case 'completed':
+        return [Color(0xFF4CAF50), Color(0xFF2E7D32)]; // Darker Green
+      default:
+        return [Color(0xFF2196F3), Color(0xFF0D47A1)]; // Darker Blue
+    }
   }
 
   AppBar _buildTeacherAppBar(BuildContext context) {
