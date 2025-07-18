@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nutify/pages/login.dart';
 import 'package:nutify/pages/studentHome.dart';
+import 'package:nutify/pages/teacherHome.dart';
 import 'package:nutify/services/firebase_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -64,6 +65,11 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> checkLoginState() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+    String userType = prefs.getString('userType') ?? '';
+    
+    print('Checking login state...');
+    print('isLoggedIn: $isLoggedIn');
+    print('userType: $userType');
     
     await Future.delayed(Duration(seconds: 2)); // Optional splash delay
     
@@ -74,10 +80,21 @@ class _SplashScreenState extends State<SplashScreen> {
       if (userType == 'student') {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => StudentHome()),
+          MaterialPageRoute(
+            builder: (context) => StudentHome(),
+            settings: RouteSettings(name: '/studentHome'),
+          ),
+        );
+      } else if (userType == 'teacher') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TeacherHome(),
+            settings: RouteSettings(name: '/teacherHome'),
+          ),
         );
       } else {
-        // For teacher/moderator, go to login for now
+        // Unknown user type, go to login
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => LoginPage()),
