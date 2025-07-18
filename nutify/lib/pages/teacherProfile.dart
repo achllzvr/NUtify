@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nutify/pages/teacherHome.dart';
 import 'package:nutify/pages/teacherInbox.dart';
+import 'package:nutify/pages/teacherEditSched.dart';
 import 'package:nutify/pages/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -260,16 +261,13 @@ class _TeacherProfileState extends State<TeacherProfile> {
                     Icons.schedule_outlined,
                     Color(0xFF2196F3),
                     () {
-                      print('Edit Available Times tapped');
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            'Feature not yet implemented',
-                            style: TextStyle(fontFamily: 'Arimo'),
-                          ),
-                          duration: Duration(seconds: 2),
-                          backgroundColor: Colors.red,
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => TeacherEditSched(),
+                          settings: RouteSettings(name: '/teacherEditSched'),
                         ),
+                        (Route<dynamic> route) => false,
                       );
                     },
                   ),
