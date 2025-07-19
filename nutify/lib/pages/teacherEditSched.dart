@@ -150,6 +150,7 @@ class _TeacherEditSchedState extends State<TeacherEditSched>
         statusText = 'Unknown';
     }
 
+    final isBooked = status.toLowerCase() == 'booked';
     return Card(
       margin: EdgeInsets.only(bottom: 12),
       elevation: 2,
@@ -222,12 +223,21 @@ class _TeacherEditSchedState extends State<TeacherEditSched>
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: IconButton(
-                      onPressed: () {
-                        _showEditScheduleDialog(scheduleId, startTime, endTime);
-                      },
+                      onPressed: isBooked
+                          ? () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text("You can't edit nor delete a booked schedule", style: TextStyle(fontFamily: 'Arimo')),
+                                  backgroundColor: Color(0xFFF44336),
+                                ),
+                              );
+                            }
+                          : () {
+                              _showEditScheduleDialog(scheduleId, startTime, endTime);
+                            },
                       icon: Icon(
                         Icons.edit_outlined,
-                        color: Color(0xFFFFD418),
+                        color: isBooked ? Color(0xFFFFD418).withOpacity(0.4) : Color(0xFFFFD418),
                         size: 20,
                       ),
                       padding: EdgeInsets.all(8),
@@ -235,6 +245,7 @@ class _TeacherEditSchedState extends State<TeacherEditSched>
                         minWidth: 36,
                         minHeight: 36,
                       ),
+                      tooltip: isBooked ? "Can't edit booked schedule" : null,
                     ),
                   ),
                   SizedBox(width: 8),
@@ -245,12 +256,21 @@ class _TeacherEditSchedState extends State<TeacherEditSched>
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: IconButton(
-                      onPressed: () {
-                        _showDeleteScheduleDialog(scheduleId, startTime, endTime);
-                      },
+                      onPressed: isBooked
+                          ? () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text("You can't edit nor delete a booked schedule", style: TextStyle(fontFamily: 'Arimo')),
+                                  backgroundColor: Color(0xFFF44336),
+                                ),
+                              );
+                            }
+                          : () {
+                              _showDeleteScheduleDialog(scheduleId, startTime, endTime);
+                            },
                       icon: Icon(
                         Icons.delete_outline,
-                        color: Color(0xFFF44336),
+                        color: isBooked ? Color(0xFFF44336).withOpacity(0.4) : Color(0xFFF44336),
                         size: 20,
                       ),
                       padding: EdgeInsets.all(8),
@@ -258,6 +278,7 @@ class _TeacherEditSchedState extends State<TeacherEditSched>
                         minWidth: 36,
                         minHeight: 36,
                       ),
+                      tooltip: isBooked ? "Can't delete booked schedule" : null,
                     ),
                   ),
                 ],
