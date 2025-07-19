@@ -334,10 +334,17 @@ class _StudentHomeState extends State<StudentHome> {
                   itemBuilder: (context, index) {
                     return GestureDetector(
                       onTap: () {
-                        // Access the professor ID here
+                        // Show appointment request modal
                         String professorId = recentProfessors[index].id;
                         String professorName = recentProfessors[index].name;
-                        print('Professor ID: $professorId, Name: $professorName');
+                        int? idInt = int.tryParse(professorId);
+                        if (idInt != null) {
+                          showAppointmentRequestModal(context, professorName, idInt);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Invalid professor ID'), duration: Duration(seconds: 2)),
+                          );
+                        }
                       },
                       child: Container(
                         width: 140, // Made wider
@@ -635,7 +642,6 @@ class _StudentHomeState extends State<StudentHome> {
         var professor = _searchResults[index];
         // Get initials for avatar
         String initials = professor.name.split(' ').map((name) => name.isNotEmpty ? name[0] : '').take(2).join('').toUpperCase();
-        
         return Container(
           padding: EdgeInsets.all(20),
           decoration: BoxDecoration(
@@ -730,11 +736,17 @@ class _StudentHomeState extends State<StudentHome> {
                   ),
                   child: ElevatedButton(
                     onPressed: () {
-                      // Access the professor ID here
+                      // Show appointment request modal
                       String professorId = professor.id;
                       String professorName = professor.name;
-                      print('Setting appointment with Professor ID: $professorId, Name: $professorName');
-                      // TODO: Navigate to appointment booking page
+                      int? idInt = int.tryParse(professorId);
+                      if (idInt != null) {
+                        showAppointmentRequestModal(context, professorName, idInt);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Invalid professor ID'), duration: Duration(seconds: 2)),
+                        );
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.transparent,
@@ -761,5 +773,304 @@ class _StudentHomeState extends State<StudentHome> {
         );
       },
     );
+  }
+}
+
+// Appointment Request Modal
+void showAppointmentRequestModal(BuildContext context, String facultyName, int facultyId) async {
+  List<Map<String, dynamic>> schedules = await fetchFacultySchedules(facultyId);
+  Map<String, List<Map<String, dynamic>>> schedulesByDay = {};
+  for (var sched in schedules) {
+    String day = sched['day_of_week'] ?? sched['day'] ?? '';
+    if (!schedulesByDay.containsKey(day)) {
+      schedulesByDay[day] = [];
+    }
+    schedulesByDay[day]!.add(sched);
+  }
+  List<String> days = schedulesByDay.keys.toList();
+  String selectedDay = days.isNotEmpty ? days[0] : '';
+  int? selectedIndex;
+
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) {
+      return StatefulBuilder(
+        builder: (context, setState) {
+          List<Map<String, dynamic>> availableTimes = schedulesByDay[selectedDay] ?? [];
+          return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            child: Container(
+              padding: EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.15),
+                    spreadRadius: 3,
+                    blurRadius: 20,
+                    offset: Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Title
+                  RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: "$facultyName",
+                          style: TextStyle(
+                            fontFamily: 'Arimo',
+                            fontWeight: FontWeight.bold,
+                            fontStyle: FontStyle.italic,
+                            fontSize: 22,
+                            color: Colors.black,
+                          ),
+                        ),
+                        TextSpan(
+                          text: "'s available schedules",
+                          style: TextStyle(
+                            fontFamily: 'Arimo',
+                            fontWeight: FontWeight.normal,
+                            fontSize: 22,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 24),
+                  // Day Dropdown
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Color(0xFFF5F5F5),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey.shade300),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: Theme(
+                        data: Theme.of(context).copyWith(
+                          canvasColor: Colors.white,
+                        ),
+                        child: DropdownButton<String>(
+                          value: selectedDay,
+                          isExpanded: true,
+                          icon: Icon(Icons.arrow_drop_down),
+                          style: TextStyle(
+                            fontFamily: 'Arimo',
+                            fontSize: 18,
+                            color: Colors.black,
+                          ),
+                          items: days.map((day) {
+                            return DropdownMenuItem<String>(
+                              value: day,
+                              child: Text(day),
+                            );
+                          }).toList(),
+                          onChanged: (val) {
+                            setState(() {
+                              selectedDay = val!;
+                              selectedIndex = null;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  // Schedules available for the day
+                  Text(
+                    'Schedules available for the day:',
+                    style: TextStyle(
+                      fontFamily: 'Arimo',
+                      fontSize: 16,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Container(
+                    constraints: BoxConstraints(maxHeight: 220),
+                    child: availableTimes.isEmpty
+                        ? Center(
+                            child: Text(
+                              'No available schedules for this day.',
+                              style: TextStyle(
+                                fontFamily: 'Arimo',
+                                fontSize: 15,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          )
+                        : ListView.separated(
+                            shrinkWrap: true,
+                            itemCount: availableTimes.length,
+                            separatorBuilder: (context, idx) => SizedBox(height: 12),
+                            itemBuilder: (context, idx) {
+                              var sched = availableTimes[idx];
+                              String start = formatTime(sched['start_time'] ?? sched['startTime']);
+                              String end = formatTime(sched['end_time'] ?? sched['endTime']);
+                              bool isSelected = selectedIndex == idx;
+                              return GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    selectedIndex = idx;
+                                  });
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(vertical: 18),
+                                  decoration: BoxDecoration(
+                                    color: isSelected ? Color(0xFFFFF8E1) : Color(0xFFF5F5F5),
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(
+                                      color: isSelected ? Color(0xFFFFD418) : Colors.transparent,
+                                      width: 2,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.08),
+                                        blurRadius: 8,
+                                        offset: Offset(0, 3),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      '$start - $end',
+                                      style: TextStyle(
+                                        fontFamily: 'Arimo',
+                                        fontSize: 20,
+                                        color: Color(0xFF283593),
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                  ),
+                  SizedBox(height: 24),
+                  // Action Buttons
+                  Row(
+                    children: [
+                      // Cancel Button
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.grey.shade300,
+                            foregroundColor: Colors.black,
+                            padding: EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: Text(
+                            'Cancel',
+                            style: TextStyle(
+                              fontFamily: 'Arimo',
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 16),
+                      // Schedule Button
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Color(0xFFFFD54F), Color(0xFFFFB300)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Color(0xFFFFB000).withOpacity(0.25),
+                                blurRadius: 8,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: ElevatedButton(
+                            onPressed: (selectedIndex == null) ? null : () {
+                              // TODO: Implement schedule request logic
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              shadowColor: Colors.transparent,
+                              padding: EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 0,
+                              disabledBackgroundColor: Colors.transparent,
+                              disabledForegroundColor: Colors.white.withOpacity(0.5),
+                            ),
+                            child: Text(
+                              'Schedule',
+                              style: TextStyle(
+                                fontFamily: 'Arimo',
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    },
+  );
+}
+
+// Helper: fetch faculty schedules (API call)
+Future<List<Map<String, dynamic>>> fetchFacultySchedules(int facultyId) async {
+  // TODO: Replace with real API call
+  // Example: await StudentSchedule.fetchFacultySchedules(facultyId);
+  // For now, return mock data
+  await Future.delayed(Duration(milliseconds: 300));
+  return [
+    { 'day_of_week': 'Monday', 'start_time': '09:00', 'end_time': '10:00' },
+    { 'day_of_week': 'Tuesday', 'start_time': '09:00', 'end_time': '10:00' },
+    { 'day_of_week': 'Friday', 'start_time': '09:00', 'end_time': '10:00' },
+  ];
+}
+
+// Helper: format time (HH:mm or HH:mm:ss to h:mm)
+String formatTime(String? time) {
+  if (time == null) return '';
+  try {
+    final parts = time.split(":");
+    int hour = int.parse(parts[0]);
+    int minute = int.parse(parts[1]);
+    String ampm = hour >= 12 ? 'PM' : 'AM';
+    int hour12 = hour % 12 == 0 ? 12 : hour % 12;
+    return '${hour12}:${minute.toString().padLeft(2, '0')} $ampm';
+  } catch (_) {
+    return time;
   }
 }
