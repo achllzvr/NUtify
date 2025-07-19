@@ -317,16 +317,292 @@ class _TeacherEditSchedState extends State<TeacherEditSched>
 
   // Dialog methods
   void _showAddScheduleDialog() {
-    print('Add schedule dialog');
-    // TODO: Implement add schedule dialog
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Add schedule feature coming soon',
-          style: TextStyle(fontFamily: 'Arimo'),
-        ),
-        backgroundColor: Color(0xFF35408E),
-      ),
+    String? selectedDay;
+    TimeOfDay? startTime;
+    TimeOfDay? endTime;
+    
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              elevation: 0,
+              backgroundColor: Colors.transparent,
+              child: Container(
+                padding: EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.15),
+                      spreadRadius: 3,
+                      blurRadius: 20,
+                      offset: Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Title
+                    Text(
+                      'Add New Schedule',
+                      style: TextStyle(
+                        fontFamily: 'Arimo',
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF35408E),
+                      ),
+                    ),
+                    SizedBox(height: 24),
+                    
+                    // Day Dropdown
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Color(0xFFF5F5F5),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey.shade300),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          value: selectedDay,
+                          hint: Text(
+                            'Select Day',
+                            style: TextStyle(
+                              fontFamily: 'Arimo',
+                              color: Colors.grey.shade600,
+                              fontSize: 16,
+                            ),
+                          ),
+                          icon: Icon(
+                            Icons.keyboard_arrow_down,
+                            color: Colors.grey.shade600,
+                          ),
+                          isExpanded: true,
+                          items: [
+                            'Monday',
+                            'Tuesday', 
+                            'Wednesday',
+                            'Thursday',
+                            'Friday',
+                            'Saturday'
+                          ].map((String day) {
+                            return DropdownMenuItem<String>(
+                              value: day,
+                              child: Text(
+                                day,
+                                style: TextStyle(
+                                  fontFamily: 'Arimo',
+                                  color: Color(0xFF35408E),
+                                  fontSize: 16,
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              selectedDay = newValue;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    
+                    // Start Time Field
+                    GestureDetector(
+                      onTap: () async {
+                        TimeOfDay? pickedTime = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.now(),
+                          builder: (context, child) {
+                            return Theme(
+                              data: Theme.of(context).copyWith(
+                                colorScheme: ColorScheme.light(
+                                  primary: Color(0xFF35408E),
+                                  onPrimary: Colors.white,
+                                  surface: Colors.white,
+                                  onSurface: Color(0xFF35408E),
+                                ),
+                              ),
+                              child: child!,
+                            );
+                          },
+                        );
+                        if (pickedTime != null) {
+                          setState(() {
+                            startTime = pickedTime;
+                          });
+                        }
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Color(0xFFF5F5F5),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.grey.shade300),
+                        ),
+                        child: Text(
+                          startTime != null 
+                              ? startTime!.format(context)
+                              : 'Start time',
+                          style: TextStyle(
+                            fontFamily: 'Arimo',
+                            color: startTime != null 
+                                ? Color(0xFF35408E) 
+                                : Colors.grey.shade600,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 12),
+                    
+                    // "to" text
+                    Text(
+                      'to',
+                      style: TextStyle(
+                        fontFamily: 'Arimo',
+                        color: Colors.grey.shade600,
+                        fontSize: 14,
+                      ),
+                    ),
+                    SizedBox(height: 12),
+                    
+                    // End Time Field
+                    GestureDetector(
+                      onTap: () async {
+                        TimeOfDay? pickedTime = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.now(),
+                          builder: (context, child) {
+                            return Theme(
+                              data: Theme.of(context).copyWith(
+                                colorScheme: ColorScheme.light(
+                                  primary: Color(0xFF35408E),
+                                  onPrimary: Colors.white,
+                                  surface: Colors.white,
+                                  onSurface: Color(0xFF35408E),
+                                ),
+                              ),
+                              child: child!,
+                            );
+                          },
+                        );
+                        if (pickedTime != null) {
+                          setState(() {
+                            endTime = pickedTime;
+                          });
+                        }
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Color(0xFFF5F5F5),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.grey.shade300),
+                        ),
+                        child: Text(
+                          endTime != null 
+                              ? endTime!.format(context)
+                              : 'End time',
+                          style: TextStyle(
+                            fontFamily: 'Arimo',
+                            color: endTime != null 
+                                ? Color(0xFF35408E) 
+                                : Colors.grey.shade600,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 24),
+                    
+                    // Action Buttons
+                    Row(
+                      children: [
+                        // Cancel Button
+                        Expanded(
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text(
+                              'Cancel',
+                              style: TextStyle(
+                                fontFamily: 'Arimo',
+                                color: Colors.grey.shade600,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 12),
+                        
+                        // Add Button
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: (selectedDay != null && startTime != null && endTime != null)
+                                ? () {
+                                    // TODO: Implement add schedule functionality
+                                    Navigator.of(context).pop();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          'Schedule will be added: $selectedDay ${startTime!.format(context)} - ${endTime!.format(context)}',
+                                          style: TextStyle(fontFamily: 'Arimo'),
+                                        ),
+                                        backgroundColor: Color(0xFF35408E),
+                                      ),
+                                    );
+                                  }
+                                : null,
+                            child: Text(
+                              'Add',
+                              style: TextStyle(
+                                fontFamily: 'Arimo',
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Color(0xFFFFD418),
+                              disabledBackgroundColor: Colors.grey.shade300,
+                              padding: EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 0,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
