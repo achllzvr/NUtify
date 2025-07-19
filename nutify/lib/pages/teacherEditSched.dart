@@ -422,46 +422,92 @@ class _TeacherEditSchedState extends State<TeacherEditSched>
                         border: Border.all(color: Colors.grey.shade300),
                       ),
                       child: DropdownButtonHideUnderline(
-                        child: DropdownButton<String>(
-                          value: selectedDay,
-                          hint: Text(
-                            'Select Day',
+                        child: Theme(
+                          data: Theme.of(context).copyWith(
+                            canvasColor: Colors.white,
+                            cardColor: Colors.white,
+                            dialogBackgroundColor: Colors.white,
+                          ),
+                          child: DropdownButton<String>(
+                            value: selectedDay,
+                            hint: Text(
+                              'Select Day',
+                              style: TextStyle(
+                                fontFamily: 'Arimo',
+                                color: Colors.grey.shade600,
+                                fontSize: 16,
+                              ),
+                            ),
+                            icon: Icon(
+                              Icons.keyboard_arrow_down,
+                              color: Colors.grey.shade600,
+                            ),
+                            isExpanded: true,
+                            dropdownColor: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
                             style: TextStyle(
                               fontFamily: 'Arimo',
-                              color: Colors.grey.shade600,
+                              color: Color(0xFF35408E),
                               fontSize: 16,
+                              fontWeight: FontWeight.w500,
                             ),
-                          ),
-                          icon: Icon(
-                            Icons.keyboard_arrow_down,
-                            color: Colors.grey.shade600,
-                          ),
-                          isExpanded: true,
-                          items: [
-                            'Monday',
-                            'Tuesday',
-                            'Wednesday',
-                            'Thursday',
-                            'Friday',
-                            'Saturday'
-                          ].map((String day) {
-                            return DropdownMenuItem<String>(
-                              value: day,
-                              child: Text(
-                                day,
-                                style: TextStyle(
-                                  fontFamily: 'Arimo',
-                                  color: Color(0xFF35408E),
-                                  fontSize: 16,
+                            selectedItemBuilder: (BuildContext context) {
+                              return [
+                                'Monday',
+                                'Tuesday',
+                                'Wednesday',
+                                'Thursday',
+                                'Friday',
+                                'Saturday'
+                              ].map((String day) {
+                                return Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    day,
+                                    style: TextStyle(
+                                      fontFamily: 'Arimo',
+                                      color: Color(0xFF35408E),
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                );
+                              }).toList();
+                            },
+                            items: [
+                              'Monday',
+                              'Tuesday',
+                              'Wednesday',
+                              'Thursday',
+                              'Friday',
+                              'Saturday'
+                            ].map((String day) {
+                              return DropdownMenuItem<String>(
+                                value: day,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                                  child: Text(
+                                    day,
+                                    style: TextStyle(
+                                      fontFamily: 'Arimo',
+                                      color: Color(0xFF35408E),
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            );
-                          }).toList(),
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              selectedDay = newValue;
-                            });
-                          },
+                              );
+                            }).toList(),
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                selectedDay = newValue;
+                              });
+                            },
+                          ),
                         ),
                       ),
                     ),
