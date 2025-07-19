@@ -8,6 +8,7 @@ class TeacherInboxMissed {
   final String department;
   final String scheduleDate;
   final String scheduleTime;
+  final String appointmentReason;
 
   TeacherInboxMissed({
     required this.id,
@@ -15,6 +16,7 @@ class TeacherInboxMissed {
     required this.department,
     required this.scheduleDate,
     required this.scheduleTime,
+    required this.appointmentReason,
   });
 
   factory TeacherInboxMissed.fromJson(Map<String, dynamic> json) {
@@ -24,6 +26,7 @@ class TeacherInboxMissed {
       department: json['department']?.toString() ?? '',
       scheduleDate: json['schedule_date']?.toString() ?? '',
       scheduleTime: json['schedule_time']?.toString() ?? '',
+      appointmentReason: json['appointment_reason']?.toString() ?? '',
     );
   }
 

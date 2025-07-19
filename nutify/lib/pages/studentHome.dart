@@ -217,6 +217,18 @@ class _StudentHomeState extends State<StudentHome> {
                                       color: Colors.grey[600],
                                     ),
                                   ),
+                                  if (appointment.appointmentReason != null && appointment.appointmentReason!.isNotEmpty) ...[
+                                    SizedBox(height: 4),
+                                    Text(
+                                      'Reason: ${appointment.appointmentReason}',
+                                      style: TextStyle(
+                                        fontFamily: 'Arimo',
+                                        fontSize: 13,
+                                        color: Colors.grey[700],
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                    ),
+                                  ],
                                 ],
                               ),
                             ),

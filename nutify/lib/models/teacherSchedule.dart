@@ -9,6 +9,9 @@ class TeacherSchedule {
   final String startTime;
   final String endTime;
   final String status;
+  // Additional fields for 12-hour format display
+  final String startTime12h;
+  final String endTime12h;
 
   TeacherSchedule({
     required this.scheduleId,
@@ -17,6 +20,8 @@ class TeacherSchedule {
     required this.startTime,
     required this.endTime,
     required this.status,
+    required this.startTime12h,
+    required this.endTime12h,
   });
 
   factory TeacherSchedule.fromJson(Map<String, dynamic> json) {
@@ -27,6 +32,8 @@ class TeacherSchedule {
       startTime: json['start_time'] ?? '',
       endTime: json['end_time'] ?? '',
       status: json['status'] ?? 'available',
+      startTime12h: json['start_time_12h'] ?? _convertTo12Hour(json['start_time'] ?? ''),
+      endTime12h: json['end_time_12h'] ?? _convertTo12Hour(json['end_time'] ?? ''),
     );
   }
 
@@ -38,7 +45,30 @@ class TeacherSchedule {
       'start_time': startTime,
       'end_time': endTime,
       'status': status,
+      'start_time_12h': startTime12h,
+      'end_time_12h': endTime12h,
     };
+  }
+
+  // Helper method to convert 24-hour time to 12-hour format on client side
+  static String _convertTo12Hour(String time24) {
+    if (time24.isEmpty) return '';
+    
+    try {
+      // Parse the time string (HH:mm:ss or HH:mm)
+      List<String> parts = time24.split(':');
+      if (parts.length < 2) return time24;
+      
+      int hour = int.parse(parts[0]);
+      int minute = int.parse(parts[1]);
+      
+      String period = hour >= 12 ? 'PM' : 'AM';
+      int displayHour = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
+      
+      return '${displayHour}:${minute.toString().padLeft(2, '0')} $period';
+    } catch (e) {
+      return time24; // Return original if conversion fails
+    }
   }
 
   // Static method to get teacher schedules for a specific day
@@ -250,6 +280,6 @@ class TeacherSchedule {
 
   @override
   String toString() {
-    return 'TeacherSchedule{scheduleId: $scheduleId, teacherId: $teacherId, dayOfWeek: $dayOfWeek, startTime: $startTime, endTime: $endTime, status: $status}';
+    return 'TeacherSchedule{scheduleId: $scheduleId, teacherId: $teacherId, dayOfWeek: $dayOfWeek, startTime: $startTime ($startTime12h), endTime: $endTime ($endTime12h), status: $status}';
   }
 }

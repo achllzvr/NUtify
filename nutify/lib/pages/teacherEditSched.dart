@@ -110,8 +110,8 @@ class _TeacherEditSchedState extends State<TeacherEditSched>
           itemBuilder: (context, index) {
             var schedule = schedules[index];
             return _buildScheduleCard(
-              schedule.startTime,
-              schedule.endTime,
+              schedule.startTime12h,  // Use 12-hour format for display
+              schedule.endTime12h,    // Use 12-hour format for display
               schedule.status,
               schedule.scheduleId,
             );

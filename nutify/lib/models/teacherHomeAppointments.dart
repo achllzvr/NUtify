@@ -9,6 +9,7 @@ class TeacherHomeAppointments {
   final String scheduleDate;
   final String scheduleTime;
   final String status;
+  final String appointmentReason;
 
   TeacherHomeAppointments({
     required this.id,
@@ -17,6 +18,7 @@ class TeacherHomeAppointments {
     required this.scheduleDate,
     required this.scheduleTime,
     required this.status,
+    required this.appointmentReason,
   });
 
   factory TeacherHomeAppointments.fromJson(Map<String, dynamic> json) {
@@ -27,6 +29,7 @@ class TeacherHomeAppointments {
       scheduleDate: json['schedule_date']?.toString() ?? '',
       scheduleTime: json['schedule_time']?.toString() ?? '',
       status: json['status']?.toString() ?? '',
+      appointmentReason: json['appointment_reason']?.toString() ?? '',
     );
   }
 

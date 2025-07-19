@@ -152,6 +152,18 @@ class _StudentInboxState extends State<StudentInbox>
                                   color: Colors.grey.shade600,
                                 ),
                               ),
+                              if (appointment.appointmentReason != null && appointment.appointmentReason!.isNotEmpty) ...[
+                                SizedBox(height: 4),
+                                Text(
+                                  'Reason: ${appointment.appointmentReason}',
+                                  style: TextStyle(
+                                    fontFamily: 'Arimo',
+                                    fontSize: 12,
+                                    color: Colors.grey.shade700,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
+                              ],
                             ],
                           ),
                         ),
@@ -301,6 +313,18 @@ class _StudentInboxState extends State<StudentInbox>
                                   color: Colors.grey.shade600,
                                 ),
                               ),
+                              if (appointment.appointmentReason != null && appointment.appointmentReason!.isNotEmpty) ...[
+                                SizedBox(height: 4),
+                                Text(
+                                  'Reason: ${appointment.appointmentReason}',
+                                  style: TextStyle(
+                                    fontFamily: 'Arimo',
+                                    fontSize: 12,
+                                    color: Colors.grey.shade700,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
+                              ],
                             ],
                           ),
                         ),
@@ -450,6 +474,18 @@ class _StudentInboxState extends State<StudentInbox>
                                   color: Colors.grey.shade600,
                                 ),
                               ),
+                              if (appointment.appointmentReason != null && appointment.appointmentReason!.isNotEmpty) ...[
+                                SizedBox(height: 4),
+                                Text(
+                                  'Reason: ${appointment.appointmentReason}',
+                                  style: TextStyle(
+                                    fontFamily: 'Arimo',
+                                    fontSize: 12,
+                                    color: Colors.grey.shade700,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
+                              ],
                             ],
                           ),
                         ),
@@ -599,6 +635,18 @@ class _StudentInboxState extends State<StudentInbox>
                                   color: Colors.grey.shade600,
                                 ),
                               ),
+                              if (appointment.appointmentReason != null && appointment.appointmentReason!.isNotEmpty) ...[
+                                SizedBox(height: 4),
+                                Text(
+                                  'Reason: ${appointment.appointmentReason}',
+                                  style: TextStyle(
+                                    fontFamily: 'Arimo',
+                                    fontSize: 12,
+                                    color: Colors.grey.shade700,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
+                              ],
                             ],
                           ),
                         ),

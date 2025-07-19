@@ -8,6 +8,7 @@ class StudentInboxPending {
   final String department;
   final String scheduleDate;
   final String scheduleTime;
+  final String appointmentReason;
 
   StudentInboxPending({
     required this.id,
@@ -15,6 +16,7 @@ class StudentInboxPending {
     required this.department,
     required this.scheduleDate,
     required this.scheduleTime,
+    required this.appointmentReason,
   });
 
   factory StudentInboxPending.fromJson(Map<String, dynamic> json) {
@@ -24,6 +26,7 @@ class StudentInboxPending {
       department: json['department']?.toString() ?? '',
       scheduleDate: json['schedule_date']?.toString() ?? '',
       scheduleTime: json['schedule_time']?.toString() ?? '',
+      appointmentReason: json['appointment_reason']?.toString() ?? '',
     );
   }
 

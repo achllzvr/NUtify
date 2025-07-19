@@ -113,6 +113,7 @@ class _TeacherInboxState extends State<TeacherInbox>
               appointment.scheduleTime,
               'pending',
               appointment.id,
+              appointment.appointmentReason,
             );
           },
         );
@@ -147,6 +148,7 @@ class _TeacherInboxState extends State<TeacherInbox>
               appointment.scheduleTime,
               'declined',
               appointment.id,
+              appointment.appointmentReason,
             );
           },
         );
@@ -181,6 +183,7 @@ class _TeacherInboxState extends State<TeacherInbox>
               appointment.scheduleTime,
               'missed',
               appointment.id,
+              appointment.appointmentReason,
             );
           },
         );
@@ -215,6 +218,7 @@ class _TeacherInboxState extends State<TeacherInbox>
               appointment.scheduleTime,
               'completed',
               appointment.id,
+              appointment.appointmentReason,
             );
           },
         );
@@ -450,6 +454,7 @@ class _TeacherInboxState extends State<TeacherInbox>
     String scheduleTime,
     String status,
     String appointmentId,
+    String? appointmentReason,
   ) {
     // Get initials for avatar
     String initials = studentName.split(' ').map((name) => name.isNotEmpty ? name[0] : '').take(2).join('').toUpperCase();
@@ -542,6 +547,18 @@ class _TeacherInboxState extends State<TeacherInbox>
                             color: Colors.grey.shade600,
                           ),
                         ),
+                        if (appointmentReason != null && appointmentReason.isNotEmpty) ...[
+                          SizedBox(height: 4),
+                          Text(
+                            'Reason: $appointmentReason',
+                            style: TextStyle(
+                              fontFamily: 'Arimo',
+                              fontSize: 12,
+                              color: Colors.grey.shade700,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ),
