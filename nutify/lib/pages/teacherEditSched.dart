@@ -3,6 +3,7 @@ import 'package:nutify/pages/teacherHome.dart';
 import 'package:nutify/pages/teacherInbox.dart';
 import 'package:nutify/pages/teacherProfile.dart';
 import 'package:nutify/models/teacherSchedule.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TeacherEditSched extends StatefulWidget {
   TeacherEditSched({super.key});
@@ -320,13 +321,63 @@ class _TeacherEditSchedState extends State<TeacherEditSched>
     String? selectedDay;
     TimeOfDay? startTime;
     TimeOfDay? endTime;
-    
+    bool isLoading = false;
+
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (context, setState) {
+            // Helper to check if time range is at least 1 minute
+            bool isTimeRangeValid() {
+              if (startTime == null || endTime == null) return false;
+              final start = Duration(hours: startTime!.hour, minutes: startTime!.minute);
+              final end = Duration(hours: endTime!.hour, minutes: endTime!.minute);
+              return end > start && end.inMinutes - start.inMinutes >= 1;
+            }
+            Future<void> addSchedule() async {
+              setState(() { isLoading = true; });
+              try {
+                // Format times as HH:mm (24-hour)
+                String formatTime(TimeOfDay t) => t.hour.toString().padLeft(2, '0') + ':' + t.minute.toString().padLeft(2, '0');
+                final success = await TeacherSchedule.addSchedule(
+                  dayOfWeek: selectedDay!,
+                  startTime: formatTime(startTime!),
+                  endTime: formatTime(endTime!),
+                );
+                setState(() { isLoading = false; });
+                Navigator.of(context).pop();
+                if (success) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Schedule added successfully', style: TextStyle(fontFamily: 'Arimo')),
+                      backgroundColor: Color(0xFF4CAF50),
+                    ),
+                  );
+                  print('Schedule added successfully');
+                  // Refresh the page
+                  this.setState(() {});
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Failed to add schedule', style: TextStyle(fontFamily: 'Arimo')),
+                      backgroundColor: Color(0xFFF44336),
+                    ),
+                  );
+                  print('Failed to add schedule');
+                }
+              } catch (e) {
+                setState(() { isLoading = false; });
+                Navigator.of(context).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Error: $e', style: TextStyle(fontFamily: 'Arimo')),
+                    backgroundColor: Color(0xFFF44336),
+                  ),
+                );
+              }
+            }
             return Dialog(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
@@ -361,7 +412,6 @@ class _TeacherEditSchedState extends State<TeacherEditSched>
                       ),
                     ),
                     SizedBox(height: 24),
-                    
                     // Day Dropdown
                     Container(
                       width: double.infinity,
@@ -389,7 +439,7 @@ class _TeacherEditSchedState extends State<TeacherEditSched>
                           isExpanded: true,
                           items: [
                             'Monday',
-                            'Tuesday', 
+                            'Tuesday',
                             'Wednesday',
                             'Thursday',
                             'Friday',
@@ -416,7 +466,6 @@ class _TeacherEditSchedState extends State<TeacherEditSched>
                       ),
                     ),
                     SizedBox(height: 16),
-                    
                     // Start Time Field
                     GestureDetector(
                       onTap: () async {
@@ -452,13 +501,13 @@ class _TeacherEditSchedState extends State<TeacherEditSched>
                           border: Border.all(color: Colors.grey.shade300),
                         ),
                         child: Text(
-                          startTime != null 
+                          startTime != null
                               ? startTime!.format(context)
                               : 'Start time',
                           style: TextStyle(
                             fontFamily: 'Arimo',
-                            color: startTime != null 
-                                ? Color(0xFF35408E) 
+                            color: startTime != null
+                                ? Color(0xFF35408E)
                                 : Colors.grey.shade600,
                             fontSize: 16,
                           ),
@@ -466,7 +515,6 @@ class _TeacherEditSchedState extends State<TeacherEditSched>
                       ),
                     ),
                     SizedBox(height: 12),
-                    
                     // "to" text
                     Text(
                       'to',
@@ -477,7 +525,6 @@ class _TeacherEditSchedState extends State<TeacherEditSched>
                       ),
                     ),
                     SizedBox(height: 12),
-                    
                     // End Time Field
                     GestureDetector(
                       onTap: () async {
@@ -513,13 +560,13 @@ class _TeacherEditSchedState extends State<TeacherEditSched>
                           border: Border.all(color: Colors.grey.shade300),
                         ),
                         child: Text(
-                          endTime != null 
+                          endTime != null
                               ? endTime!.format(context)
                               : 'End time',
                           style: TextStyle(
                             fontFamily: 'Arimo',
-                            color: endTime != null 
-                                ? Color(0xFF35408E) 
+                            color: endTime != null
+                                ? Color(0xFF35408E)
                                 : Colors.grey.shade600,
                             fontSize: 16,
                           ),
@@ -527,7 +574,6 @@ class _TeacherEditSchedState extends State<TeacherEditSched>
                       ),
                     ),
                     SizedBox(height: 24),
-                    
                     // Action Buttons
                     Row(
                       children: [
@@ -555,42 +601,59 @@ class _TeacherEditSchedState extends State<TeacherEditSched>
                           ),
                         ),
                         SizedBox(width: 12),
-                        
-                        // Add Button
+                        // Add Button with gradient
                         Expanded(
-                          child: ElevatedButton(
-                            onPressed: (selectedDay != null && startTime != null && endTime != null)
-                                ? () {
-                                    // TODO: Implement add schedule functionality
-                                    Navigator.of(context).pop();
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          'Schedule will be added: $selectedDay ${startTime!.format(context)} - ${endTime!.format(context)}',
-                                          style: TextStyle(fontFamily: 'Arimo'),
-                                        ),
-                                        backgroundColor: Color(0xFF35408E),
-                                      ),
-                                    );
-                                  }
-                                : null,
-                            child: Text(
-                              'Add',
-                              style: TextStyle(
-                                fontFamily: 'Arimo',
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [Color(0xFFFFD418), Color(0xFFFFC300)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
                               ),
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Color(0xFFFFD418).withOpacity(0.15),
+                                  spreadRadius: 1,
+                                  blurRadius: 6,
+                                  offset: Offset(0, 3),
+                                ),
+                              ],
                             ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(0xFFFFD418),
-                              disabledBackgroundColor: Colors.grey.shade300,
-                              padding: EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
+                            child: ElevatedButton(
+                              onPressed: (selectedDay != null && startTime != null && endTime != null && isTimeRangeValid() && !isLoading)
+                                  ? () async {
+                                      await addSchedule();
+                                    }
+                                  : null,
+                              child: isLoading
+                                  ? SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2.5,
+                                      ),
+                                    )
+                                  : Text(
+                                      'Add',
+                                      style: TextStyle(
+                                        fontFamily: 'Arimo',
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.transparent,
+                                disabledBackgroundColor: Colors.grey.shade300,
+                                shadowColor: Colors.transparent,
+                                padding: EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                elevation: 0,
                               ),
-                              elevation: 0,
                             ),
                           ),
                         ),
