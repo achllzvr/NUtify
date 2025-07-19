@@ -716,16 +716,355 @@ class _TeacherEditSchedState extends State<TeacherEditSched>
   }
 
   void _showEditScheduleDialog(String scheduleId, String startTime, String endTime) {
-    print('Edit schedule dialog for ID: $scheduleId');
-    // TODO: Implement edit schedule dialog
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Edit schedule feature coming soon',
-          style: TextStyle(fontFamily: 'Arimo'),
-        ),
-        backgroundColor: Color(0xFFFFD418),
-      ),
+
+    // Find the day_of_week for this scheduleId by searching all tabs' schedules
+    String? dayOfWeekForSchedule;
+    for (var day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']) {
+      // This is a synchronous search, so we need to use the last loaded snapshot if available
+      // We'll use the currently loaded schedules in the tab views if possible
+      // But since this is a modal, we can pass the day as an extra argument if needed
+      // For now, try to infer from the tab context
+      // Fallback: try to get from the visible tab
+      // If not possible, ask the user to pass it in
+      // But for now, try to get from the current tab
+      // We'll use the _tabController index
+      int tabIndex = _tabController.index;
+      List<String> days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      if (tabIndex >= 0 && tabIndex < days.length) {
+        dayOfWeekForSchedule = days[tabIndex];
+      }
+      break;
+    }
+    // Parse the initial start and end time (12h format) to TimeOfDay
+    TimeOfDay? initialStartTime;
+    TimeOfDay? initialEndTime;
+    try {
+      final startParts = startTime.split(' ');
+      final endParts = endTime.split(' ');
+      if (startParts.length == 2 && endParts.length == 2) {
+        final startHM = startParts[0].split(':');
+        final endHM = endParts[0].split(':');
+        int startHour = int.parse(startHM[0]);
+        int endHour = int.parse(endHM[0]);
+        if (startParts[1] == 'PM' && startHour != 12) startHour += 12;
+        if (startParts[1] == 'AM' && startHour == 12) startHour = 0;
+        if (endParts[1] == 'PM' && endHour != 12) endHour += 12;
+        if (endParts[1] == 'AM' && endHour == 12) endHour = 0;
+        initialStartTime = TimeOfDay(hour: startHour, minute: int.parse(startHM[1]));
+        initialEndTime = TimeOfDay(hour: endHour, minute: int.parse(endHM[1]));
+      }
+    } catch (e) {
+      initialStartTime = null;
+      initialEndTime = null;
+    }
+
+    TimeOfDay? editedStartTime = initialStartTime;
+    TimeOfDay? editedEndTime = initialEndTime;
+    bool isLoading = false;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            // Helper to check if time range is at least 1 minute and changed
+            bool isTimeRangeValidAndChanged() {
+              if (editedStartTime == null || editedEndTime == null || initialStartTime == null || initialEndTime == null) return false;
+              final start = Duration(hours: editedStartTime!.hour, minutes: editedStartTime!.minute);
+              final end = Duration(hours: editedEndTime!.hour, minutes: editedEndTime!.minute);
+              final initialStart = Duration(hours: initialStartTime!.hour, minutes: initialStartTime!.minute);
+              final initialEnd = Duration(hours: initialEndTime!.hour, minutes: initialEndTime!.minute);
+              // Must be at least 1 minute apart and must be different from initial
+              return end > start && (end.inMinutes - start.inMinutes >= 1) && (start != initialStart || end != initialEnd);
+            }
+            Future<void> saveSchedule() async {
+              setState(() { isLoading = true; });
+              try {
+                String formatTime(TimeOfDay t) => t.hour.toString().padLeft(2, '0') + ':' + t.minute.toString().padLeft(2, '0');
+                final success = await TeacherSchedule.updateSchedule(
+                  scheduleId: scheduleId,
+                  dayOfWeek: dayOfWeekForSchedule ?? '',
+                  startTime: formatTime(editedStartTime!),
+                  endTime: formatTime(editedEndTime!),
+                );
+                setState(() { isLoading = false; });
+                Navigator.of(context).pop();
+                if (success) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Schedule updated successfully', style: TextStyle(fontFamily: 'Arimo')),
+                      backgroundColor: Color(0xFF4CAF50),
+                    ),
+                  );
+                  this.setState(() {});
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Failed to update schedule', style: TextStyle(fontFamily: 'Arimo')),
+                      backgroundColor: Color(0xFFF44336),
+                    ),
+                  );
+                }
+              } catch (e) {
+                setState(() { isLoading = false; });
+                Navigator.of(context).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Error: $e', style: TextStyle(fontFamily: 'Arimo')),
+                    backgroundColor: Color(0xFFF44336),
+                  ),
+                );
+              }
+            }
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              elevation: 0,
+              backgroundColor: Colors.transparent,
+              child: Container(
+                padding: EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.15),
+                      spreadRadius: 3,
+                      blurRadius: 20,
+                      offset: Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Title
+                    Text(
+                      'Edit Schedule',
+                      style: TextStyle(
+                        fontFamily: 'Arimo',
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF35408E),
+                      ),
+                    ),
+                    SizedBox(height: 24),
+                    // Start Time Field
+                    GestureDetector(
+                      onTap: () async {
+                        TimeOfDay? pickedTime = await showTimePicker(
+                          context: context,
+                          initialTime: editedStartTime ?? TimeOfDay.now(),
+                          builder: (context, child) {
+                            return Theme(
+                              data: Theme.of(context).copyWith(
+                                colorScheme: ColorScheme.light(
+                                  primary: Color(0xFF35408E),
+                                  onPrimary: Colors.white,
+                                  surface: Colors.white,
+                                  onSurface: Color(0xFF35408E),
+                                ),
+                              ),
+                              child: child!,
+                            );
+                          },
+                        );
+                        if (pickedTime != null) {
+                          setState(() {
+                            editedStartTime = pickedTime;
+                          });
+                        }
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Color(0xFFF5F5F5),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.grey.shade300),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.shade300,
+                              blurRadius: 4,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          editedStartTime != null
+                              ? editedStartTime!.format(context)
+                              : 'Start time',
+                          style: TextStyle(
+                            fontFamily: 'Arimo',
+                            color: editedStartTime != null
+                                ? Color(0xFF35408E)
+                                : Colors.grey.shade600,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 12),
+                    // "to" text
+                    Text(
+                      'to',
+                      style: TextStyle(
+                        fontFamily: 'Arimo',
+                        color: Colors.grey.shade600,
+                        fontSize: 14,
+                      ),
+                    ),
+                    SizedBox(height: 12),
+                    // End Time Field
+                    GestureDetector(
+                      onTap: () async {
+                        TimeOfDay? pickedTime = await showTimePicker(
+                          context: context,
+                          initialTime: editedEndTime ?? TimeOfDay.now(),
+                          builder: (context, child) {
+                            return Theme(
+                              data: Theme.of(context).copyWith(
+                                colorScheme: ColorScheme.light(
+                                  primary: Color(0xFF35408E),
+                                  onPrimary: Colors.white,
+                                  surface: Colors.white,
+                                  onSurface: Color(0xFF35408E),
+                                ),
+                              ),
+                              child: child!,
+                            );
+                          },
+                        );
+                        if (pickedTime != null) {
+                          setState(() {
+                            editedEndTime = pickedTime;
+                          });
+                        }
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Color(0xFFF5F5F5),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.grey.shade300),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.shade300,
+                              blurRadius: 4,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          editedEndTime != null
+                              ? editedEndTime!.format(context)
+                              : 'End time',
+                          style: TextStyle(
+                            fontFamily: 'Arimo',
+                            color: editedEndTime != null
+                                ? Color(0xFF35408E)
+                                : Colors.grey.shade600,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 24),
+                    // Action Buttons Row
+                    Row(
+                      children: [
+                        // Cancel Button
+                        Expanded(
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text(
+                              'Cancel',
+                              style: TextStyle(
+                                fontFamily: 'Arimo',
+                                color: Colors.grey.shade600,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 12),
+                        // Save Button
+                        Expanded(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [Color(0xFFFFD418), Color(0xFFFFC300)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Color(0xFFFFD418).withOpacity(0.15),
+                                  spreadRadius: 1,
+                                  blurRadius: 6,
+                                  offset: Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: ElevatedButton(
+                              onPressed: (isTimeRangeValidAndChanged() && !isLoading)
+                                  ? () async {
+                                      await saveSchedule();
+                                    }
+                                  : null,
+                              child: isLoading
+                                  ? SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2.5,
+                                      ),
+                                    )
+                                  : Text(
+                                      'Save',
+                                      style: TextStyle(
+                                        fontFamily: 'Arimo',
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.transparent,
+                                disabledBackgroundColor: Colors.grey.shade300,
+                                shadowColor: Colors.transparent,
+                                padding: EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                elevation: 0,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
