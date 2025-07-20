@@ -788,15 +788,28 @@ void showAppointmentRequestModal(BuildContext context, String facultyName, int f
   List<Map<String, dynamic>> availableSchedules = schedules.where((s) => (s['status'] ?? '').toLowerCase() == 'available').toList();
   print('[DEBUG] Available schedules:');
   print(availableSchedules);
-  // Get unique days from available schedules
+
+  // Define the order of days for sorting
+  const List<String> dayOrder = [
+    'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
+  ];
+
+  // Deduplicate and sort days based on dayOrder
   List<String> days = availableSchedules
       .map((s) => (s['day_of_week'] ?? s['day'] ?? '').toString())
-      .toSet()
       .where((d) => d.isNotEmpty)
+      .toSet()
       .toList();
-  print('[DEBUG] Days extracted from available schedules:');
+  days.sort((a, b) {
+    int ia = dayOrder.indexOf(a);
+    int ib = dayOrder.indexOf(b);
+    if (ia == -1 && ib == -1) return a.compareTo(b);
+    if (ia == -1) return 1;
+    if (ib == -1) return -1;
+    return ia.compareTo(ib);
+  });
+  print('[DEBUG] Days extracted from available schedules (deduped & sorted):');
   print(days);
-  days.sort((a, b) => a.compareTo(b));
   String selectedDay = days.isNotEmpty ? days[0] : '';
   int? selectedIndex;
 
@@ -806,9 +819,9 @@ void showAppointmentRequestModal(BuildContext context, String facultyName, int f
     builder: (context) {
       return StatefulBuilder(
         builder: (context, setState) {
-          // Filter available schedules for the selected day
+          // Filter available schedules for the selected day (exact match)
           List<Map<String, dynamic>> availableTimes = availableSchedules.where((s) {
-            String day = s['day_of_week'] ?? s['day'] ?? '';
+            String day = (s['day_of_week'] ?? s['day'] ?? '').toString();
             return day == selectedDay;
           }).toList();
           return Dialog(
