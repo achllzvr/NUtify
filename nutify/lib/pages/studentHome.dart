@@ -5,6 +5,8 @@ import 'package:nutify/pages/studentInbox.dart';
 import 'package:nutify/pages/studentProfile.dart';
 import 'package:nutify/pages/login.dart';
 import 'package:nutify/models/studentSearch.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class StudentHome extends StatefulWidget {
   StudentHome({super.key});
@@ -778,16 +780,23 @@ class _StudentHomeState extends State<StudentHome> {
 
 // Appointment Request Modal
 void showAppointmentRequestModal(BuildContext context, String facultyName, int facultyId) async {
+  print('[DEBUG] POSTING to fetchFacultySchedules with facultyId: $facultyId');
   List<Map<String, dynamic>> schedules = await fetchFacultySchedules(facultyId);
-  Map<String, List<Map<String, dynamic>>> schedulesByDay = {};
-  for (var sched in schedules) {
-    String day = sched['day_of_week'] ?? sched['day'] ?? '';
-    if (!schedulesByDay.containsKey(day)) {
-      schedulesByDay[day] = [];
-    }
-    schedulesByDay[day]!.add(sched);
-  }
-  List<String> days = schedulesByDay.keys.toList();
+  print('[DEBUG] Schedules returned:');
+  print(schedules);
+  // Only consider schedules with status 'available'
+  List<Map<String, dynamic>> availableSchedules = schedules.where((s) => (s['status'] ?? '').toLowerCase() == 'available').toList();
+  print('[DEBUG] Available schedules:');
+  print(availableSchedules);
+  // Get unique days from available schedules
+  List<String> days = availableSchedules
+      .map((s) => (s['day_of_week'] ?? s['day'] ?? '').toString())
+      .toSet()
+      .where((d) => d.isNotEmpty)
+      .toList();
+  print('[DEBUG] Days extracted from available schedules:');
+  print(days);
+  days.sort((a, b) => a.compareTo(b));
   String selectedDay = days.isNotEmpty ? days[0] : '';
   int? selectedIndex;
 
@@ -797,7 +806,11 @@ void showAppointmentRequestModal(BuildContext context, String facultyName, int f
     builder: (context) {
       return StatefulBuilder(
         builder: (context, setState) {
-          List<Map<String, dynamic>> availableTimes = schedulesByDay[selectedDay] ?? [];
+          // Filter available schedules for the selected day
+          List<Map<String, dynamic>> availableTimes = availableSchedules.where((s) {
+            String day = s['day_of_week'] ?? s['day'] ?? '';
+            return day == selectedDay;
+          }).toList();
           return Dialog(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
@@ -1047,17 +1060,34 @@ void showAppointmentRequestModal(BuildContext context, String facultyName, int f
   );
 }
 
-// Helper: fetch faculty schedules (API call)
 Future<List<Map<String, dynamic>>> fetchFacultySchedules(int facultyId) async {
-  // TODO: Replace with real API call
-  // Example: await StudentSchedule.fetchFacultySchedules(facultyId);
-  // For now, return mock data
-  await Future.delayed(Duration(milliseconds: 300));
-  return [
-    { 'day_of_week': 'Monday', 'start_time': '09:00', 'end_time': '10:00' },
-    { 'day_of_week': 'Tuesday', 'start_time': '09:00', 'end_time': '10:00' },
-    { 'day_of_week': 'Friday', 'start_time': '09:00', 'end_time': '10:00' },
-  ];
+  // Calls the backend API to fetch schedules for a teacher (facultyId)
+  const String apiUrl = 'https://nutify.site/api.php?action=studentFetchTeacherSched';
+  try {
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'id': facultyId.toString()}),
+    );
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (data is List) {
+        // Each item should have day_of_week, start_time, end_time, status, schedule_id, etc.
+        return List<Map<String, dynamic>>.from(data);
+      } else if (data is Map && data.containsKey('schedules')) {
+        // Some APIs wrap in a 'schedules' key
+        return List<Map<String, dynamic>>.from(data['schedules']);
+      } else {
+        return [];
+      }
+    } else {
+      print('Failed to fetch schedules: ${response.statusCode}');
+      return [];
+    }
+  } catch (e) {
+    print('Error fetching faculty schedules: $e');
+    return [];
+  }
 }
 
 // Helper: format time (HH:mm or HH:mm:ss to h:mm)
