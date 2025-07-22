@@ -911,12 +911,6 @@ Future<Map<String, dynamic>> _updateAppointmentStatus(String appointmentId, Stri
     case 'declined':
       action = 'updateAppStatusD';
       break;
-    case 'missed':
-      action = 'teacherMarkMissed';
-      break;
-    case 'completed':
-      action = 'updateAppStatusC';
-      break;
     default:
       throw Exception('Invalid status');
   }

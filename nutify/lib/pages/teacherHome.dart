@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:nutify/pages/teacherInbox.dart';
 import 'package:nutify/pages/teacherProfile.dart';
 import 'package:nutify/models/teacherHomeAppointments.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class TeacherHome extends StatefulWidget {
   TeacherHome({super.key});
@@ -203,13 +205,29 @@ class _TeacherHomeState extends State<TeacherHome> {
                         ],
                       ),
                       child: ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
                           _showStatusConfirmationDialog(
                             context,
                             'completed',
                             appointment.id,
-                            () {
-                              // TODO: Implement mark as completed logic
+                            () async {
+                              final result = await _updateAppointmentStatus(appointment.id, 'completed');
+                              if (result['error'] == false) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Appointment marked as completed!', style: TextStyle(fontFamily: 'Arimo', color: Colors.white)),
+                                    backgroundColor: Color(0xFF35408E),
+                                  ),
+                                );
+                                setState(() {}); // Refresh UI
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(result['message'] ?? 'Failed to update appointment', style: TextStyle(fontFamily: 'Arimo', color: Colors.white)),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              }
                             },
                           );
                         },
@@ -252,13 +270,29 @@ class _TeacherHomeState extends State<TeacherHome> {
                         ],
                       ),
                       child: ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
                           _showStatusConfirmationDialog(
                             context,
                             'missed',
                             appointment.id,
-                            () {
-                              // TODO: Implement mark as missed logic
+                            () async{
+                              final result = await _updateAppointmentStatus(appointment.id, 'missed');
+                              if (result['error'] == false) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Appointment marked as missed!', style: TextStyle(fontFamily: 'Arimo', color: Colors.white)),
+                                    backgroundColor: Color(0xFF35408E),
+                                  ),
+                                );
+                                setState(() {}); // Refresh UI
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(result['message'] ?? 'Failed to update appointment', style: TextStyle(fontFamily: 'Arimo', color: Colors.white)),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              }
                             },
                           );
                         },
@@ -292,7 +326,7 @@ class _TeacherHomeState extends State<TeacherHome> {
   }
 
   // Confirmation dialog method
-  Future<void> _showStatusConfirmationDialog(BuildContext context, String status, String appointmentId, VoidCallback onConfirm) async {
+  Future<void> _showStatusConfirmationDialog(BuildContext context, String status, String appointmentId, Future<void> Function() onConfirm,) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -433,10 +467,10 @@ class _TeacherHomeState extends State<TeacherHome> {
                           ],
                         ),
                         child: ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
                             Navigator.of(context).pop(); // Close dialog
                             print('$status confirmation dialog for appointment id: $appointmentId');
-                            onConfirm();
+                            await onConfirm();
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.transparent,
@@ -630,4 +664,26 @@ class _TeacherHomeState extends State<TeacherHome> {
       ),
     );
   }
+}
+
+Future<Map<String, dynamic>> _updateAppointmentStatus(String appointmentId, String status) async {
+  // Map status to API action
+  String action;
+  switch (status) {
+    case 'completed':
+      action = 'updateAppStatusC';
+      break;
+    case 'missed':
+      action = 'updateAppStatusM';
+      break;
+    default:
+      throw Exception('Invalid status');
+  }
+
+  final response = await http.post(
+    Uri.parse('https://nutify.site/api.php?action=$action'),
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({'appointment_id': appointmentId}),
+  );
+  return jsonDecode(response.body);
 }
