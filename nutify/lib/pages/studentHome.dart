@@ -824,30 +824,37 @@ void showAppointmentRequestModal(BuildContext context, String facultyName, int f
             String day = (s['day_of_week'] ?? s['day'] ?? '').toString();
             return day == selectedDay;
           }).toList();
+
+        // Button enabled only if a day is selected, there are available times, and a schedule is selected
+        bool isScheduleButtonEnabled = 
+          selectedDay.isNotEmpty &&
+          availableTimes.isNotEmpty &&
+          selectedIndex != null;
+
           return Dialog(
-            shape: RoundedRectangleBorder(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
               borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.15),
+                  spreadRadius: 3,
+                  blurRadius: 20,
+                  offset: Offset(0, 8),
+                ),
+              ],
             ),
-            elevation: 0,
-            backgroundColor: Colors.transparent,
-            child: Container(
-              padding: EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.15),
-                    spreadRadius: 3,
-                    blurRadius: 20,
-                    offset: Offset(0, 8),
-                  ),
-                ],
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
                   // Title
                   RichText(
                     text: TextSpan(
@@ -1020,24 +1027,34 @@ void showAppointmentRequestModal(BuildContext context, String facultyName, int f
                       Expanded(
                         child: Container(
                           decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [Color(0xFFFFD54F), Color(0xFFFFB300)],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
+                            gradient: isScheduleButtonEnabled
+                                ? LinearGradient(
+                                    colors: [Color(0xFFFFD54F), Color(0xFFFFB300)],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  )
+                                : LinearGradient(
+                                    colors: [Colors.grey.shade300, Colors.grey.shade400],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
                             borderRadius: BorderRadius.circular(12),
                             boxShadow: [
                               BoxShadow(
-                                color: Color(0xFFFFB000).withOpacity(0.25),
+                                color: isScheduleButtonEnabled
+                                    ? Color(0xFFFFB000).withOpacity(0.25)
+                                    : Colors.grey.withOpacity(0.15),
                                 blurRadius: 8,
                                 offset: Offset(0, 4),
                               ),
                             ],
                           ),
                           child: ElevatedButton(
-                            onPressed: (selectedIndex == null) ? null : () {
-                              // TODO: Implement schedule request logic
-                            },
+                            onPressed: isScheduleButtonEnabled
+                                ? () {
+                                    // TODO: Implement schedule request logic
+                                  }
+                                : null,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.transparent,
                               shadowColor: Colors.transparent,
@@ -1055,7 +1072,7 @@ void showAppointmentRequestModal(BuildContext context, String facultyName, int f
                                 fontFamily: 'Arimo',
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                                color: isScheduleButtonEnabled ? Colors.white : Colors.grey.shade400,
                               ),
                             ),
                           ),
