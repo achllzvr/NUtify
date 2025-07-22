@@ -7,6 +7,7 @@ import 'package:nutify/pages/login.dart';
 import 'package:nutify/models/studentSearch.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class StudentHome extends StatefulWidget {
   StudentHome({super.key});
@@ -1097,13 +1098,49 @@ void showAppointmentRequestModal(BuildContext context, String facultyName, int f
                           ),
                           child: ElevatedButton(
                             onPressed: isScheduleButtonEnabled
-                                ? () {
+                                ? () async {
                                     
-                                    print('Scheduling appointment with $facultyName on $selectedDay: facultyId: $facultyId, schedule id: ${availableTimes[selectedIndex!]['schedule_id']}');
-                                    print('Reason: ${reasonController.text.trim()}');
-                                    
-                                  }
-                                : null,
+                                    final prefs = await SharedPreferences.getInstance();
+                                    final String? studentIdStr = prefs.getString('userId');
+                                    if (studentIdStr == null) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text('User ID not found. Please log in again.')),
+                                      );
+                                      return;
+                                    }
+                                    final int studentId = int.tryParse(studentIdStr) ?? 0;
+                                    if (studentId == 0) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text('Invalid user ID. Please log in again.')),
+                                      );
+                                      return;
+                                    }
+                                    int scheduleId = availableTimes[selectedIndex!]['schedule_id'];
+                                    String reason = reasonController.text.trim();
+
+                                    if (scheduleId > 0 && reason.isNotEmpty) {
+                                      var result = await postSetAppointment(
+                                        studentId: studentId,
+                                        teacherId: facultyId,
+                                        scheduleId: scheduleId,
+                                        reason: reason,
+                                      );
+                                      if (result['error'] == true) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text(result['message'])),
+                                        );
+                                      } else {
+                                        Navigator.of(context).pop(); // Close dialog on success
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text('Appointment request sent successfully!')),
+                                        );
+                                      }
+                                    } else {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text('There was an error. Appointment could not be scheduled.')),
+                                      );
+                                    }
+                                  } : null,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.transparent,
                               shadowColor: Colors.transparent,
@@ -1181,5 +1218,38 @@ String formatTime(String? time) {
     return '${hour12}:${minute.toString().padLeft(2, '0')} $ampm';
   } catch (_) {
     return time;
+  }
+}
+
+Future<Map<String, dynamic>> postSetAppointment({
+  required int studentId,
+  required int teacherId,
+  required int scheduleId,
+  required String reason,
+}) async {
+  const String apiUrl = 'https://nutify.site/api.php?action=studentSetAppointment';
+  try {
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      body: {
+        'studentID': studentId.toString(),
+        'teacherID': teacherId.toString(),
+        'schedule_id': scheduleId.toString(),
+        'appointment_reason': reason,
+      },
+    );
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body) as Map<String, dynamic>;
+    } else {
+      return {
+        'error': true,
+        'message': 'Failed to set appointment: ${response.statusCode}'
+      };
+    }
+  } catch (e) {
+    return {
+      'error': true,
+      'message': 'Error: $e'
+    };
   }
 }
