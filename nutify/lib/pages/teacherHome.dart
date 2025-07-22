@@ -4,6 +4,7 @@ import 'package:nutify/pages/teacherProfile.dart';
 import 'package:nutify/models/teacherHomeAppointments.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TeacherHome extends StatefulWidget {
   TeacherHome({super.key});
@@ -13,6 +14,22 @@ class TeacherHome extends StatefulWidget {
 }
 
 class _TeacherHomeState extends State<TeacherHome> {
+
+  String? teacherUserId;
+  
+  @override
+  void initState() {
+    super.initState();
+    _loadTeacherUserId();
+  }
+  
+  Future<void> _loadTeacherUserId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      teacherUserId = prefs.getString('userId');
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -92,10 +109,18 @@ class _TeacherHomeState extends State<TeacherHome> {
   Widget _buildAppointmentCard(TeacherHomeAppointments appointment) {
     // Get initials for avatar
     String initials = appointment.studentName.split(' ').map((name) => name.isNotEmpty ? name[0] : '').take(2).join('').toUpperCase();
-    
+
     return GestureDetector(
       onTap: () {
-        print('Accepted appointment ID: ${appointment.id}');
+        if (teacherUserId != null) {
+          print('Accepted appointment ID: ${appointment.id}');
+          _callStudentToAppointment(appointment.id, teacherUserId!);
+        } else {
+          // Handle the case where userID is not loaded yet
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('User ID not loaded')),
+          );
+        }
       },
       child: Card(
         margin: EdgeInsets.only(bottom: 12),
@@ -664,6 +689,55 @@ class _TeacherHomeState extends State<TeacherHome> {
       ),
     );
   }
+
+  Future<void> _callStudentToAppointment(String appointmentId, String facultyId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('https://nutify.site/api.php?action=sendTeacherCallNotification'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'appointment_id': appointmentId,
+          'faculty_id': facultyId,
+        }),
+      );
+  
+      if (response.statusCode == 200 && response.body.isNotEmpty) {
+        final result = jsonDecode(response.body);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              result['error'] == false
+                  ? 'Student called to appointment!'
+                  : (result['message'] ?? 'Failed to send notification'),
+              style: TextStyle(fontFamily: 'Arimo', color: Colors.white),
+            ),
+            backgroundColor: result['error'] == false ? Color(0xFF35408E) : Colors.red,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Server error: ${response.statusCode}\n${response.body}',
+              style: TextStyle(fontFamily: 'Arimo', color: Colors.white),
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Error: $e',
+            style: TextStyle(fontFamily: 'Arimo', color: Colors.white),
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
 }
 
 Future<Map<String, dynamic>> _updateAppointmentStatus(String appointmentId, String status) async {
