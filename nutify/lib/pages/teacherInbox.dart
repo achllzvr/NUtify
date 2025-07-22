@@ -5,6 +5,8 @@ import 'package:nutify/models/teacherInboxPending.dart';
 import 'package:nutify/models/teacherInboxCancelled.dart';
 import 'package:nutify/models/teacherInboxCompleted.dart';
 import 'package:nutify/models/teacherInboxMissed.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class TeacherInbox extends StatefulWidget {
   TeacherInbox({super.key});
@@ -227,7 +229,7 @@ class _TeacherInboxState extends State<TeacherInbox>
   }
 
   // Confirmation dialog method
-  Future<void> _showStatusConfirmationDialog(BuildContext context, String status, String appointmentId, VoidCallback onConfirm) async {
+  Future<void> _showStatusConfirmationDialog(BuildContext context, String status, String appointmentId, Future<void> Function() onConfirm,) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -368,10 +370,10 @@ class _TeacherInboxState extends State<TeacherInbox>
                           ],
                         ),
                         child: ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
                             Navigator.of(context).pop(); // Close dialog
                             print('$status confirmation dialog for appointment id: $appointmentId');
-                            onConfirm();
+                            await onConfirm();
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.transparent,
@@ -573,7 +575,7 @@ class _TeacherInboxState extends State<TeacherInbox>
                       child: Container(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [Color(0xFF87CEEB), Color(0xFF4682B4)], // Same blue as card
+                            colors: [Color(0xFF87CEEB), Color(0xFF4682B4)],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
@@ -592,8 +594,24 @@ class _TeacherInboxState extends State<TeacherInbox>
                               context,
                               'accepted',
                               appointmentId,
-                              () {
-                                // TODO: Implement accept logic
+                              () async {
+                                final result = await _updateAppointmentStatus(appointmentId, 'accepted');
+                                if (result['error'] == false) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Appointment marked as accepted!', style: TextStyle(fontFamily: 'Arimo', color: Colors.white)),
+                                      backgroundColor: Color(0xFF35408E),
+                                    ),
+                                  );
+                                  setState(() {}); // Refresh UI
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(result['message'] ?? 'Failed to update appointment', style: TextStyle(fontFamily: 'Arimo', color: Colors.white)),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                }
                               },
                             );
                           },
@@ -641,8 +659,24 @@ class _TeacherInboxState extends State<TeacherInbox>
                               context,
                               'declined',
                               appointmentId,
-                              () {
-                                // TODO: Implement decline logic
+                              () async {
+                                final result = await _updateAppointmentStatus(appointmentId, 'declined');
+                                if (result['error'] == false) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Appointment marked as declined!', style: TextStyle(fontFamily: 'Arimo', color: Colors.white)),
+                                      backgroundColor: Color(0xFF35408E),
+                                    ),
+                                  );
+                                  setState(() {}); // Refresh UI
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(result['message'] ?? 'Failed to update appointment', style: TextStyle(fontFamily: 'Arimo', color: Colors.white)),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                }
                               },
                             );
                           },
@@ -865,4 +899,32 @@ class _TeacherInboxState extends State<TeacherInbox>
       ),
     );
   }
+}
+
+Future<Map<String, dynamic>> _updateAppointmentStatus(String appointmentId, String status) async {
+  // Map status to API action
+  String action;
+  switch (status) {
+    case 'accepted':
+      action = 'updateAppStatusA';
+      break;
+    case 'declined':
+      action = 'updateAppStatusD';
+      break;
+    case 'missed':
+      action = 'teacherMarkMissed';
+      break;
+    case 'completed':
+      action = 'updateAppStatusC';
+      break;
+    default:
+      throw Exception('Invalid status');
+  }
+
+  final response = await http.post(
+    Uri.parse('https://nutify.site/api.php?action=$action'),
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({'appointment_id': appointmentId}),
+  );
+  return jsonDecode(response.body);
 }
