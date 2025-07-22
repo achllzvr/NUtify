@@ -817,6 +817,7 @@ void showAppointmentRequestModal(BuildContext context, String facultyName, int f
     context: context,
     barrierDismissible: false,
     builder: (context) {
+      final TextEditingController reasonController = TextEditingController();
       return StatefulBuilder(
         builder: (context, setState) {
           // Filter available schedules for the selected day (exact match)
@@ -829,7 +830,8 @@ void showAppointmentRequestModal(BuildContext context, String facultyName, int f
         bool isScheduleButtonEnabled = 
           selectedDay.isNotEmpty &&
           availableTimes.isNotEmpty &&
-          selectedIndex != null;
+          selectedIndex != null &&
+          reasonController.text.trim().isNotEmpty;
 
           return Dialog(
           shape: RoundedRectangleBorder(
@@ -993,6 +995,50 @@ void showAppointmentRequestModal(BuildContext context, String facultyName, int f
                             },
                           ),
                   ),
+                  SizedBox(height: 16),
+                  // Reason for Appointment Text Field
+                  Text(
+                    'Reason for Appointment:',
+                    style: TextStyle(
+                      fontFamily: 'Arimo',
+                      fontSize: 16,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Color(0xFFF5F5F5),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey.shade300),
+                    ),
+                    child: TextField(
+                      controller: reasonController,
+                      maxLines: 2,
+                      minLines: 1,
+                      onChanged: (val) {
+                        setState(() {}); // Update button enabled state
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'Enter your reason...',
+                        hintStyle: TextStyle(
+                          fontFamily: 'Arimo',
+                          color: Colors.grey,
+                          fontSize: 15,
+                        ),
+                        border: InputBorder.none,
+                        isDense: true,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                      style: TextStyle(
+                        fontFamily: 'Arimo',
+                        fontSize: 15,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
                   SizedBox(height: 24),
                   // Action Buttons
                   Row(
@@ -1054,6 +1100,7 @@ void showAppointmentRequestModal(BuildContext context, String facultyName, int f
                                 ? () {
                                     
                                     print('Scheduling appointment with $facultyName on $selectedDay: facultyId: $facultyId, schedule id: ${availableTimes[selectedIndex!]['schedule_id']}');
+                                    print('Reason: ${reasonController.text.trim()}');
                                     
                                   }
                                 : null,
