@@ -1131,14 +1131,10 @@ void showAppointmentRequestModal(BuildContext context, String facultyName, int f
                                         );
                                       } else {
                                         Navigator.of(context).pop(); // Close dialog on success
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(content: Text('Appointment request sent successfully!')),
-                                        );
+                                        showRequestSnackBar(context, 'Appointment request sent successfully!');
                                       }
                                     } else {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text('There was an error. Appointment could not be scheduled.')),
-                                      );
+                                      showRequestSnackBarError(context, 'There was an error. Appointment could not be scheduled.');
                                     }
                                   } : null,
                             style: ElevatedButton.styleFrom(
@@ -1252,4 +1248,36 @@ Future<Map<String, dynamic>> postSetAppointment({
       'message': 'Error: $e'
     };
   }
+}
+
+void showRequestSnackBar(BuildContext context, String message) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(
+        message,
+        style: TextStyle(
+          fontFamily: 'Arimo',
+          color: Colors.white,
+        ),
+      ),
+      duration: Duration(seconds: 2),
+      backgroundColor: Color(0xFF00FD0F),
+    ),
+  );
+}
+
+void showRequestSnackBarError(BuildContext context, String message) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(
+        message,
+        style: TextStyle(
+          fontFamily: 'Arimo',
+          color: Colors.white,
+        ),
+      ),
+      duration: Duration(seconds: 2),
+      backgroundColor: Color(0xFFDF0000),
+    ),
+  );
 }
