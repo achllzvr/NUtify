@@ -1052,7 +1052,9 @@ void showAppointmentRequestModal(BuildContext context, String facultyName, int f
                           child: ElevatedButton(
                             onPressed: isScheduleButtonEnabled
                                 ? () {
-                                    // TODO: Implement schedule request logic
+                                    
+                                    print('Scheduling appointment with $facultyName on $selectedDay: facultyId: $facultyId, schedule id: ${availableTimes[selectedIndex!]['schedule_id']}');
+                                    
                                   }
                                 : null,
                             style: ElevatedButton.styleFrom(
