@@ -7,6 +7,7 @@ import 'package:nutify/models/teacherInboxCompleted.dart';
 import 'package:nutify/models/teacherInboxMissed.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TeacherInbox extends StatefulWidget {
   TeacherInbox({super.key});
@@ -19,10 +20,21 @@ class _TeacherInboxState extends State<TeacherInbox>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
+  String? teacherUserId;
+  
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
+    _loadTeacherUserId();
+  }
+
+
+  Future<void> _loadTeacherUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      teacherUserId = prefs.getString('userId');
+    });
   }
 
   @override
@@ -595,7 +607,7 @@ class _TeacherInboxState extends State<TeacherInbox>
                               'accepted',
                               appointmentId,
                               () async {
-                                final result = await _updateAppointmentStatus(appointmentId, 'accepted');
+                                final result = await _updateAppointmentStatus(appointmentId, 'accepted', teacherUserId!);
                                 if (result['error'] == false) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
@@ -660,7 +672,7 @@ class _TeacherInboxState extends State<TeacherInbox>
                               'declined',
                               appointmentId,
                               () async {
-                                final result = await _updateAppointmentStatus(appointmentId, 'declined');
+                                final result = await _updateAppointmentStatus(appointmentId, 'declined', teacherUserId!);
                                 if (result['error'] == false) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
@@ -901,7 +913,8 @@ class _TeacherInboxState extends State<TeacherInbox>
   }
 }
 
-Future<Map<String, dynamic>> _updateAppointmentStatus(String appointmentId, String status) async {
+Future<Map<String, dynamic>> _updateAppointmentStatus(
+    String appointmentId, String status, String facultyId) async {
   // Map status to API action
   String action;
   switch (status) {
@@ -918,7 +931,11 @@ Future<Map<String, dynamic>> _updateAppointmentStatus(String appointmentId, Stri
   final response = await http.post(
     Uri.parse('https://nutify.site/api.php?action=$action'),
     headers: {'Content-Type': 'application/json'},
-    body: jsonEncode({'appointment_id': appointmentId}),
+    body: jsonEncode({
+      'appointment_id': appointmentId,
+      'faculty_id': facultyId,
+      'status': status,
+    }),
   );
   return jsonDecode(response.body);
 }

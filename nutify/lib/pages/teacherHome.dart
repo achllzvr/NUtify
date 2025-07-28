@@ -230,13 +230,13 @@ class _TeacherHomeState extends State<TeacherHome> {
                         ],
                       ),
                       child: ElevatedButton(
-                        onPressed: () async {
+                        onPressed: () {
                           _showStatusConfirmationDialog(
                             context,
                             'completed',
                             appointment.id,
                             () async {
-                              final result = await _updateAppointmentStatus(appointment.id, 'completed');
+                              final result = await _updateAppointmentStatus(appointment.id, 'completed', teacherUserId!);
                               if (result['error'] == false) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
@@ -295,13 +295,13 @@ class _TeacherHomeState extends State<TeacherHome> {
                         ],
                       ),
                       child: ElevatedButton(
-                        onPressed: () async {
+                        onPressed: () {
                           _showStatusConfirmationDialog(
                             context,
                             'missed',
                             appointment.id,
                             () async{
-                              final result = await _updateAppointmentStatus(appointment.id, 'missed');
+                              final result = await _updateAppointmentStatus(appointment.id, 'missed', teacherUserId!);
                               if (result['error'] == false) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
@@ -740,7 +740,8 @@ class _TeacherHomeState extends State<TeacherHome> {
 
 }
 
-Future<Map<String, dynamic>> _updateAppointmentStatus(String appointmentId, String status) async {
+Future<Map<String, dynamic>> _updateAppointmentStatus(
+    String appointmentId, String status, String facultyId) async {
   // Map status to API action
   String action;
   switch (status) {
@@ -757,7 +758,11 @@ Future<Map<String, dynamic>> _updateAppointmentStatus(String appointmentId, Stri
   final response = await http.post(
     Uri.parse('https://nutify.site/api.php?action=$action'),
     headers: {'Content-Type': 'application/json'},
-    body: jsonEncode({'appointment_id': appointmentId}),
+    body: jsonEncode({
+      'appointment_id': appointmentId,
+      'faculty_id': facultyId,
+      'status': status,
+    }),
   );
   return jsonDecode(response.body);
 }
