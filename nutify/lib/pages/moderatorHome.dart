@@ -336,22 +336,32 @@ class _ModeratorHomeState extends State<ModeratorHome> {
             child: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Color(0xFFFFB000), Color(0xFFFF8F00)], // Student Home gradient
+                  colors: [Color(0xFFFFD418), Color(0xFFFFC107)], // Student Home gradient
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(10),
                 boxShadow: [
                   BoxShadow(
-                    color: Color(0xFFFFB000).withOpacity(0.3),
+                    color: Color(0xFFFFD418).withOpacity(0.4),
                     blurRadius: 8,
                     offset: Offset(0, 4),
                   ),
                 ],
               ),
               child: ElevatedButton(
-                onPressed: () {
-                  print('View Details pressed for appointment id: ${appointment.id}');
+                onPressed: () async {
+                  int appId = int.tryParse(appointment.id.toString()) ?? 0;
+                  if (appId == 0) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Invalid appointment ID')),
+                    );
+                    return;
+                  }
+                  await notifyAppointees(appId);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Notification sent!')),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.transparent,
@@ -363,7 +373,7 @@ class _ModeratorHomeState extends State<ModeratorHome> {
                   elevation: 0,
                 ),
                 child: Text(
-                  'View Details',
+                  'Notify Appointees',
                   style: TextStyle(
                     fontFamily: 'Arimo',
                     fontSize: 16,
@@ -378,4 +388,15 @@ class _ModeratorHomeState extends State<ModeratorHome> {
       ),
     );
   }
+
+  Future<void> notifyAppointees(int appointmentId) async {
+    final response = await http.post(
+      Uri.parse('https://nutify.site/api.php?action=notifyAppointees'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'appointment_id': appointmentId}),
+    );
+    final data = jsonDecode(response.body);
+    // Optionally show a snackbar with data['message']
+  }
+
 }
