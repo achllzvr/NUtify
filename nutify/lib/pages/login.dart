@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nutify/pages/studentHome.dart';
 import 'package:nutify/pages/teacherHome.dart';
 import 'package:nutify/pages/register.dart';
+import 'package:nutify/pages/moderatorHome.dart';
 import 'package:nutify/services/firebase_service.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -212,12 +213,21 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   (Route<dynamic> route) => false,
                 );
+              } else if (userType == 'moderator') {
+                // Moderator
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ModeratorHome(),
+                    settings: RouteSettings(name: '/moderatorHome'),
+                  ),
+                  (Route<dynamic> route) => false,
+                );
               } else {
-                // Show message for moderator account type (not implemented yet)
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                      'Moderator login not implemented yet',
+                      'Unknown user type: $userType',
                       style: TextStyle(fontFamily: 'Arimo'),
                     ),
                     backgroundColor: Color(0xFF35408E),
