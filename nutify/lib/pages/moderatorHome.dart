@@ -360,7 +360,10 @@ class _ModeratorHomeState extends State<ModeratorHome> {
                   }
                   await notifyAppointees(appId);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Notification sent!')),
+                    SnackBar(
+                      content: Text('Notification sent!', style: TextStyle(fontFamily: 'Arimo', color: Colors.white)),
+                      backgroundColor: Color(0xFF43A047), // Green
+                    ),
                   );
                 },
                 style: ElevatedButton.styleFrom(
