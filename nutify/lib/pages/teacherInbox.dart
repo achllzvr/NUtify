@@ -29,11 +29,13 @@ class _TeacherInboxState extends State<TeacherInbox>
     _loadTeacherUserId();
   }
 
+  bool _isUserIdLoading = true;
 
   Future<void> _loadTeacherUserId() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       teacherUserId = prefs.getString('userId');
+      _isUserIdLoading = false;
     });
   }
 
@@ -45,6 +47,13 @@ class _TeacherInboxState extends State<TeacherInbox>
 
   @override
   Widget build(BuildContext context) {
+    if (_isUserIdLoading) {
+      return Scaffold(
+        backgroundColor: const Color(0xFFF5F5F5),
+        appBar: _buildTeacherAppBar(context),
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: _buildTeacherAppBar(context),
@@ -383,8 +392,9 @@ class _TeacherInboxState extends State<TeacherInbox>
                         ),
                         child: ElevatedButton(
                           onPressed: () async {
+                            print('$status button pressed, teacherUserId=$teacherUserId');
                             Navigator.of(context).pop(); // Close dialog
-                            print('$status confirmation dialog for appointment id: $appointmentId');
+                            print('$status confirmation dialog for $teacherUserId\'s appointment id: $appointmentId');
                             await onConfirm();
                           },
                           style: ElevatedButton.styleFrom(
@@ -601,12 +611,13 @@ class _TeacherInboxState extends State<TeacherInbox>
                           ],
                         ),
                         child: ElevatedButton(
-                          onPressed: () {
+                          onPressed: teacherUserId == null || teacherUserId?.isEmpty == true ? null : () {
                             _showStatusConfirmationDialog(
                               context,
                               'accepted',
                               appointmentId,
                               () async {
+                                print('Sending: appointmentId=$appointmentId, facultyId=${teacherUserId!}, status=accepted');
                                 final result = await _updateAppointmentStatus(appointmentId, 'accepted', teacherUserId!);
                                 if (result['error'] == false) {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -666,12 +677,13 @@ class _TeacherInboxState extends State<TeacherInbox>
                           ],
                         ),
                         child: ElevatedButton(
-                          onPressed: () {
+                          onPressed: teacherUserId == null ? null : () {
                             _showStatusConfirmationDialog(
                               context,
                               'declined',
                               appointmentId,
                               () async {
+                                print('Sending: appointmentId=$appointmentId, facultyId=${teacherUserId!}, status=declined');
                                 final result = await _updateAppointmentStatus(appointmentId, 'declined', teacherUserId!);
                                 if (result['error'] == false) {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -911,31 +923,33 @@ class _TeacherInboxState extends State<TeacherInbox>
       ),
     );
   }
-}
 
-Future<Map<String, dynamic>> _updateAppointmentStatus(
-    String appointmentId, String status, String facultyId) async {
-  // Map status to API action
-  String action;
-  switch (status) {
-    case 'accepted':
-      action = 'updateAppStatusA';
-      break;
-    case 'declined':
-      action = 'updateAppStatusD';
-      break;
-    default:
-      throw Exception('Invalid status');
+  Future<Map<String, dynamic>> _updateAppointmentStatus(
+      String appointmentId, String status, String facultyId) async {
+    // Map status to API action
+    String action;
+    switch (status) {
+      case 'accepted':
+        action = 'updateAppStatusA';
+        break;
+      case 'declined':
+        action = 'updateAppStatusD';
+        break;
+      default:
+        throw Exception('Invalid status');
+    }
+
+    final response = await http.post(
+      Uri.parse('https://nutify.site/api.php?action=$action'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'appointment_id': appointmentId,
+        'faculty_id': facultyId,
+        'status': status,
+      }),
+    );
+    print('teacherUserId: $teacherUserId, appointmentId: $appointmentId, status: $status');
+    return jsonDecode(response.body);
   }
 
-  final response = await http.post(
-    Uri.parse('https://nutify.site/api.php?action=$action'),
-    headers: {'Content-Type': 'application/json'},
-    body: jsonEncode({
-      'appointment_id': appointmentId,
-      'faculty_id': facultyId,
-      'status': status,
-    }),
-  );
-  return jsonDecode(response.body);
 }
