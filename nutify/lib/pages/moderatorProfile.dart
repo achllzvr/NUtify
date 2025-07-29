@@ -430,25 +430,46 @@ class _ModeratorProfileState extends State<ModeratorProfile> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               IconButton(
-                icon: const Icon(Icons.home, color: Color(0xFFFFD418)),
+                icon: const Icon(Icons.home, color: Colors.white),
                 onPressed: () {
                   // Check if already on ModeratorHome page
                   if (ModalRoute.of(context)?.settings.name == '/moderatorHome') {
-                    // Already on home
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'You are already on the Home page',
+                          style: TextStyle(fontFamily: 'Arimo'),
+                        ),
+                        duration: Duration(seconds: 2),
+                        backgroundColor: Color(0xFF35408E),
+                      ),
+                    );
                   } else {
-                    Navigator.pushReplacementNamed(context, '/moderatorHome');
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ModeratorHome(),
+                        settings: RouteSettings(name: '/moderatorHome'),
+                      ),
+                      (Route<dynamic> route) => false,
+                    );
                   }
                 },
               ),
               IconButton(
-                icon: const Icon(Icons.inbox, color: Color(0xFFFFD418)),
+                icon: const Icon(Icons.inbox, color: Colors.white),
                 onPressed: () {
-                  // Check if already on ModeratorInbox page
-                  if (ModalRoute.of(context)?.settings.name == '/moderatorInbox') {
-                    // Already on inbox
-                  } else {
-                    Navigator.pushReplacementNamed(context, '/moderatorInbox');
-                  }
+                  // TODO: Replace with actual ModeratorInbox navigation when available
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Inbox page not implemented yet',
+                        style: TextStyle(fontFamily: 'Arimo'),
+                      ),
+                      duration: Duration(seconds: 2),
+                      backgroundColor: Color(0xFF35408E),
+                    ),
+                  );
                 },
               ),
             ],

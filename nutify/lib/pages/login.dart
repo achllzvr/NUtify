@@ -78,9 +78,8 @@ class _LoginPageState extends State<LoginPage> {
   void getDeviceToken() async {
     String url = "https://nutify.site/api.php?action=fetchToken";
 
-    // You would need a user ID to fetch their token
-    // This is just an example - you'd get the actual user ID from somewhere
-    String userID = "1"; // Replace with actual user ID
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String userID = prefs.getString('userId') ?? '';
 
     try {
       final Map<String, dynamic> requestBody = {'userID': userID};
