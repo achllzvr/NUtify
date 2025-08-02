@@ -577,6 +577,7 @@ body {
 
 /* History Section */
 .history-section {
+  background: #f0f0f0;
   border-radius: 20px;
   padding: 25px;
   margin-top: 2.5em;

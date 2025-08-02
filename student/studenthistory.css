@@ -577,6 +577,7 @@ body {
 
 /* History Section */
 .history-section {
+  background: #f0f0f0;
   border-radius: 20px;
   padding: 25px;
   margin-top: 2.5em;
@@ -596,7 +597,6 @@ body {
   box-shadow: inset 8px 8px 15px rgba(0, 0, 0, 0.1),
     inset -8px -8px 15px rgba(255, 255, 255, 0.8);
   transition: all 0.3s ease;
-  /* Increase right margin for more space between card and scrollbar */
   margin-right: 24px;
 }
 
