@@ -75,9 +75,9 @@
       </div>
 
       <div class="settings-dropdown" id="settingsDropdown">
-        <a href="#" class="dropdown-item">Edit Profile Details</a>
-          <a href="forgot.html" class="dropdown-item">Edit Available Times</a>
-        <a href="forgot.html" class="dropdown-item">Forgot Password</a>
+        <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#profileEditModal">Edit Profile Details</a>
+        <a href="forgot.html" class="dropdown-item">Edit Available Times</a>
+        <a href="../auth/forgot.html" class="dropdown-item">Forgot Password</a>
         <a href="#" class="dropdown-item">Logout</a>
       </div>
     </div>
@@ -219,11 +219,93 @@
       </div>
     </div>
 
+    <!-- Profile Edit Modal -->
+    <div
+      class="modal fade"
+      id="profileEditModal"
+      tabindex="-1"
+      aria-labelledby="profileEditModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="profileEditModalLabel">
+              Edit Profile Details
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="profile-edit-form">
+              <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <div class="input-group">
+                  <img
+                    src="../feather/user.svg"
+                    alt="User"
+                    class="input-icon"
+                  />
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="username"
+                    value="Not John Doe"
+                  />
+                </div>
+              </div>
+
+              <div class="department-notice">
+                <p class="notice-text">
+                  If you wish to change your department, first name, or last
+                  name. Please go to the nearest admin.
+                </p>
+                <p class="notice-link">
+                  <a href="#" class="text-primary"
+                    >See Moderator/ Admin List.</a
+                  >
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" id="saveProfileBtn">
+              Save
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
       crossorigin="anonymous"
     ></script>
     <script src="faculty.js"></script>
+    <script>
+      document.querySelectorAll('.modal').forEach(function(modal) {
+        modal.addEventListener('hidden.bs.modal', function () {
+          document.querySelectorAll('.modal-backdrop').forEach(function(backdrop) {
+            backdrop.remove();
+          });
+          if (!document.querySelector('.modal.show')) {
+            document.body.classList.remove('modal-open');
+            document.body.style.paddingRight = '';
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
+    </script>
+  </body>
+</html>
+      
+    </script>
   </body>
 </html>

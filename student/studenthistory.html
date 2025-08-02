@@ -76,7 +76,7 @@
 
       <div class="settings-dropdown" id="settingsDropdown">
         <a href="#" class="dropdown-item">Edit Profile Details</a>
-        <a href="studentforgot.html" class="dropdown-item">Forgot Password</a>
+        <a href="../auth/forgot.html" class="dropdown-item">Forgot Password</a>
         <a href="#" class="dropdown-item">Logout</a>
       </div>
     </div>
@@ -467,9 +467,21 @@
       crossorigin="anonymous"
     ></script>
     <script src="student.js"></script>
-  </body>
-</html>
-    ></script>
-    <script src="student.js"></script>
+    <script>
+ 
+      document.querySelectorAll('.modal').forEach(function(modal) {
+        modal.addEventListener('hidden.bs.modal', function () {
+        
+          document.querySelectorAll('.modal-backdrop').forEach(function(backdrop) {
+            backdrop.remove();
+          });
+       
+          if (!document.querySelector('.modal.show')) {
+            document.body.classList.remove('modal-open');
+            document.body.style.paddingRight = '';
+          }
+        });
+      });
+    </script>
   </body>
 </html>
