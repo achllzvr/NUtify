@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NUtify - History</title>
-    <link rel="stylesheet" href="facultyhistory.css" />
+    <title>NUtify - Home</title>
+    <link rel="stylesheet" href="facultyhome.css" />
     <!--Favicon-->
     <link rel="icon" type="image/x-icon" href="../img/bell.png" />
     <!--Montserrat/Armio-->
@@ -23,289 +23,23 @@
     />
   </head>
   <body>
-    <!--Sidebar-->
-    <div class="sidebar" id="sidebar">
-      <div class="sidebar-content">
-        <div class="sidebar-header">
-          <div class="sidebar-logo">
-            <img src="../img/NUtifywhite.png" alt="NUtify" class="logo" />
-            <div class="chevron-icon" id="menuToggle">
-              <img
-                src="../feather/chevron-left.svg"
-                alt="Collapse"
-                class="icon"
-              />
-            </div>
-          </div>
-          <div class="sidebar-icon menu-burger" id="menuToggleBurger">
-            <img src="../feather/menu.svg" alt="Menu" class="icon" />
-          </div>
-        </div>
-
-        <div class="sidebar-nav">
-          <div class="sidebar-icon active">
-            <img src="../feather/home.svg" alt="Home" class="icon" />
-            <span class="nav-text">Home</span>
-          </div>
-          <div class="sidebar-icon">
-            <img src="../feather/mail.svg" alt="History" class="icon" />
-            <span class="nav-text">History</span>
-          </div>
-        </div>
-
-        <!--Profile-->
-        <div class="sidebar-bottom">
-          <div class="user-info">
-            <div class="sidebar-avatar">
-              <img
-                src="../tabler-avatars-1.0.0/jpg/237d3876ef98d5364ed1326813f4ed5b.jpg"
-                alt="Avatar"
-                class="avatar"
-              />
-            </div>
-            <div class="user-details">
-              <div class="user-name">Not John Doe</div>
-              <div class="user-role">Faculty - SACE</div>
-            </div>
-            <div class="settings-icon" id="settingsToggle">
-              <img src="../feather/settings.svg" alt="Settings" class="icon" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="settings-dropdown" id="settingsDropdown">
-        <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#profileEditModal">Edit Profile Details</a>
-        <a href="forgot.html" class="dropdown-item">Edit Available Times</a>
-        <a href="../auth/forgot.html" class="dropdown-item">Forgot Password</a>
-        <a href="#" class="dropdown-item">Logout</a>
-      </div>
-    </div>
-
-    <!-- Top Header -->
-    <div class="top-header">
-      <div class="header-left">
-        <h1 class="header-title">Hello, Not John Doe</h1>
-        <p class="header-subtitle">
-          Manage all your student appointments and consultations in one place
-        </p>
-      </div>
-      <div class="header-right">
-        <div class="search-container">
-          <div class="search-input-wrapper">
-            <img src="../feather/menu.svg" alt="Menu" class="menu-icon" />
-            <input
-              type="text"
-              class="search-input"
-              placeholder="Search Students"
-            />
-            <img
-              src="../feather/search.svg"
-              alt="Search"
-              class="search-icon-end"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="main-content">
-      <div class="content-container">
-        <div class="left-column">
-          <div class="history-section" style="margin-top:2.5em;">
-            <div class="section-header">
-              <h2>Upcoming Student Appointments</h2>
-            </div>
-            <div class="history-card-list appointment-list">
-              <div class="appointment-item history-item" data-status="accepted">
-                <div class="appointment-avatar">
-                  <img
-                    src="../tabler-avatars-1.0.0/jpg/1c9a4dd0bbd964e3eecbd40caf3b7e37.jpg"
-                    alt="Beatriz Solis"
-                    class="avatar-img"
-                  />
-                </div>
-                <div class="appointment-info">
-                  <div class="appointment-name history-name">Beatriz Solis</div>
-                  <div class="appointment-details history-details">
-                    Student - SACE
-                  </div>
-                  <div class="appointment-time">June 15 - 00:00 am</div>
-                  <button class="see-more-btn">See More</button>
-                </div>
-              </div>
-              <div class="appointment-item history-item" data-status="accepted">
-                <div class="appointment-avatar">
-                  <img
-                    src="../tabler-avatars-1.0.0/jpg/c33237da3438494d1abc67166196484e.jpg"
-                    alt="John Clarenz Dimazana"
-                    class="avatar-img"
-                  />
-                </div>
-                <div class="appointment-info">
-                  <div class="appointment-name history-name">John Clarenz Dimazana</div>
-                  <div class="appointment-details history-details">
-                    Student - SACE
-                  </div>
-                  <div class="appointment-time">June 16 - 10:00 am</div>
-                  <button class="see-more-btn">See More</button>
-                </div>
-              </div>
-              <div class="appointment-item history-item" data-status="accepted">
-                <div class="appointment-avatar">
-                  <img
-                    src="../tabler-avatars-1.0.0/jpg/8940e8ea369def14e82f05a5fee994b9.jpg"
-                    alt="Kriztopher Kier Estioco"
-                    class="avatar-img"
-                  />
-                </div>
-                <div class="appointment-info">
-                  <div class="appointment-name history-name">Kriztopher Kier Estioco</div>
-                  <div class="appointment-details history-details">
-                    Student - SACE
-                  </div>
-                  <div class="appointment-time">June 18 - 02:00 pm</div>
-                  <button class="see-more-btn">See More</button>
-                </div>
-              </div>
-              <div class="appointment-item history-item" data-status="accepted">
-                <div class="appointment-avatar">
-                  <img
-                    src="../tabler-avatars-1.0.0/jpg/237d3876ef98d5364ed1326813f4ed5b.jpg"
-                    alt="Niel Cerezo"
-                    class="avatar-img"
-                  />
-                </div>
-                <div class="appointment-info">
-                  <div class="appointment-name history-name">Niel Cerezo</div>
-                  <div class="appointment-details history-details">
-                    Student - SACE
-                  </div>
-                  <div class="appointment-time">June 19 - 11:00 am</div>
-                  <button class="see-more-btn">See More</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div
-      class="modal fade"
-      id="historyDetailsModal"
-      tabindex="-1"
-      aria-labelledby="historyDetailsModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content history-details-modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="historyDetailsModalLabel">
-              Appointment Status
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body">
-            <div class="history-details-modal-body"></div>
-          </div>
-          <div class="modal-footer"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Profile Edit Modal -->
-    <div
-      class="modal fade"
-      id="profileEditModal"
-      tabindex="-1"
-      aria-labelledby="profileEditModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="profileEditModalLabel">
-              Edit Profile Details
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body">
-            <div class="profile-edit-form">
-              <div class="mb-3">
-                <label for="username" class="form-label">Username</label>
-                <div class="input-group">
-                  <img
-                    src="../feather/user.svg"
-                    alt="User"
-                    class="input-icon"
-                  />
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="username"
-                    value="Not John Doe"
-                  />
-                </div>
-              </div>
-
-              <div class="department-notice">
-                <p class="notice-text">
-                  If you wish to change your department, first name, or last
-                  name. Please go to the nearest admin.
-                </p>
-                <p class="notice-link">
-                  <a href="#" class="text-primary"
-                    >See Moderator/ Admin List.</a
-                  >
-                </p>
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-primary" id="saveProfileBtn">
-              Save
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <!-- Component Containers -->
+    <div id="faculty-sidebar-container"></div>
+    <div id="faculty-header-container"></div>
+    <div id="faculty-main-content-container"></div>
+    <div id="faculty-modals-container"></div>
 
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
       crossorigin="anonymous"
     ></script>
+    <!-- Component Scripts -->
+    <script src="components/facultysidebar.js"></script>
+    <script src="components/facultyheader.js"></script>
+    <script src="components/facultyappointments.js"></script>
+    <script src="components/facultymodals.js"></script>
     <script src="faculty.js"></script>
-    <script>
-      document.querySelectorAll('.modal').forEach(function(modal) {
-        modal.addEventListener('hidden.bs.modal', function () {
-          document.querySelectorAll('.modal-backdrop').forEach(function(backdrop) {
-            backdrop.remove();
-          });
-          if (!document.querySelector('.modal.show')) {
-            document.body.classList.remove('modal-open');
-            document.body.style.paddingRight = '';
-          }
-        });
-      });
-    </script>
-  </body>
-</html>
-    </script>
   </body>
 </html>
       
-    </script>
-  </body>
-</html>

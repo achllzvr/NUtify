@@ -304,8 +304,7 @@ document.addEventListener("DOMContentLoaded", function () {
           .textContent.toLowerCase();
 
         const matchesFilter =
-          filterValue === "all" ||
-          itemStatus === filterValue; // "declined" is now supported
+          filterValue === "all" || itemStatus === filterValue; // "declined" is now supported
         const matchesSearch =
           !searchTerm ||
           name.includes(searchTerm) ||
@@ -366,7 +365,9 @@ document.addEventListener("DOMContentLoaded", function () {
   // See More modal functionality
   const seeMoreBtns = document.querySelectorAll(".see-more-btn");
   const historyDetailsModal = document.getElementById("historyDetailsModal");
-  const historyDetailsModalBody = document.querySelector(".history-details-modal-body");
+  const historyDetailsModalBody = document.querySelector(
+    ".history-details-modal-body"
+  );
 
   //status mapping for modal
   const statusModalMap = {
@@ -374,44 +375,44 @@ document.addEventListener("DOMContentLoaded", function () {
       main: { text: "-", class: "pending" },
       secondary: [
         { text: "-", class: "secondary" },
-        { text: "Pending - June 11; 6:00 pm", class: "secondary" }
-      ]
+        { text: "Pending - June 11; 6:00 pm", class: "secondary" },
+      ],
     },
     completed: {
       main: { text: "Completed - June 13; 9:23 am", class: "completed" },
       secondary: [
         { text: "Accepted - June 12; 12:00 am", class: "secondary" },
-        { text: "Pending - June 11; 6:00 pm", class: "secondary" }
-      ]
+        { text: "Pending - June 11; 6:00 pm", class: "secondary" },
+      ],
     },
     accepted: {
       main: { text: "-", class: "pending" },
       secondary: [
         { text: "Accepted - June 13; 9:23 am", class: "accepted" },
-        { text: "Pending - June 11; 6:00 pm", class: "secondary" }
-      ]
+        { text: "Pending - June 11; 6:00 pm", class: "secondary" },
+      ],
     },
     missed: {
       main: { text: "Missed - June 13; 9:23 am", class: "missed" },
       secondary: [
         { text: "Accepted - June 12; 12:00 am", class: "secondary" },
-        { text: "Pending - June 11; 6:00 pm", class: "secondary" }
-      ]
+        { text: "Pending - June 11; 6:00 pm", class: "secondary" },
+      ],
     },
     declined: {
       main: { text: "-", class: "pending" },
       secondary: [
         { text: "Declined - June 13; 9:23 am", class: "declined" },
-        { text: "Pending - June 11; 6:00 pm", class: "secondary" }
-      ]
+        { text: "Pending - June 11; 6:00 pm", class: "secondary" },
+      ],
     },
     cancelled: {
       main: { text: "Cancelled - June 13; 9:23 am", class: "cancelled" },
       secondary: [
         { text: "Accepted - June 12; 12:00 am", class: "secondary" },
-        { text: "Pending - June 11; 6:00 pm", class: "secondary" }
-      ]
-    }
+        { text: "Pending - June 11; 6:00 pm", class: "secondary" },
+      ],
+    },
   };
 
   seeMoreBtns.forEach((btn) => {
@@ -457,16 +458,179 @@ document.addEventListener("DOMContentLoaded", function () {
       if (historyDetailsModalBody) {
         historyDetailsModalBody.innerHTML = modalHtml;
       }
- 
+
       if (historyDetailsModal) {
-        const modalDialog = historyDetailsModal.querySelector('.modal-dialog');
+        const modalDialog = historyDetailsModal.querySelector(".modal-dialog");
         if (modalDialog) {
-          modalDialog.classList.add('profile-modal-bg');
+          modalDialog.classList.add("profile-modal-bg");
         }
       }
-   
+
       const modalInstance = new bootstrap.Modal(historyDetailsModal);
       modalInstance.show();
     });
+  });
+});
+// Demo schedule data for each faculty
+const facultySchedules = {
+  "Jayson Guia": [
+    "Monday - 9:00 - 10:00",
+    "Tuesday - 9:00 - 10:00",
+    "Wednesday - 10:00 - 11:00",
+    "Thursday - 1:00 - 2:00",
+    "Friday - 9:00 - 10:00",
+    "Friday - 2:00 - 3:00",
+  ],
+  "Jei Pastrana": [
+    "Monday - 9:00 - 10:00",
+    "Tuesday - 9:00 - 10:00",
+    "Friday - 9:00 - 10:00",
+  ],
+  "Irene Balmes": [
+    "Monday - 8:00 - 9:00",
+    "Tuesday - 10:00 - 11:00",
+    "Wednesday - 1:00 - 2:00",
+    "Thursday - 3:00 - 4:00",
+    "Friday - 11:00 - 12:00",
+  ],
+  "Carlo Torres": [
+    "Monday - 7:00 - 8:00",
+    "Tuesday - 8:00 - 9:00",
+    "Wednesday - 9:00 - 10:00",
+    "Thursday - 10:00 - 11:00",
+    "Friday - 1:00 - 2:00",
+    "Friday - 3:00 - 4:00",
+    "Saturday - 9:00 - 10:00",
+  ],
+  "Archie Menisis": [
+    "Monday - 9:00 - 10:00",
+    "Tuesday - 9:00 - 10:00",
+    "Wednesday - 9:00 - 10:00",
+    "Thursday - 9:00 - 10:00",
+    "Friday - 9:00 - 10:00",
+  ],
+  "Michael Joseph Aramil": [
+    "Monday - 8:00 - 9:00",
+    "Tuesday - 8:00 - 9:00",
+    "Wednesday - 8:00 - 9:00",
+    "Thursday - 8:00 - 9:00",
+    "Friday - 8:00 - 9:00",
+    "Saturday - 8:00 - 9:00",
+  ],
+  "Erwin De Castro": [
+    "Monday - 10:00 - 11:00",
+    "Tuesday - 10:00 - 11:00",
+    "Wednesday - 10:00 - 11:00",
+    "Thursday - 10:00 - 11:00",
+    "Friday - 10:00 - 11:00",
+  ],
+  "Joel Enriquez": [
+    "Monday - 2:00 - 3:00",
+    "Tuesday - 2:00 - 3:00",
+    "Wednesday - 2:00 - 3:00",
+    "Thursday - 2:00 - 3:00",
+    "Friday - 2:00 - 3:00",
+    "Saturday - 2:00 - 3:00",
+  ],
+};
+
+// Show schedule modal on faculty card click
+document.querySelectorAll(".faculty-item").forEach(function (card) {
+  card.addEventListener("click", function () {
+    var name = card.querySelector(".faculty-name").textContent;
+    document.getElementById("scheduleFacultyName").textContent =
+      name + "'s available times...";
+    var times = facultySchedules[name] || [
+      "Monday - 9:00 - 10:00",
+      "Tuesday - 9:00 - 10:00",
+      "Friday - 9:00 - 10:00",
+    ];
+    var timesRow = document.getElementById("scheduleTimesRow");
+    timesRow.innerHTML = "";
+    times.forEach(function (time) {
+      var col = document.createElement("div");
+      col.className = "col-6";
+      col.innerHTML = '<div class="schedule-time-card">' + time + "</div>";
+      timesRow.appendChild(col);
+    });
+
+    // Disable schedule button initially
+    var scheduleBtn = document.getElementById("scheduleBtn");
+    if (scheduleBtn) scheduleBtn.disabled = true;
+
+    // Remove previous click listeners for scheduleBtn
+    scheduleBtn.onclick = null;
+
+    // Add selection logic for schedule cards
+    setTimeout(function () {
+      var cards = timesRow.querySelectorAll(".schedule-time-card");
+      cards.forEach(function (card) {
+        card.addEventListener("click", function () {
+          cards.forEach(function (c) {
+            c.classList.remove("selected");
+          });
+          card.classList.add("selected");
+          if (scheduleBtn) scheduleBtn.disabled = false;
+        });
+      });
+    }, 0);
+
+    // Add click handler for scheduleBtn to show success modal
+    scheduleBtn.onclick = function () {
+      var scheduleModal = bootstrap.Modal.getInstance(
+        document.getElementById("scheduleModal")
+      );
+      if (scheduleModal) scheduleModal.hide();
+      var successModal = new bootstrap.Modal(
+        document.getElementById("successModal")
+      );
+      successModal.show();
+    };
+
+    var modal = new bootstrap.Modal(document.getElementById("scheduleModal"));
+    modal.show();
+  });
+});
+
+// Go Back button in success modal
+document.getElementById("goBackBtn").addEventListener("click", function () {
+  var successModal = bootstrap.Modal.getInstance(
+    document.getElementById("successModal")
+  );
+  if (successModal) successModal.hide();
+});
+
+document
+  .getElementById("seeMoreUpcomingBtn")
+  .addEventListener("click", function () {
+    window.location.href = "studenthistory.html?filter=accepted";
+  });
+
+// See More for Completed Sessions: go to history with completed filter
+document
+  .getElementById("seeMoreCompletedBtn")
+  .addEventListener("click", function () {
+    window.location.href = "studenthistory.html?filter=completed";
+  });
+document.querySelectorAll(".modal").forEach(function (modal) {
+  modal.addEventListener("hidden.bs.modal", function () {
+    document.querySelectorAll(".modal-backdrop").forEach(function (backdrop) {
+      backdrop.remove();
+    });
+    if (!document.querySelector(".modal.show")) {
+      document.body.classList.remove("modal-open");
+      document.body.style.paddingRight = "";
+    }
+  });
+});
+document.querySelectorAll(".modal").forEach(function (modal) {
+  modal.addEventListener("hidden.bs.modal", function () {
+    document.querySelectorAll(".modal-backdrop").forEach(function (backdrop) {
+      backdrop.remove();
+    });
+    if (!document.querySelector(".modal.show")) {
+      document.body.classList.remove("modal-open");
+      document.body.style.paddingRight = "";
+    }
   });
 });

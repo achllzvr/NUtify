@@ -1,9 +1,18 @@
 document.addEventListener("DOMContentLoaded", function () {
+  // Wait for components to load before initializing functionality
+  setTimeout(() => {
+    initializeFacultyFunctionality();
+  }, 200);
+});
+
+function initializeFacultyFunctionality() {
   const sidebar = document.getElementById("sidebar");
   const menuToggle = document.getElementById("menuToggle");
   const menuToggleBurger = document.getElementById("menuToggleBurger");
   const settingsToggle = document.getElementById("settingsToggle");
   const settingsDropdown = document.getElementById("settingsDropdown");
+
+  if (!sidebar) return; // Exit if components haven't loaded yet
 
   function saveSidebarState() {
     const isExpanded = sidebar.classList.contains("expanded");
@@ -100,7 +109,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  //sidebar functionality
+  // Faculty-specific navigation
   const navItems = document.querySelectorAll(".sidebar-nav .sidebar-icon");
   navItems.forEach((item) => {
     item.addEventListener("click", function () {
@@ -309,8 +318,7 @@ document.addEventListener("DOMContentLoaded", function () {
           .textContent.toLowerCase();
 
         const matchesFilter =
-          filterValue === "all" ||
-          itemStatus === filterValue; // "declined" is now supported
+          filterValue === "all" || itemStatus === filterValue; // "declined" is now supported
         const matchesSearch =
           !searchTerm ||
           name.includes(searchTerm) ||
@@ -371,7 +379,9 @@ document.addEventListener("DOMContentLoaded", function () {
   // See More modal functionality
   const seeMoreBtns = document.querySelectorAll(".see-more-btn");
   const historyDetailsModal = document.getElementById("historyDetailsModal");
-  const historyDetailsModalBody = document.querySelector(".history-details-modal-body");
+  const historyDetailsModalBody = document.querySelector(
+    ".history-details-modal-body"
+  );
 
   //status mapping for modal
   const statusModalMap = {
@@ -379,44 +389,44 @@ document.addEventListener("DOMContentLoaded", function () {
       main: { text: "-", class: "pending" },
       secondary: [
         { text: "Accept Appointment?", class: "secondary" },
-        { text: "Pending - June 11; 6:00 pm", class: "secondary" }
-      ]
+        { text: "Pending - June 11; 6:00 pm", class: "secondary" },
+      ],
     },
     completed: {
       main: { text: "Completed - June 13; 9:23 am", class: "completed" },
       secondary: [
         { text: "Accepted - June 12; 12:00 am", class: "secondary" },
-        { text: "Pending - June 11; 6:00 pm", class: "secondary" }
-      ]
+        { text: "Pending - June 11; 6:00 pm", class: "secondary" },
+      ],
     },
     accepted: {
       main: { text: "-", class: "pending" },
       secondary: [
         { text: "Accepted - June 13; 9:23 am", class: "accepted" },
-        { text: "Pending - June 11; 6:00 pm", class: "secondary" }
-      ]
+        { text: "Pending - June 11; 6:00 pm", class: "secondary" },
+      ],
     },
     missed: {
       main: { text: "Missed - June 13; 9:23 am", class: "missed" },
       secondary: [
         { text: "Accepted - June 12; 12:00 am", class: "secondary" },
-        { text: "Pending - June 11; 6:00 pm", class: "secondary" }
-      ]
+        { text: "Pending - June 11; 6:00 pm", class: "secondary" },
+      ],
     },
     declined: {
       main: { text: "-", class: "pending" },
       secondary: [
         { text: "Declined - June 13; 9:23 am", class: "declined" },
-        { text: "Pending - June 11; 6:00 pm", class: "secondary" }
-      ]
+        { text: "Pending - June 11; 6:00 pm", class: "secondary" },
+      ],
     },
     cancelled: {
       main: { text: "Cancelled - June 13; 9:23 am", class: "cancelled" },
       secondary: [
         { text: "Accepted - June 12; 12:00 am", class: "secondary" },
-        { text: "Pending - June 11; 6:00 pm", class: "secondary" }
-      ]
-    }
+        { text: "Pending - June 11; 6:00 pm", class: "secondary" },
+      ],
+    },
   };
 
   seeMoreBtns.forEach((btn) => {
@@ -456,7 +466,8 @@ document.addEventListener("DOMContentLoaded", function () {
       if (modalStatus.secondary && modalStatus.secondary.length) {
         modalStatus.secondary.forEach((sec) => {
           // Add pending-badge class if text is "Accept Appointment?"
-          const extraClass = sec.text === "Accept Appointment?" ? "pending-badge" : "";
+          const extraClass =
+            sec.text === "Accept Appointment?" ? "pending-badge" : "";
           modalHtml += `<div class="history-details-modal-status ${sec.class} ${extraClass}">${sec.text}</div>`;
         });
       }
@@ -464,17 +475,27 @@ document.addEventListener("DOMContentLoaded", function () {
       if (historyDetailsModalBody) {
         historyDetailsModalBody.innerHTML = modalHtml;
       }
- 
+
       if (historyDetailsModal) {
-        const modalDialog = historyDetailsModal.querySelector('.modal-dialog');
+        const modalDialog = historyDetailsModal.querySelector(".modal-dialog");
         if (modalDialog) {
-          modalDialog.classList.add('profile-modal-bg');
+          modalDialog.classList.add("profile-modal-bg");
         }
       }
-   
+
       const modalInstance = new bootstrap.Modal(historyDetailsModal);
       modalInstance.show();
     });
   });
+}
+document.querySelectorAll(".modal").forEach(function (modal) {
+  modal.addEventListener("hidden.bs.modal", function () {
+    document.querySelectorAll(".modal-backdrop").forEach(function (backdrop) {
+      backdrop.remove();
+    });
+    if (!document.querySelector(".modal.show")) {
+      document.body.classList.remove("modal-open");
+      document.body.style.paddingRight = "";
+    }
+  });
 });
-
