@@ -92,7 +92,6 @@ function createFacultyHistoryModals() {
   `;
 }
 
-// Initialize faculty history modals when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('faculty-history-modals-container').innerHTML = createFacultyHistoryModals();
 });

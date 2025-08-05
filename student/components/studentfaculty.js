@@ -42,9 +42,7 @@ function createFacultyList() {
   `;
 }
 
-// Initialize faculty when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-  // Wait for appointments to load first, then add faculty
   setTimeout(() => {
     document.getElementById('faculty-container').innerHTML = createFacultyList();
   }, 100);

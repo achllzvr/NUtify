@@ -18,7 +18,6 @@ function createHistoryHeader() {
   `;
 }
 
-// Initialize history header when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('history-header-container').innerHTML = createHistoryHeader();
 });

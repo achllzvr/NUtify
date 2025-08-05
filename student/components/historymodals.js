@@ -92,7 +92,6 @@ function createHistoryModals() {
   `;
 }
 
-// Initialize history modals when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('history-modals-container').innerHTML = createHistoryModals();
 });

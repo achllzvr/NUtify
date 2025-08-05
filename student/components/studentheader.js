@@ -18,7 +18,6 @@ function createHomeHeader() {
   `;
 }
 
-// Initialize home header when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('header-container').innerHTML = createHomeHeader();
 });

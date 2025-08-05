@@ -46,7 +46,6 @@ function createFacultyModals() {
   `;
 }
 
-// Initialize faculty modals when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('faculty-modals-container').innerHTML = createFacultyModals();
 });

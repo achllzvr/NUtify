@@ -50,7 +50,6 @@ function createHomeSidebar() {
   `;
 }
 
-// Initialize home sidebar when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('sidebar-container').innerHTML = createHomeSidebar();
 });

@@ -64,7 +64,7 @@ function createHomeModals() {
   `;
 }
 
-// Initialize home modals when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('modals-container').innerHTML = createHomeModals();
 });
+

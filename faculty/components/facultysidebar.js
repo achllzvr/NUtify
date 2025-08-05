@@ -51,7 +51,6 @@ function createFacultySidebar() {
   `;
 }
 
-// Initialize faculty sidebar when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('faculty-sidebar-container').innerHTML = createFacultySidebar();
 });

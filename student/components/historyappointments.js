@@ -58,7 +58,6 @@ function createHistoryAppointments() {
   `;
 }
 
-// Initialize history appointments when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('history-main-content-container').innerHTML = createHistoryAppointments();
 });

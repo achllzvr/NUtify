@@ -42,7 +42,6 @@ function createFacultyAppointments() {
   `;
 }
 
-// Initialize faculty appointments when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('faculty-main-content-container').innerHTML = createFacultyAppointments();
 });

@@ -18,7 +18,7 @@ function createFacultyHistoryHeader() {
   `;
 }
 
-// Initialize faculty history header when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('faculty-history-header-container').innerHTML = createFacultyHistoryHeader();
 });
+

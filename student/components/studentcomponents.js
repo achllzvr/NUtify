@@ -1,4 +1,3 @@
-// Sample data for appointments and faculty
 const appointmentData = {
   upcoming: [
     { name: "Jei Pastrana", department: "Faculty - SACE", time: "June 15 - 09:00 am", avatar: "../tabler-avatars-1.0.0/jpg/1c9a4dd0bbd964e3eecbd40caf3b7e37.jpg" },
@@ -24,7 +23,6 @@ const facultyData = [
   { name: "Bernie Fabito", department: "Faculty - SACE", status: "online", avatar: "../tabler-avatars-1.0.0/jpg/78529e2ec8eb4a2eb2fb961e04915b0a.jpg" }
 ];
 
-// Component Generators
 function createSidebar() {
   return `
     <div class="sidebar" id="sidebar">
@@ -252,10 +250,11 @@ function createModals() {
   `;
 }
 
-// Initialize all components when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('sidebar-container').innerHTML = createSidebar();
   document.getElementById('header-container').innerHTML = createHeader();
   document.getElementById('main-content-container').innerHTML = createMainContent();
   document.getElementById('modals-container').innerHTML = createModals();
 });
+  document.getElementById('main-content-container').innerHTML = createMainContent();
+  document.getElementById('modals-container').innerHTML = createModals();

@@ -50,7 +50,6 @@ function createHistorySidebar() {
   `;
 }
 
-// Initialize history sidebar when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('history-sidebar-container').innerHTML = createHistorySidebar();
 });

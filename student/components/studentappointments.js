@@ -74,7 +74,6 @@ function createHomeAppointments() {
   `;
 }
 
-// Initialize home appointments when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('main-content-container').innerHTML = createHomeAppointments();
 });

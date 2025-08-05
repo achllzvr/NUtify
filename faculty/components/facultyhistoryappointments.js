@@ -61,7 +61,6 @@ function createFacultyHistoryAppointments() {
   `;
 }
 
-// Initialize faculty history appointments when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('faculty-history-main-content-container').innerHTML = createFacultyHistoryAppointments();
 });
