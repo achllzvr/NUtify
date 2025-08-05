@@ -597,7 +597,6 @@ body {
   box-shadow: inset 8px 8px 15px rgba(0, 0, 0, 0.1),
     inset -8px -8px 15px rgba(255, 255, 255, 0.8);
   transition: all 0.3s ease;
-  margin-right: 24px;
 }
 
 .appointment-item:hover,
@@ -686,8 +685,8 @@ body {
 .history-card-list {
   max-height: 520px;
   overflow-y: auto;
-  /* Remove all horizontal padding so scrollbar is at the absolute right */
-  padding: 10px 0 10px 0;
+  padding: 10px 12px 10px 0;
+  margin-right: -12px;
 }
 
 .history-card-list::-webkit-scrollbar {
