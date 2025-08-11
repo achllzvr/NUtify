@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:nutify/pages/moderatorProfile.dart';
+import 'package:nutify/pages/moderatorInbox.dart';
 import 'package:nutify/models/moderatorHomeAppointments.dart';
+import 'package:nutify/models/moderatorRequests.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -36,6 +38,7 @@ class _ModeratorHomeState extends State<ModeratorHome> {
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: _buildModeratorAppBar(context),
       body: _buildMainContent(),
+      floatingActionButton: _buildRequestFab(),
     );
   }
 
@@ -136,15 +139,11 @@ class _ModeratorHomeState extends State<ModeratorHome> {
               IconButton(
                 icon: const Icon(Icons.inbox, color: Colors.white),
                 onPressed: () {
-                  // TODO: Replace with actual ModeratorInbox navigation when available
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Inbox page not implemented yet',
-                        style: TextStyle(fontFamily: 'Arimo'),
-                      ),
-                      duration: Duration(seconds: 2),
-                      backgroundColor: Color(0xFF35408E),
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ModeratorInbox(),
+                      settings: const RouteSettings(name: '/moderatorInbox'),
                     ),
                   );
                 },
@@ -443,6 +442,44 @@ class _ModeratorHomeState extends State<ModeratorHome> {
     );
   }
 
+  Widget _buildRequestFab() {
+    return FloatingActionButton(
+      onPressed: _openOnSpotRequestFlow,
+      backgroundColor: const Color(0xFFFFD418),
+      child: const Icon(Icons.add_comment, color: Colors.black),
+    );
+  }
+
+  void _openOnSpotRequestFlow() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return _OnSpotRequestSheet(onSubmitted: (teacherId, studentId, reason) async {
+          final result = await ModeratorRequestsApi.createOnSpotRequest(
+            teacherId: teacherId,
+            studentId: studentId,
+            reason: reason,
+          );
+          if (mounted) {
+            if (result['error'] == true) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(result['message'] ?? 'Failed'), backgroundColor: const Color(0xFFD32F2F)),
+              );
+            } else {
+              Navigator.of(context).pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Request created'), backgroundColor: Color(0xFF43A047)),
+              );
+              setState(() {});
+            }
+          }
+        });
+      },
+    );
+  }
+
   Future<bool> notifyAppointees(int appointmentId) async {
     final response = await http.post(
       Uri.parse('https://nutify.site/api.php?action=notifyAppointees'),
@@ -724,4 +761,298 @@ class _ModeratorHomeState extends State<ModeratorHome> {
       ),
     );
   }
+}
+
+class _OnSpotRequestSheet extends StatefulWidget {
+  final Future<void> Function(int teacherId, int studentId, String reason) onSubmitted;
+  const _OnSpotRequestSheet({required this.onSubmitted});
+
+  @override
+  State<_OnSpotRequestSheet> createState() => _OnSpotRequestSheetState();
+}
+
+class _OnSpotRequestSheetState extends State<_OnSpotRequestSheet> {
+  int? _teacherId;
+  int? _studentId;
+  String _teacherName = '';
+  String _studentName = '';
+  final TextEditingController _reasonCtrl = TextEditingController();
+
+  @override
+  void dispose() {
+    _reasonCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final canSubmit = _teacherId != null && _studentId != null && _reasonCtrl.text.trim().isNotEmpty;
+    return Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 20, offset: const Offset(0, -2)),
+          ],
+        ),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(width: 44, height: 5, decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(3))),
+              ),
+              const SizedBox(height: 12),
+              const Text('Create On-the-spot Request', style: TextStyle(fontFamily: 'Arimo', fontWeight: FontWeight.bold, fontSize: 18)),
+              const SizedBox(height: 16),
+
+              // Step 1: Faculty search
+              const Text('Select Faculty', style: TextStyle(fontFamily: 'Arimo', fontSize: 13, color: Colors.black54)),
+              const SizedBox(height: 6),
+              _SearchUserField(
+                hint: 'Search faculty…',
+                role: 'teacher',
+                onSelected: (id, name) {
+                  setState(() {
+                    _teacherId = id;
+                    _teacherName = name;
+                  });
+                },
+              ),
+              if (_teacherName.isNotEmpty) Padding(
+                padding: const EdgeInsets.only(top: 6.0),
+                child: Text('Selected: $_teacherName', style: const TextStyle(fontFamily: 'Arimo', color: Colors.green)),
+              ),
+
+              const SizedBox(height: 16),
+              // Step 2: Student search
+              const Text('Select Student', style: TextStyle(fontFamily: 'Arimo', fontSize: 13, color: Colors.black54)),
+              const SizedBox(height: 6),
+              IgnorePointer(
+                ignoring: _teacherId == null,
+                child: Opacity(
+                  opacity: _teacherId == null ? 0.5 : 1,
+                  child: _SearchUserField(
+                    hint: 'Search student…',
+                    role: 'student',
+                    onSelected: (id, name) {
+                      setState(() {
+                        _studentId = id;
+                        _studentName = name;
+                      });
+                    },
+                  ),
+                ),
+              ),
+              if (_studentName.isNotEmpty) Padding(
+                padding: const EdgeInsets.only(top: 6.0),
+                child: Text('Selected: $_studentName', style: const TextStyle(fontFamily: 'Arimo', color: Colors.green)),
+              ),
+
+              const SizedBox(height: 16),
+              // Step 3: Reason
+              const Text('Reason', style: TextStyle(fontFamily: 'Arimo', fontSize: 13, color: Colors.black54)),
+              const SizedBox(height: 6),
+              IgnorePointer(
+                ignoring: _studentId == null,
+                child: Opacity(
+                  opacity: _studentId == null ? 0.5 : 1,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF5F5F5),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey.shade300),
+                    ),
+                    child: TextField(
+                      controller: _reasonCtrl,
+                      onChanged: (_) => setState(() {}),
+                      minLines: 1,
+                      maxLines: 3,
+                      decoration: const InputDecoration(
+                        hintText: 'Enter reason…',
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      ),
+                      style: const TextStyle(fontFamily: 'Arimo'),
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: canSubmit ? const [Color(0xFFFFD54F), Color(0xFFFFB300)] : [Colors.grey.shade300, Colors.grey.shade400],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: (canSubmit ? const Color(0xFFFFB000) : Colors.grey).withOpacity(0.25),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: ElevatedButton(
+                        onPressed: canSubmit
+                            ? () async {
+                                final tid = _teacherId!;
+                                final sid = _studentId!;
+                                final reason = _reasonCtrl.text.trim();
+                                await widget.onSubmitted(tid, sid, reason);
+                              }
+                            : null,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          disabledBackgroundColor: Colors.transparent,
+                        ),
+                        child: Text(
+                          'Schedule',
+                          style: TextStyle(
+                            fontFamily: 'Arimo',
+                            fontWeight: FontWeight.bold,
+                            color: canSubmit ? Colors.white : Colors.grey.shade600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SearchUserField extends StatefulWidget {
+  final String hint;
+  final String role; // 'teacher' or 'student'
+  final void Function(int id, String name) onSelected;
+  const _SearchUserField({required this.hint, required this.role, required this.onSelected});
+
+  @override
+  State<_SearchUserField> createState() => _SearchUserFieldState();
+}
+
+class _SearchUserFieldState extends State<_SearchUserField> {
+  final TextEditingController _ctrl = TextEditingController();
+  List<_Option> _options = [];
+  bool _loading = false;
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _search(String q) async {
+    if (q.trim().isEmpty) {
+      setState(() => _options = []);
+      return;
+    }
+    setState(() => _loading = true);
+    try {
+      final uri = Uri.parse('https://nutify.site/api.php?action=searchUsers');
+      final res = await http.post(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'q': q, 'role': widget.role}),
+      );
+      if (res.statusCode == 200) {
+        final data = jsonDecode(res.body);
+        final list = (data['results'] ?? []) as List;
+        setState(() {
+          _options = list
+              .map((e) => _Option(
+                    id: int.tryParse(e['user_id']?.toString() ?? '') ?? 0,
+                    name: (e['full_name'] ?? '${e['user_fn'] ?? ''} ${e['user_ln'] ?? ''}').trim(),
+                  ))
+              .toList();
+        });
+      } else {
+        setState(() => _options = []);
+      }
+    } catch (_) {
+      setState(() => _options = []);
+    } finally {
+      setState(() => _loading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        TextField(
+          controller: _ctrl,
+          onChanged: _search,
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: Colors.white,
+            hintText: widget.hint,
+            hintStyle: const TextStyle(fontFamily: 'Arimo'),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+            prefixIcon: const Icon(Icons.search),
+          ),
+          style: const TextStyle(fontFamily: 'Arimo'),
+        ),
+        const SizedBox(height: 8),
+        if (_loading) const LinearProgressIndicator(minHeight: 2),
+        if (_options.isNotEmpty)
+          Container(
+            constraints: const BoxConstraints(maxHeight: 180),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 10, offset: const Offset(0, 3)),
+              ],
+            ),
+            child: ListView.separated(
+              padding: const EdgeInsets.all(8),
+              itemCount: _options.length,
+              separatorBuilder: (_, __) => const Divider(height: 1),
+              itemBuilder: (context, i) {
+                final o = _options[i];
+                return ListTile(
+                  title: Text(o.name, style: const TextStyle(fontFamily: 'Arimo')),
+                  onTap: () {
+                    widget.onSelected(o.id, o.name);
+                    setState(() {
+                      _ctrl.text = o.name;
+                      _options = [];
+                    });
+                  },
+                );
+              },
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _Option {
+  final int id;
+  final String name;
+  _Option({required this.id, required this.name});
 }
