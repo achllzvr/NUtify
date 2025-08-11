@@ -464,49 +464,223 @@ class _ModeratorHomeState extends State<ModeratorHome> {
   Future<bool?> _confirmNotifyDialog() async {
     return showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text('Notify Appointees', style: TextStyle(fontFamily: 'Arimo', fontWeight: FontWeight.bold)),
-        content: Text('Call both the student and the professor to this appointment now?', style: TextStyle(fontFamily: 'Arimo')),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text('Cancel', style: TextStyle(fontFamily: 'Arimo', color: Colors.blueGrey)),
+      barrierDismissible: true,
+      builder: (ctx) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.15),
+                spreadRadius: 3,
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text('Notify', style: TextStyle(fontFamily: 'Arimo', color: Color(0xFF35408E), fontWeight: FontWeight.bold)),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFFFD54F), Color(0xFFFFB300)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.notifications_active, color: Colors.white),
+                  ),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Text(
+                      'Notify Appointees',
+                      style: TextStyle(
+                        fontFamily: 'Arimo',
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              const Text(
+                'Call both the student and the professor to this appointment now?',
+                style: TextStyle(
+                  fontFamily: 'Arimo',
+                  fontSize: 15,
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.of(ctx).pop(false),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey.shade300,
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: const Text(
+                        'Cancel',
+                        style: TextStyle(
+                          fontFamily: 'Arimo',
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFFFFD54F), Color(0xFFFFB300)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFFFFB000).withOpacity(0.25),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.of(ctx).pop(true),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          elevation: 0,
+                        ),
+                        child: const Text(
+                          'Notify',
+                          style: TextStyle(
+                            fontFamily: 'Arimo',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 
   void _showAppointmentDetails(ModeratorHomeAppointments a) {
+    // Format date
+    String formattedDate = a.scheduleDate;
+    try {
+      final date = DateTime.parse(a.scheduleDate);
+      formattedDate = DateFormat('MMMM d, y').format(date);
+    } catch (_) {}
+
+    // Format time
+    String formattedTime = a.scheduleTime;
+    try {
+      if (a.scheduleTime.contains('-')) {
+        var times = a.scheduleTime.split('-');
+        final startTime = DateFormat('HH:mm:ss').parse(times[0].trim());
+        final endTime = DateFormat('HH:mm:ss').parse(times[1].trim());
+        formattedTime = '${DateFormat('h:mm a').format(startTime)} - ${DateFormat('h:mm a').format(endTime)}';
+      } else {
+        final t = DateFormat('HH:mm:ss').parse(a.scheduleTime.trim());
+        formattedTime = DateFormat('h:mm a').format(t);
+      }
+    } catch (_) {}
+
     showModalBottomSheet(
       context: context,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       builder: (ctx) {
-        return Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+        return Container(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+          decoration: const BoxDecoration(
+            color: Colors.transparent,
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.15),
+                  blurRadius: 20,
+                  offset: const Offset(0, -2),
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 10, 20, 16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.event, color: Color(0xFF35408E)),
-                  SizedBox(width: 8),
-                  Text('Appointment Details', style: TextStyle(fontFamily: 'Arimo', fontSize: 18, fontWeight: FontWeight.bold)),
+                  Center(
+                    child: Container(
+                      width: 44,
+                      height: 5,
+                      margin: const EdgeInsets.only(bottom: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                    ),
+                  ),
+                  Row(
+                    children: const [
+                      Icon(Icons.event_note, color: Color(0xFF35408E)),
+                      SizedBox(width: 8),
+                      Text(
+                        'Appointment Details',
+                        style: TextStyle(
+                          fontFamily: 'Arimo',
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 14),
+                  _detailRow('Professor', a.teacherName),
+                  _detailRow('Student', a.studentName),
+                  _detailRow('Date', formattedDate),
+                  _detailRow('Time', formattedTime),
+                  if (a.appointmentReason.isNotEmpty) _detailRow('Reason', a.appointmentReason),
+                  const SizedBox(height: 6),
                 ],
               ),
-              SizedBox(height: 12),
-              _detailRow('Professor', a.teacherName),
-              _detailRow('Student', a.studentName),
-              _detailRow('Date', a.scheduleDate),
-              _detailRow('Time', a.scheduleTime),
-              if (a.appointmentReason.isNotEmpty) _detailRow('Reason', a.appointmentReason),
-              SizedBox(height: 8),
-            ],
+            ),
           ),
         );
       },
@@ -514,13 +688,38 @@ class _ModeratorHomeState extends State<ModeratorHome> {
   }
 
   Widget _detailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
-      child: Row(
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF5F5F5),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(width: 90, child: Text('$label:', style: TextStyle(fontFamily: 'Arimo', fontWeight: FontWeight.w600, color: Colors.grey[800]))),
-          Expanded(child: Text(value, style: TextStyle(fontFamily: 'Arimo', color: Colors.black87))),
+          Text(
+            label.toUpperCase(),
+            style: TextStyle(
+              fontFamily: 'Arimo',
+              fontSize: 11,
+              color: Colors.grey.shade700,
+              letterSpacing: 0.7,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: const TextStyle(
+              fontFamily: 'Arimo',
+              fontSize: 16,
+              color: Colors.black87,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ],
       ),
     );
