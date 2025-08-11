@@ -15,6 +15,7 @@ class ModeratorHome extends StatefulWidget {
 
 class _ModeratorHomeState extends State<ModeratorHome> {
   String? moderatorUserId;
+  bool _isNotifying = false;
 
   @override
   void initState() {
@@ -331,75 +332,197 @@ class _ModeratorHomeState extends State<ModeratorHome> {
             ],
           ),
           SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Color(0xFFFFD418), Color(0xFFFFC107)], // Student Home gradient
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Color(0xFFFFD418).withOpacity(0.4),
-                    blurRadius: 8,
-                    offset: Offset(0, 4),
+          Row(
+            children: [
+              // View Details
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () => _showAppointmentDetails(appointment),
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: Color(0xFF35408E)),
+                    padding: EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
-                ],
-              ),
-              child: ElevatedButton(
-                onPressed: () async {
-                  int appId = int.tryParse(appointment.id.toString()) ?? 0;
-                  if (appId == 0) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Invalid appointment ID')),
-                    );
-                    return;
-                  }
-                  await notifyAppointees(appId);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Notification sent!', style: TextStyle(fontFamily: 'Arimo', color: Colors.white)),
-                      backgroundColor: Color(0xFF43A047), // Green
+                  child: Text(
+                    'View Details',
+                    style: TextStyle(
+                      fontFamily: 'Arimo',
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF35408E),
                     ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                  padding: EdgeInsets.symmetric(vertical: 15),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  elevation: 0,
-                ),
-                child: Text(
-                  'Notify Appointees',
-                  style: TextStyle(
-                    fontFamily: 'Arimo',
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
                   ),
                 ),
               ),
-            ),
+              SizedBox(width: 12),
+              // Notify Appointees
+              Expanded(
+                child: Container
+                (
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Color(0xFFFFD418), Color(0xFFFFC107)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color(0xFFFFD418).withOpacity(0.4),
+                        blurRadius: 8,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: ElevatedButton(
+                    onPressed: _isNotifying
+                        ? null
+                        : () async {
+                            int appId = int.tryParse(appointment.id.toString()) ?? 0;
+                            if (appId == 0) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Invalid appointment ID')),
+                              );
+                              return;
+                            }
+                            final confirm = await _confirmNotifyDialog();
+                            if (confirm != true) return;
+                            setState(() => _isNotifying = true);
+                            try {
+                              final ok = await notifyAppointees(appId);
+                              if (ok) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Notification sent!', style: TextStyle(fontFamily: 'Arimo', color: Colors.white)),
+                                    backgroundColor: Color(0xFF43A047),
+                                  ),
+                                );
+                              }
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(e.toString(), style: TextStyle(fontFamily: 'Arimo', color: Colors.white)),
+                                  backgroundColor: Color(0xFFD32F2F),
+                                ),
+                              );
+                            } finally {
+                              if (mounted) setState(() => _isNotifying = false);
+                            }
+                          },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                      padding: EdgeInsets.symmetric(vertical: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: _isNotifying
+                        ? SizedBox(
+                            height: 18,
+                            width: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2.5, valueColor: AlwaysStoppedAnimation<Color>(Colors.white)),
+                          )
+                        : Text(
+                            'Notify Appointees',
+                            style: TextStyle(
+                              fontFamily: 'Arimo',
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
-  Future<void> notifyAppointees(int appointmentId) async {
+  Future<bool> notifyAppointees(int appointmentId) async {
     final response = await http.post(
       Uri.parse('https://nutify.site/api.php?action=notifyAppointees'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'appointment_id': appointmentId}),
     );
-    final data = jsonDecode(response.body);
-    // Optionally show a snackbar with data['message']
+    Map<String, dynamic> data = {};
+    try {
+      data = jsonDecode(response.body);
+    } catch (_) {}
+
+    if (response.statusCode == 200 && (data['error'] == false || data['success'] == true)) {
+      return true;
+    }
+    final msg = (data['message'] ?? 'Failed to send notification');
+    throw Exception(msg);
   }
 
+  Future<bool?> _confirmNotifyDialog() async {
+    return showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Notify Appointees', style: TextStyle(fontFamily: 'Arimo', fontWeight: FontWeight.bold)),
+        content: Text('Call both the student and the professor to this appointment now?', style: TextStyle(fontFamily: 'Arimo')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text('Cancel', style: TextStyle(fontFamily: 'Arimo', color: Colors.blueGrey)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text('Notify', style: TextStyle(fontFamily: 'Arimo', color: Color(0xFF35408E), fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAppointmentDetails(ModeratorHomeAppointments a) {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+      builder: (ctx) {
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.event, color: Color(0xFF35408E)),
+                  SizedBox(width: 8),
+                  Text('Appointment Details', style: TextStyle(fontFamily: 'Arimo', fontSize: 18, fontWeight: FontWeight.bold)),
+                ],
+              ),
+              SizedBox(height: 12),
+              _detailRow('Professor', a.teacherName),
+              _detailRow('Student', a.studentName),
+              _detailRow('Date', a.scheduleDate),
+              _detailRow('Time', a.scheduleTime),
+              if (a.appointmentReason.isNotEmpty) _detailRow('Reason', a.appointmentReason),
+              SizedBox(height: 8),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _detailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(width: 90, child: Text('$label:', style: TextStyle(fontFamily: 'Arimo', fontWeight: FontWeight.w600, color: Colors.grey[800]))),
+          Expanded(child: Text(value, style: TextStyle(fontFamily: 'Arimo', color: Colors.black87))),
+        ],
+      ),
+    );
+  }
 }
