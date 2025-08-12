@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1074225461961",
+    "project_id": "nutify-81b2a",
+    "storage_bucket": "nutify-81b2a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1074225461961:android:1200a880c6e978188d2b18",
+        "android_client_info": {
+          "package_name": "com.example.nutify"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAW-NgcXbSvdYXiuDLa_-oZZdJHhIjPaao"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
