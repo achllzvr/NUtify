@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:nutify/models/moderatorRequests.dart';
 import 'package:nutify/pages/moderatorHome.dart';
 import 'package:nutify/pages/moderatorProfile.dart';
+import 'package:intl/intl.dart';
 
 class ModeratorInbox extends StatefulWidget {
   const ModeratorInbox({super.key});
@@ -15,6 +16,10 @@ class ModeratorInbox extends StatefulWidget {
 class _ModeratorInboxState extends State<ModeratorInbox> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final TextEditingController _searchController = TextEditingController();
+  // New controllers for specific tabs
+  final TextEditingController _studentsLogSearchCtrl = TextEditingController();
+  final TextEditingController _otsSearchCtrl = TextEditingController();
+  DateTime? _studentsLogDateFilter;
 
   @override
   void initState() {
@@ -26,6 +31,8 @@ class _ModeratorInboxState extends State<ModeratorInbox> with SingleTickerProvid
   void dispose() {
     _tabController.dispose();
     _searchController.dispose();
+    _studentsLogSearchCtrl.dispose();
+    _otsSearchCtrl.dispose();
     super.dispose();
   }
 
@@ -41,7 +48,7 @@ class _ModeratorInboxState extends State<ModeratorInbox> with SingleTickerProvid
             child: TabBarView(
               controller: _tabController,
               children: [
-                _requestsTab(),
+                _studentsLogTab(),
                 _onTheSpotTab(),
                 _accountApprovalsTab(),
                 _accountsOnHoldTab(),
@@ -191,10 +198,154 @@ class _ModeratorInboxState extends State<ModeratorInbox> with SingleTickerProvid
           fontWeight: FontWeight.normal,
         ),
         tabs: const [
-          Tab(text: 'Requests'),
+          Tab(text: 'Students Log'),
           Tab(text: 'On-The-Spot Requests'),
           Tab(text: 'Account Approvals'),
           Tab(text: 'Accounts on Hold'),
+        ],
+      ),
+    );
+  }
+
+  // Students Log tab: completed appointments, grouped by date, with search + date filter
+  Widget _studentsLogTab() {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _studentsLogSearchCtrl,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    hintText: 'Search students or faculty…',
+                    hintStyle: const TextStyle(fontFamily: 'Arimo'),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    prefixIcon: const Icon(Icons.search),
+                  ),
+                  onChanged: (_) => setState(() {}),
+                ),
+              ),
+              const SizedBox(width: 10),
+              IconButton(
+                tooltip: _studentsLogDateFilter == null
+                    ? 'Filter by date'
+                    : 'Filtered: ${DateFormat('y-MM-dd').format(_studentsLogDateFilter!)} (tap to change)',
+                icon: const Icon(Icons.event, color: Color(0xFF35408E)),
+                onPressed: () async {
+                  final now = DateTime.now();
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: _studentsLogDateFilter ?? now,
+                    firstDate: DateTime(now.year - 2),
+                    lastDate: DateTime(now.year + 2),
+                  );
+                  if (picked != null) {
+                    setState(() => _studentsLogDateFilter = picked);
+                  }
+                },
+              ),
+              if (_studentsLogDateFilter != null)
+                IconButton(
+                  tooltip: 'Clear date filter',
+                  icon: const Icon(Icons.clear, color: Colors.redAccent),
+                  onPressed: () => setState(() => _studentsLogDateFilter = null),
+                ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: FutureBuilder<List<StudentsLogItem>>(
+            future: ModeratorRequestsApi.fetchStudentsLog(date: _studentsLogDateFilter),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              var items = snapshot.data ?? [];
+              final q = _studentsLogSearchCtrl.text.trim().toLowerCase();
+              if (q.isNotEmpty) {
+                items = items
+                    .where((e) => e.studentName.toLowerCase().contains(q) || e.teacherName.toLowerCase().contains(q))
+                    .toList();
+              }
+              if (items.isEmpty) {
+                return const Center(
+                  child: Text('No completed visits found', style: TextStyle(fontFamily: 'Arimo', color: Colors.grey)),
+                );
+              }
+
+              // Group by date (YYYY-MM-DD)
+              final Map<String, List<StudentsLogItem>> grouped = {};
+              for (final it in items) {
+                final dateKey = (it.appointmentDate.split(' ').first);
+                grouped.putIfAbsent(dateKey, () => []).add(it);
+              }
+              final keys = grouped.keys.toList()
+                ..sort((a, b) => b.compareTo(a)); // latest first
+
+              return ListView.builder(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                itemCount: keys.length,
+                itemBuilder: (context, idx) {
+                  final k = keys[idx];
+                  DateTime? d;
+                  try { d = DateTime.parse(k); } catch (_) {}
+                  final pretty = d != null ? DateFormat('MMMM d, y').format(d) : k;
+                  final dayItems = grouped[k]!;
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Text(pretty, style: const TextStyle(fontFamily: 'Arimo', fontSize: 16, fontWeight: FontWeight.bold)),
+                      ),
+                      ...dayItems.map(_studentsLogCard).toList(),
+                      const SizedBox(height: 12),
+                    ],
+                  );
+                },
+              );
+            },
+          ),
+        )
+      ],
+    );
+  }
+
+  Widget _studentsLogCard(StudentsLogItem item) {
+    String when = item.appointmentDate;
+    try {
+      final dt = DateTime.parse(item.appointmentDate.replaceFirst(' ', 'T'));
+      when = DateFormat('MMMM d, y • h:mm a').format(dt);
+    } catch (_) {}
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 10, offset: const Offset(0, 3)),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(item.studentName, style: const TextStyle(fontFamily: 'Arimo', fontSize: 16, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 4),
+          Text('Faculty: ${item.teacherName}', style: TextStyle(fontFamily: 'Arimo', color: Colors.grey.shade700)),
+          const SizedBox(height: 6),
+          Text(when, style: const TextStyle(fontFamily: 'Arimo')),
+          if (item.reason.trim().isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Text('Reason: ${item.reason}', style: const TextStyle(fontFamily: 'Arimo')),
+          ]
         ],
       ),
     );
@@ -229,49 +380,57 @@ class _ModeratorInboxState extends State<ModeratorInbox> with SingleTickerProvid
     );
   }
 
-  Widget _requestsTab() {
-    return FutureBuilder<List<ModeratorRequestItem>>(
-      future: ModeratorRequestsApi.fetchRequests(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        final list = snapshot.data ?? [];
-        if (list.isEmpty) {
-          return const Center(
-            child: Text('No moderator requests found', style: TextStyle(fontFamily: 'Arimo', color: Colors.grey)),
-          );
-        }
-        return ListView.separated(
-          padding: const EdgeInsets.all(16),
-          itemCount: list.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 12),
-          itemBuilder: (context, i) => _requestCard(list[i]),
-        );
-      },
-    );
-  }
-
+  // On-The-Spot tab with search
   Widget _onTheSpotTab() {
-    return FutureBuilder<List<ModeratorRequestItem>>(
-      future: ModeratorRequestsApi.fetchOnTheSpotRequests(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        final list = snapshot.data ?? [];
-        if (list.isEmpty) {
-          return const Center(
-            child: Text('No on-the-spot requests found', style: TextStyle(fontFamily: 'Arimo', color: Colors.grey)),
-          );
-        }
-        return ListView.separated(
-          padding: const EdgeInsets.all(16),
-          itemCount: list.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 12),
-          itemBuilder: (context, i) => _requestCard(list[i]),
-        );
-      },
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: TextField(
+            controller: _otsSearchCtrl,
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: Colors.white,
+              hintText: 'Search on-the-spot requests…',
+              hintStyle: const TextStyle(fontFamily: 'Arimo'),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+              prefixIcon: const Icon(Icons.search),
+            ),
+            onChanged: (_) => setState(() {}),
+          ),
+        ),
+        Expanded(
+          child: FutureBuilder<List<ModeratorRequestItem>>(
+            future: ModeratorRequestsApi.fetchOnTheSpotRequests(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              var list = snapshot.data ?? [];
+              final q = _otsSearchCtrl.text.trim().toLowerCase();
+              if (q.isNotEmpty) {
+                list = list
+                    .where((e) => e.studentName.toLowerCase().contains(q) || e.teacherName.toLowerCase().contains(q) || e.reason.toLowerCase().contains(q))
+                    .toList();
+              }
+              if (list.isEmpty) {
+                return const Center(
+                  child: Text('No on-the-spot requests found', style: TextStyle(fontFamily: 'Arimo', color: Colors.grey)),
+                );
+              }
+              return ListView.separated(
+                padding: const EdgeInsets.all(16),
+                itemCount: list.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                itemBuilder: (context, i) => _requestCard(list[i]),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 
@@ -339,7 +498,15 @@ class _ModeratorInboxState extends State<ModeratorInbox> with SingleTickerProvid
                           children: [
                             Expanded(
                               child: ElevatedButton(
-                                onPressed: () => _updateVerification(u.userId, 2),
+                                onPressed: () async {
+                                  await _updateVerification(u.userId, 2);
+                                  if (mounted) {
+                                    setState(() {});
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('Moved to hold')),
+                                    );
+                                  }
+                                },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.grey.shade300,
                                   foregroundColor: Colors.black,
@@ -361,7 +528,15 @@ class _ModeratorInboxState extends State<ModeratorInbox> with SingleTickerProvid
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: ElevatedButton(
-                                  onPressed: () => _updateVerification(u.userId, 1),
+                                  onPressed: () async {
+                                    await _updateVerification(u.userId, 1);
+                                    if (mounted) {
+                                      setState(() {});
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(content: Text('Verified')),
+                                      );
+                                    }
+                                  },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.transparent,
                                     shadowColor: Colors.transparent,
@@ -461,7 +636,12 @@ class _ModeratorInboxState extends State<ModeratorInbox> with SingleTickerProvid
                                 child: ElevatedButton(
                                   onPressed: () async {
                                     await _updateVerification(u.userId, 1);
-                                    if (mounted) setState(() {});
+                                    if (mounted) {
+                                      setState(() {});
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(content: Text('Verified')),
+                                      );
+                                    }
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.transparent,
