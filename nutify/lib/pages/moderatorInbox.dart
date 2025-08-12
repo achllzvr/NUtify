@@ -62,6 +62,7 @@ class _ModeratorInboxState extends State<ModeratorInbox> with SingleTickerProvid
 
   AppBar _moderatorAppBar(BuildContext context) {
     return AppBar(
+      automaticallyImplyLeading: false,
       title: Container(
         margin: const EdgeInsets.only(left: 10.0),
         child: const Text(
@@ -245,6 +246,25 @@ class _ModeratorInboxState extends State<ModeratorInbox> with SingleTickerProvid
                     initialDate: _studentsLogDateFilter ?? now,
                     firstDate: DateTime(now.year - 2),
                     lastDate: DateTime(now.year + 2),
+                    builder: (context, child) {
+                      final theme = Theme.of(context);
+                      return Theme(
+                        data: theme.copyWith(
+                          colorScheme: const ColorScheme.light(
+                            primary: Color(0xFF35408E), // header bg & active
+                            secondary: Color(0xFFFFD418),
+                            onPrimary: Colors.white,      // header text
+                            onSurface: Color(0xFF1A2049), // body text
+                          ),
+                          textButtonTheme: TextButtonThemeData(
+                            style: TextButton.styleFrom(
+                              foregroundColor: const Color(0xFF35408E), // buttons
+                            ),
+                          ),
+                        ),
+                        child: child!,
+                      );
+                    },
                   );
                   if (picked != null) {
                     setState(() => _studentsLogDateFilter = picked);
@@ -290,7 +310,7 @@ class _ModeratorInboxState extends State<ModeratorInbox> with SingleTickerProvid
                 ..sort((a, b) => b.compareTo(a)); // latest first
 
               return ListView.builder(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                padding: const EdgeInsets.only(bottom: 16),
                 itemCount: keys.length,
                 itemBuilder: (context, idx) {
                   final k = keys[idx];
@@ -302,7 +322,7 @@ class _ModeratorInboxState extends State<ModeratorInbox> with SingleTickerProvid
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                         child: Text(pretty, style: const TextStyle(fontFamily: 'Arimo', fontSize: 16, fontWeight: FontWeight.bold)),
                       ),
                       ...dayItems.map(_studentsLogCard).toList(),
@@ -352,6 +372,11 @@ class _ModeratorInboxState extends State<ModeratorInbox> with SingleTickerProvid
   }
 
   Widget _requestCard(ModeratorRequestItem item) {
+    String created = item.createdAt;
+    try {
+      final dt = DateTime.parse(item.createdAt.replaceFirst(' ', 'T'));
+      created = DateFormat('MMMM d, y • h:mm a').format(dt);
+    } catch (_) {}
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -375,6 +400,8 @@ class _ModeratorInboxState extends State<ModeratorInbox> with SingleTickerProvid
           Text('Reason: ${item.reason}', style: const TextStyle(fontFamily: 'Arimo')),
           const SizedBox(height: 6),
           Text('Status: ${item.status}', style: const TextStyle(fontFamily: 'Arimo')),
+          const SizedBox(height: 6),
+          Text('Timestamp: $created', style: const TextStyle(fontFamily: 'Arimo')),
         ],
       ),
     );
@@ -503,7 +530,7 @@ class _ModeratorInboxState extends State<ModeratorInbox> with SingleTickerProvid
                                   if (mounted) {
                                     setState(() {});
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Moved to hold')),
+                                      SnackBar(content: const Text('Moved to hold'), backgroundColor: Colors.red.shade600),
                                     );
                                   }
                                 },
@@ -533,7 +560,7 @@ class _ModeratorInboxState extends State<ModeratorInbox> with SingleTickerProvid
                                     if (mounted) {
                                       setState(() {});
                                       ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text('Verified')),
+                                        SnackBar(content: const Text('Verified'), backgroundColor: Colors.green.shade600),
                                       );
                                     }
                                   },
@@ -639,7 +666,7 @@ class _ModeratorInboxState extends State<ModeratorInbox> with SingleTickerProvid
                                     if (mounted) {
                                       setState(() {});
                                       ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text('Verified')),
+                                        SnackBar(content: const Text('Verified'), backgroundColor: Colors.green.shade600),
                                       );
                                     }
                                   },
