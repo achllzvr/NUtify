@@ -198,10 +198,10 @@ class _ModeratorInboxState extends State<ModeratorInbox> with SingleTickerProvid
           fontWeight: FontWeight.normal,
         ),
         tabs: const [
-          Tab(text: 'Students Log'),
-          Tab(text: 'On-The-Spot Requests'),
-          Tab(text: 'Account Approvals'),
-          Tab(text: 'Accounts on Hold'),
+          Tab(text: 'Daily Log'),
+          Tab(text: 'Requests'),
+          Tab(text: 'Approvals'),
+          Tab(text: 'On Hold'),
         ],
       ),
     );
