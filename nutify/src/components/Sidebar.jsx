@@ -1,0 +1,152 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import logo from '../assets/images/NUtifywhite.png';
+import chevronLeftIcon from '../assets/icons/chevron-left.svg';
+import menuIcon from '../assets/icons/menu.svg';
+import homeIcon from '../assets/icons/home.svg';
+import mailIcon from '../assets/icons/mail.svg';
+import settingsIcon from '../assets/icons/settings.svg';
+import userIcon from '../assets/icons/user.svg';
+
+const Sidebar = ({ userType, userName, userRole, userAvatar }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [showSettingsDropdown, setShowSettingsDropdown] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Load sidebar state from localStorage
+  useEffect(() => {
+    const savedState = localStorage.getItem('sidebarExpanded');
+    if (savedState === 'true') {
+      setIsExpanded(true);
+    }
+  }, []);
+
+  // Save sidebar state to localStorage
+  const saveSidebarState = (expanded) => {
+    localStorage.setItem('sidebarExpanded', expanded);
+  };
+
+  const toggleSidebar = () => {
+    const newState = !isExpanded;
+    setIsExpanded(newState);
+    saveSidebarState(newState);
+  };
+
+  const toggleSettingsDropdown = (e) => {
+    e.stopPropagation();
+    setShowSettingsDropdown(!showSettingsDropdown);
+  };
+
+  const handleNavigation = (path) => {
+    navigate(path);
+  };
+
+  const handleSettingsAction = (action) => {
+    setShowSettingsDropdown(false);
+    switch (action) {
+      case 'profile':
+        // Handle profile edit
+        break;
+      case 'password':
+        navigate('/forgot-password');
+        break;
+      case 'logout':
+        navigate('/login');
+        break;
+      default:
+        break;
+    }
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (showSettingsDropdown && !e.target.closest('.settings-dropdown') && !e.target.closest('.settings-icon')) {
+        setShowSettingsDropdown(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [showSettingsDropdown]);
+
+  // Close sidebar on mobile when clicking outside
+  useEffect(() => {
+    const handleMobileClickOutside = (e) => {
+      if (window.innerWidth <= 768 && isExpanded && !e.target.closest('.sidebar')) {
+        setIsExpanded(false);
+        saveSidebarState(false);
+      }
+    };
+
+    document.addEventListener('click', handleMobileClickOutside);
+    return () => document.removeEventListener('click', handleMobileClickOutside);
+  }, [isExpanded]);
+
+  const isActive = (path) => location.pathname === path;
+
+  return (
+    <div className={`sidebar ${isExpanded ? 'expanded' : ''}`}>
+      <div className="sidebar-content">
+        <div className="sidebar-header">
+          <div className="sidebar-logo">
+            <img src={logo} alt="NUtify" className="logo" />
+            <div className="chevron-icon" onClick={toggleSidebar}>
+              <img src={chevronLeftIcon} alt="Collapse" className="icon" />
+            </div>
+          </div>
+          <div className="sidebar-icon menu-burger" onClick={toggleSidebar}>
+            <img src={menuIcon} alt="Menu" className="icon" />
+          </div>
+        </div>
+
+        <div className="sidebar-nav">
+          <div 
+            className={`sidebar-icon ${isActive(`/${userType}/home`) ? 'active' : ''}`}
+            onClick={() => handleNavigation(`/${userType}/home`)}
+          >
+            <img src={homeIcon} alt="Home" className="icon" />
+            <span className="nav-text">Home</span>
+          </div>
+          <div 
+            className={`sidebar-icon ${isActive(`/${userType}/history`) ? 'active' : ''}`}
+            onClick={() => handleNavigation(`/${userType}/history`)}
+          >
+            <img src={mailIcon} alt="History" className="icon" />
+            <span className="nav-text">History</span>
+          </div>
+        </div>
+
+        <div className="sidebar-bottom">
+          <div className="user-info">
+            <div className="sidebar-avatar">
+              <img src={userAvatar} alt="Avatar" className="avatar" />
+            </div>
+            <div className="user-details">
+              <div className="user-name">{userName}</div>
+              <div className="user-role">{userRole}</div>
+            </div>
+            <div className="settings-icon" onClick={toggleSettingsDropdown}>
+              <img src={settingsIcon} alt="Settings" className="icon" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className={`settings-dropdown ${showSettingsDropdown ? 'show' : ''}`}>
+        <div className="dropdown-item" onClick={() => handleSettingsAction('profile')}>
+          Edit Profile Details
+        </div>
+        <div className="dropdown-item" onClick={() => handleSettingsAction('password')}>
+          Forgot Password
+        </div>
+        <div className="dropdown-item" onClick={() => handleSettingsAction('logout')}>
+          Logout
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Sidebar;
