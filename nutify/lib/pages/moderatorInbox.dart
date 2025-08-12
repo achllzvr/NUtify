@@ -310,7 +310,7 @@ class _ModeratorInboxState extends State<ModeratorInbox> with SingleTickerProvid
                 ..sort((a, b) => b.compareTo(a)); // latest first
 
               return ListView.builder(
-                padding: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 itemCount: keys.length,
                 itemBuilder: (context, idx) {
                   final k = keys[idx];
