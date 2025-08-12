@@ -53,4 +53,19 @@ function createFacultySidebar() {
 
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('faculty-sidebar-container').innerHTML = createFacultySidebar();
+  // Remove sidebar transition for initial load and navigation
+  const sidebar = document.getElementById('sidebar');
+  sidebar.classList.add('no-transition');
+  const isExpanded = localStorage.getItem('sidebarExpanded') === 'true';
+  if (isExpanded) {
+    sidebar.classList.add('expanded');
+  }
+  // No sliding animation at all
+  const chevron = document.getElementById('menuToggle');
+  if (chevron) {
+    chevron.onclick = function () {
+      sidebar.classList.toggle('expanded');
+      localStorage.setItem('sidebarExpanded', sidebar.classList.contains('expanded'));
+    };
+  }
 });

@@ -7,24 +7,29 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function initializeFacultyFunctionality() {
   const sidebar = document.getElementById("sidebar");
-  const menuToggle = document.getElementById("menuToggle");
+    const menuToggle = document.getElementById("menuToggle");
   const menuToggleBurger = document.getElementById("menuToggleBurger");
   const settingsToggle = document.getElementById("settingsToggle");
   const settingsDropdown = document.getElementById("settingsDropdown");
 
-  if (!sidebar) return; // Exit if components haven't loaded yet
+  
 
   function saveSidebarState() {
     const isExpanded = sidebar.classList.contains("expanded");
     localStorage.setItem("sidebarExpanded", isExpanded);
   }
 
-  function loadSidebarState() {
-    const isExpanded = localStorage.getItem("sidebarExpanded") === "true";
-    if (isExpanded) {
-      sidebar.classList.add("expanded");
-    }
+    function loadSidebarState() {
+  const isExpanded = localStorage.getItem("sidebarExpanded") === "true";
+  if (isExpanded) {
+    // Prevent animation on initial load
+    sidebar.classList.add("no-transition");
+    sidebar.classList.add("expanded");
+    setTimeout(() => {
+      sidebar.classList.remove("no-transition");
+    }, 0);
   }
+}
 
   loadSidebarState();
 
@@ -114,7 +119,9 @@ function initializeFacultyFunctionality() {
   navItems.forEach((item) => {
     item.addEventListener("click", function () {
       const navText = this.querySelector(".nav-text").textContent.trim();
-
+      // Disable sidebar animation before page change
+      const sidebar = document.getElementById("sidebar");
+      if (sidebar) sidebar.classList.add("no-transition");
       switch (navText) {
         case "Home":
           window.location.href = "facultyhome.html";
