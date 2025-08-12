@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:nutify/models/moderatorRequests.dart';
+import 'package:nutify/pages/moderatorHome.dart';
+import 'package:nutify/pages/moderatorProfile.dart';
 
 class ModeratorInbox extends StatefulWidget {
   const ModeratorInbox({super.key});
@@ -17,7 +19,7 @@ class _ModeratorInboxState extends State<ModeratorInbox> with SingleTickerProvid
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
   }
 
   @override
@@ -31,38 +33,197 @@ class _ModeratorInboxState extends State<ModeratorInbox> with SingleTickerProvid
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      appBar: AppBar(
-        title: const Text(
-          'Inbox',
-          style: TextStyle(fontFamily: 'Arimo', fontWeight: FontWeight.bold, color: Colors.white),
+      appBar: _moderatorAppBar(context),
+      body: Column(
+        children: [
+          _navigationalTabs(),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                _requestsTab(),
+                _onTheSpotTab(),
+                _accountApprovalsTab(),
+                _accountsOnHoldTab(),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  AppBar _moderatorAppBar(BuildContext context) {
+    return AppBar(
+      title: Container(
+        margin: const EdgeInsets.only(left: 10.0),
+        child: const Text(
+          'Moderator Inbox',
+          style: TextStyle(
+            fontFamily: 'Arimo',
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
-        centerTitle: false,
-        elevation: 0,
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF35408E), Color(0xFF1A2049)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+      ),
+      centerTitle: false,
+      elevation: 0,
+      flexibleSpace: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [const Color(0xFF35408E), const Color(0xFF1A2049)],
+            begin: const FractionalOffset(0.0, 0.0),
+            end: const FractionalOffset(0.0, 1.0),
+            stops: const [0.0, 1.0],
+            tileMode: TileMode.clamp,
+          ),
+        ),
+      ),
+      actions: [
+        GestureDetector(
+          onTap: () {
+            if (ModalRoute.of(context)?.settings.name == '/moderatorProfile') {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('You are already on the Profile page', style: TextStyle(fontFamily: 'Arimo')),
+                  duration: const Duration(seconds: 2),
+                  backgroundColor: const Color(0xFF35408E),
+                ),
+              );
+            } else {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ModeratorProfile(),
+                  settings: const RouteSettings(name: '/moderatorProfile'),
+                ),
+                (Route<dynamic> route) => false,
+              );
+            }
+          },
+          child: Container(
+            margin: const EdgeInsets.only(right: 25.0),
+            child: const CircleAvatar(
+              backgroundImage: AssetImage('assets/icons/profile.png'),
+              backgroundColor: Colors.transparent,
             ),
           ),
         ),
-        bottom: TabBar(
-          controller: _tabController,
-          labelColor: const Color(0xFFFFD418),
-          unselectedLabelColor: Colors.white,
-          indicatorColor: const Color(0xFFFFD418),
-          tabs: const [
-            Tab(text: 'Requests'),
-            Tab(text: 'Account Approvals'),
-          ],
+      ],
+      bottom: PreferredSize(
+        preferredSize: const Size.fromHeight(50.0),
+        child: Container(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.home, color: Colors.white),
+                onPressed: () {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ModeratorHome(),
+                      settings: const RouteSettings(name: '/moderatorHome'),
+                    ),
+                    (Route<dynamic> route) => false,
+                  );
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.inbox, color: Color(0xFFFFD418)),
+                onPressed: () {
+                  if (ModalRoute.of(context)?.settings.name == '/moderatorInbox' ||
+                      context.widget.runtimeType == ModeratorInbox) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text('You are already on the Inbox page', style: TextStyle(fontFamily: 'Arimo')),
+                        duration: const Duration(seconds: 2),
+                        backgroundColor: const Color(0xFF35408E),
+                      ),
+                    );
+                  } else {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ModeratorInbox(),
+                        settings: const RouteSettings(name: '/moderatorInbox'),
+                      ),
+                      (Route<dynamic> route) => false,
+                    );
+                  }
+                },
+              ),
+            ],
+          ),
         ),
       ),
-      body: TabBarView(
+    );
+  }
+
+  Widget _navigationalTabs() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 3,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: TabBar(
         controller: _tabController,
+        labelColor: const Color(0xFFFFD418),
+        unselectedLabelColor: Colors.grey.shade600,
+        indicatorColor: const Color(0xFFFFD418),
+        indicatorWeight: 3,
+        labelStyle: const TextStyle(
+          fontFamily: 'Arimo',
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+        ),
+        unselectedLabelStyle: const TextStyle(
+          fontFamily: 'Arimo',
+          fontSize: 14,
+          fontWeight: FontWeight.normal,
+        ),
+        tabs: const [
+          Tab(text: 'Requests'),
+          Tab(text: 'On-The-Spot Requests'),
+          Tab(text: 'Account Approvals'),
+          Tab(text: 'Accounts on Hold'),
+        ],
+      ),
+    );
+  }
+
+  Widget _requestCard(ModeratorRequestItem item) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _requestsTab(),
-          _accountApprovalsTab(),
+          Text(item.teacherName, style: const TextStyle(fontFamily: 'Arimo', fontSize: 16, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 4),
+          Text('Student: ${item.studentName}', style: TextStyle(fontFamily: 'Arimo', color: Colors.grey.shade700)),
+          const SizedBox(height: 6),
+          Text('Reason: ${item.reason}', style: const TextStyle(fontFamily: 'Arimo')),
+          const SizedBox(height: 6),
+          Text('Status: ${item.status}', style: const TextStyle(fontFamily: 'Arimo')),
         ],
       ),
     );
@@ -85,35 +246,30 @@ class _ModeratorInboxState extends State<ModeratorInbox> with SingleTickerProvid
           padding: const EdgeInsets.all(16),
           itemCount: list.length,
           separatorBuilder: (_, __) => const SizedBox(height: 12),
-          itemBuilder: (context, i) {
-            final item = list[i];
-            return Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.08),
-                    blurRadius: 10,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(item.teacherName, style: const TextStyle(fontFamily: 'Arimo', fontSize: 16, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 4),
-                  Text('Student: ${item.studentName}', style: TextStyle(fontFamily: 'Arimo', color: Colors.grey.shade700)),
-                  const SizedBox(height: 6),
-                  Text('Reason: ${item.reason}', style: const TextStyle(fontFamily: 'Arimo')),
-                  const SizedBox(height: 6),
-                  Text('Status: ${item.status}', style: const TextStyle(fontFamily: 'Arimo')),
-                ],
-              ),
-            );
-          },
+          itemBuilder: (context, i) => _requestCard(list[i]),
+        );
+      },
+    );
+  }
+
+  Widget _onTheSpotTab() {
+    return FutureBuilder<List<ModeratorRequestItem>>(
+      future: ModeratorRequestsApi.fetchOnTheSpotRequests(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        final list = snapshot.data ?? [];
+        if (list.isEmpty) {
+          return const Center(
+            child: Text('No on-the-spot requests found', style: TextStyle(fontFamily: 'Arimo', color: Colors.grey)),
+          );
+        }
+        return ListView.separated(
+          padding: const EdgeInsets.all(16),
+          itemCount: list.length,
+          separatorBuilder: (_, __) => const SizedBox(height: 12),
+          itemBuilder: (context, i) => _requestCard(list[i]),
         );
       },
     );
@@ -229,6 +385,107 @@ class _ModeratorInboxState extends State<ModeratorInbox> with SingleTickerProvid
       ],
     );
   }
+
+  Widget _accountsOnHoldTab() {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: TextField(
+            controller: _searchController,
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: Colors.white,
+              hintText: 'Search users…',
+              hintStyle: const TextStyle(fontFamily: 'Arimo'),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+              prefixIcon: const Icon(Icons.search),
+            ),
+            onChanged: (_) => setState(() {}),
+          ),
+        ),
+        Expanded(
+          child: FutureBuilder<List<_UserApprovalItem>>( 
+            future: _fetchHoldUsers(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              var users = snapshot.data ?? [];
+              final q = _searchController.text.trim().toLowerCase();
+              if (q.isNotEmpty) {
+                users = users.where((u) => u.name.toLowerCase().contains(q)).toList();
+              }
+              if (users.isEmpty) {
+                return const Center(child: Text('No accounts on hold', style: TextStyle(fontFamily: 'Arimo', color: Colors.grey)));
+              }
+              return ListView.separated(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                itemCount: users.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                itemBuilder: (context, i) {
+                  final u = users[i];
+                  return Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(14),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.08),
+                          blurRadius: 10,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(u.name, style: const TextStyle(fontFamily: 'Arimo', fontWeight: FontWeight.bold, fontSize: 16)),
+                        const SizedBox(height: 6),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [Color(0xFFFFD54F), Color(0xFFFFB300)],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: ElevatedButton(
+                                  onPressed: () async {
+                                    await _updateVerification(u.userId, 1);
+                                    if (mounted) setState(() {});
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.transparent,
+                                    shadowColor: Colors.transparent,
+                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                  ),
+                                  child: const Text('Verify', style: TextStyle(fontFamily: 'Arimo', fontWeight: FontWeight.bold, color: Colors.white)),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        )
+      ],
+    );
+  }
 }
 
 class _UserApprovalItem {
@@ -237,14 +494,10 @@ class _UserApprovalItem {
   _UserApprovalItem({required this.userId, required this.name});
 }
 
-Future<List<_UserApprovalItem>> _fetchPendingUsers() async {
-  final res = await http.post(
-    Uri.parse('https://nutify.site/api.php?action=getPendingUsers'),
-    headers: {'Content-Type': 'application/json'},
-    body: '{}',
-  );
-  if (res.statusCode != 200) return [];
+Future<List<_UserApprovalItem>> _fetchHoldUsers() async {
   try {
+    final res = await http.get(Uri.parse('https://nutify.site/api.php?action=getAccountsOnHold'));
+    if (res.statusCode != 200) return [];
     final data = jsonDecode(res.body);
     final list = (data['users'] ?? data['data'] ?? []) as List;
     return list
@@ -259,9 +512,28 @@ Future<List<_UserApprovalItem>> _fetchPendingUsers() async {
 }
 
 Future<void> _updateVerification(int userId, int value) async {
-  final res = await http.post(
-    Uri.parse('https://nutify.site/api.php?action=updateUserVerification'),
-    headers: {'Content-Type': 'application/json'},
-    body: jsonEncode({'user_id': userId, 'is_verified': value}),
-  );
+  try {
+    await http.post(
+      Uri.parse('https://nutify.site/api.php?action=updateUserVerification'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'user_id': userId, 'is_verified': value}),
+    );
+  } catch (_) {}
+}
+
+Future<List<_UserApprovalItem>> _fetchPendingUsers() async {
+  try {
+    final res = await http.get(Uri.parse('https://nutify.site/api.php?action=getPendingUsers'));
+    if (res.statusCode != 200) return [];
+    final data = jsonDecode(res.body);
+    final list = (data['users'] ?? data['data'] ?? []) as List;
+    return list
+        .map((e) => _UserApprovalItem(
+              userId: int.tryParse(e['user_id']?.toString() ?? '') ?? 0,
+              name: (e['full_name'] ?? '${e['user_fn'] ?? ''} ${e['user_ln'] ?? ''}').trim(),
+            ))
+        .toList();
+  } catch (_) {
+    return [];
+  }
 }

@@ -47,6 +47,18 @@ class ModeratorRequestsApi {
     }
   }
 
+  static Future<List<ModeratorRequestItem>> fetchOnTheSpotRequests() async {
+    final res = await http.get(Uri.parse('$baseUrl?action=getModeratorOnTheSpotRequests'));
+    if (res.statusCode != 200) return [];
+    try {
+      final data = jsonDecode(res.body);
+      final list = (data['requests'] ?? data['data'] ?? []) as List;
+      return list.map((e) => ModeratorRequestItem.fromJson(e)).toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
   static Future<Map<String, dynamic>> createOnSpotRequest({
     required int teacherId,
     required int studentId,
