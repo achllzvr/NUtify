@@ -345,6 +345,7 @@ class _ModeratorInboxState extends State<ModeratorInbox> with SingleTickerProvid
       when = DateFormat('MMMM d, y • h:mm a').format(dt);
     } catch (_) {}
     return Container(
+      width: double.infinity,
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
