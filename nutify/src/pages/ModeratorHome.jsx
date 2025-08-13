@@ -24,6 +24,7 @@ import kriztopher from '../assets/images/avatars/8940e8ea369def14e82f05a5fee994b
 import nielCerezo from '../assets/images/avatars/237d3876ef98d5364ed1326813f4ed5b.jpg';
 import pennyLumbera from '../assets/images/avatars/237d3876ef98d5364ed1326813f4ed5b.jpg';
 import bobbyBuendia from '../assets/images/avatars/237d3876ef98d5364ed1326813f4ed5b.jpg';
+import checkIcon from '../assets/icons/check.svg';
 
 const truncateReason = (reason, maxLength = 40) => {
   if (!reason) return '';
@@ -45,6 +46,9 @@ const ModeratorHome = () => {
   const [reason, setReason] = useState('');
   const [mainSearchInput, setMainSearchInput] = useState('');
   const [mainSearch, setMainSearch] = useState('');
+  const [requestAlertVisible, setRequestAlertVisible] = useState(false);
+  const [requestAlertTransition, setRequestAlertTransition] = useState(false);
+  const [facultyStatusFilter, setFacultyStatusFilter] = useState('all');
 
   const facultyHistoryStudents = [
     { name: 'Beatriz Solis', avatar: beatrizSolis },
@@ -258,8 +262,9 @@ const ModeratorHome = () => {
     a.department.toLowerCase().includes(mainSearch.toLowerCase())
   );
   const filteredFacultyList = facultyList.filter(f =>
-    f.name.toLowerCase().includes(mainSearch.toLowerCase()) ||
-    f.department.toLowerCase().includes(mainSearch.toLowerCase())
+    (facultyStatusFilter === 'all' || f.status === facultyStatusFilter) &&
+    (f.name.toLowerCase().includes(mainSearch.toLowerCase()) ||
+    f.department.toLowerCase().includes(mainSearch.toLowerCase()))
   );
 
   // Handler for scheduling (dummy)
@@ -268,15 +273,46 @@ const ModeratorHome = () => {
     setFacultySelected('');
     setFacultySearch('');
     setStudentName('');
+    setStudentSearch(''); 
     setReason('');
+
+    const audio = new window.Audio('/nutified.wav');
+    audio.play();
+
+    setRequestAlertVisible(true);
+    setTimeout(() => setRequestAlertTransition(true), 10);
+    setTimeout(() => {
+      setRequestAlertTransition(false);
+      setTimeout(() => setRequestAlertVisible(false), 350);
+    }, 2500);
+  };
+
+  const handleRequestAlertClose = () => {
+    setRequestAlertTransition(false);
+    setTimeout(() => setRequestAlertVisible(false), 350);
   };
 
   useEffect(() => {
     document.title = "Home - NUtify";
   }, []);
 
+  useEffect(() => {
+
+    if (detailsModalAppointment) {
+      const handleEsc = (event) => {
+        if (event.key === "Escape") {
+          setDetailsModalAppointment(null);
+        }
+      };
+      window.addEventListener("keydown", handleEsc);
+      return () => window.removeEventListener("keydown", handleEsc);
+    }
+  }, [detailsModalAppointment]);
+  // END MODIFICATION
+
   return (
     <div>
+      {/* Success alert for Notify Appointees */}
       {alertVisible && (
         <div
           style={{
@@ -325,6 +361,63 @@ const ModeratorHome = () => {
               paddingLeft: '8px'
             }}
             onClick={handleAlertClose}
+            aria-label="Close"
+            title="Close"
+          >
+            &#10005;
+          </span>
+        </div>
+      )}
+
+      {/* Green alert for Reques */}
+      {requestAlertVisible && (
+        <div
+          style={{
+            position: 'fixed',
+            top: '32px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            minWidth: '320px',
+            maxWidth: '90vw',
+            background: '#D4F7DC',
+            color: '#1c1d1e',
+            borderRadius: '8px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+            padding: '10px 18px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            zIndex: 3000,
+            fontFamily: 'Helvetica, Arial, sans-serif',
+            fontSize: '15px',
+            fontWeight: 500,
+            opacity: requestAlertTransition ? 1 : 0,
+            transform: requestAlertTransition
+              ? 'translateX(-50%) translateY(0)'
+              : 'translateX(-50%) translateY(-12px)',
+            transition: 'opacity 0.35s, transform 0.35s'
+          }}
+        >
+          <span style={{
+            display: 'flex',
+            alignItems: 'center',
+            marginRight: '2px' 
+          }}>
+            <img src={checkIcon} alt="Check" width="22" height="22" />
+          </span>
+          <span style={{ fontWeight: 600, marginRight: '2px' }}>Success:</span>
+          <span style={{ marginRight: '8px' }}>Request Created!</span>
+          <span
+            style={{
+              marginLeft: 'auto',
+              cursor: 'pointer',
+              fontSize: '18px',
+              color: '#1c1d1e',
+              fontWeight: 700,
+              lineHeight: '1',
+              paddingLeft: '8px'
+            }}
+            onClick={handleRequestAlertClose}
             aria-label="Close"
             title="Close"
           >
@@ -452,12 +545,6 @@ const ModeratorHome = () => {
                   </div>
                 )}
               </div>
-              {/* Selected faculty */}
-              {facultySelected && (
-                <div style={{ marginBottom: '18px', color: '#323d87', fontWeight: 500 }}>
-                  Selected: {facultySelected}
-                </div>
-              )}
 
               {/* Select Student label */}
               <div style={{ fontWeight: 500, marginBottom: '6px' }}>Select Student</div>
@@ -514,12 +601,6 @@ const ModeratorHome = () => {
                   </div>
                 )}
               </div>
-              {/* Selected student */}
-              {studentName && (
-                <div style={{ marginBottom: '18px', color: '#323d87', fontWeight: 500 }}>
-                  Selected: {studentName}
-                </div>
-              )}
 
               {/* Reason label */}
               <div style={{ fontWeight: 500, marginBottom: '6px' }}>Reason</div>
@@ -557,8 +638,18 @@ const ModeratorHome = () => {
 
           <div className="moderator-home-right-column">
             <div className="moderator-home-faculty-section">
-              <div className="moderator-home-section-header">
-                <h2>All Faculty List</h2>
+              <div className="moderator-home-section-header" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+                <h2 style={{ margin: 0 }}>All Faculty List</h2>
+                <select
+                  id="faculty-status-filter"
+                  value={facultyStatusFilter}
+                  onChange={e => setFacultyStatusFilter(e.target.value)}
+                  className="moderator-home-faculty-filter-dropdown"
+                >
+                  <option value="all">All</option>
+                  <option value="online">Online</option>
+                  <option value="offline">Offline</option>
+                </select>
               </div>
               <div className="moderator-home-faculty-list">
                 {filteredFacultyList.map(faculty => (

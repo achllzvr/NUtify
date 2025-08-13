@@ -232,12 +232,12 @@
 }
 
 .faculty-history-card-list::-webkit-scrollbar-thumb {
-  background: rgba(53, 64, 142, 0.4);
+  background: rgba(240, 240, 240, 0.5);
   border-radius: 3px;
 }
 
 .faculty-history-card-list::-webkit-scrollbar-thumb:hover {
-  background: rgba(53, 64, 142, 0.6);
+  background: rgba(240, 240, 240, 0.5);
 }
 
 /* Filter Modal */
