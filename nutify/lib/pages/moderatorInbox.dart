@@ -66,7 +66,7 @@ class _ModeratorInboxState extends State<ModeratorInbox> with SingleTickerProvid
       title: Container(
         margin: const EdgeInsets.only(left: 10.0),
         child: const Text(
-          'Moderator Inbox',
+          'Inbox',
           style: TextStyle(
             fontFamily: 'Arimo',
             fontSize: 24,
