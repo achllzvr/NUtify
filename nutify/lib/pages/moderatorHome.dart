@@ -18,6 +18,9 @@ class ModeratorHome extends StatefulWidget {
 class _ModeratorHomeState extends State<ModeratorHome> {
   String? moderatorUserId;
   bool _isNotifying = false;
+  // Added: search and pagination for home
+  final TextEditingController _homeSearchCtrl = TextEditingController();
+  int _homePage = 0;
 
   @override
   void initState() {
@@ -30,6 +33,13 @@ class _ModeratorHomeState extends State<ModeratorHome> {
     setState(() {
       moderatorUserId = prefs.getString('userId');
     });
+  }
+
+  @override
+  void dispose() {
+    // ...existing code...
+    _homeSearchCtrl.dispose();
+    super.dispose();
   }
 
   @override
@@ -158,6 +168,25 @@ class _ModeratorHomeState extends State<ModeratorHome> {
   Widget _buildMainContent() {
     return Column(
       children: [
+        // Search bar for home page
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          child: TextField(
+            controller: _homeSearchCtrl,
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: Colors.white,
+              hintText: 'Search by student, faculty, or reason…',
+              hintStyle: const TextStyle(fontFamily: 'Arimo'),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+              prefixIcon: const Icon(Icons.search),
+            ),
+            onChanged: (_) => setState(() { _homePage = 0; }),
+          ),
+        ),
         Expanded(
           child: FutureBuilder<List<ModeratorHomeAppointments>>(
             future: ModeratorHomeAppointments.getModeratorHomeAppointments(),
@@ -166,6 +195,40 @@ class _ModeratorHomeState extends State<ModeratorHome> {
                 return Center(child: CircularProgressIndicator());
               }
               List<ModeratorHomeAppointments> appointments = snapshot.data ?? [];
+
+              // Only upcoming appointments (filter out past)
+              DateTime now = DateTime.now();
+              bool isUpcoming(ModeratorHomeAppointments a) {
+                try {
+                  final date = DateTime.parse(a.scheduleDate);
+                  String startStr = a.scheduleTime.contains('-')
+                      ? a.scheduleTime.split('-')[0].trim()
+                      : a.scheduleTime.trim();
+                  DateTime t;
+                  try {
+                    t = DateFormat('HH:mm:ss').parse(startStr);
+                  } catch (_) {
+                    t = DateFormat('HH:mm').parse(startStr);
+                  }
+                  final start = DateTime(date.year, date.month, date.day, t.hour, t.minute, t.second);
+                  return start.isAfter(now);
+                } catch (_) {
+                  // If parsing fails, keep it (be lenient)
+                  return true;
+                }
+              }
+              appointments = appointments.where(isUpcoming).toList();
+
+              // Search filter
+              final q = _homeSearchCtrl.text.trim().toLowerCase();
+              if (q.isNotEmpty) {
+                appointments = appointments.where((a) =>
+                  a.studentName.toLowerCase().contains(q) ||
+                  a.teacherName.toLowerCase().contains(q) ||
+                  a.appointmentReason.toLowerCase().contains(q)
+                ).toList();
+              }
+
               if (appointments.isEmpty) {
                 return Center(
                   child: Text(
@@ -178,14 +241,53 @@ class _ModeratorHomeState extends State<ModeratorHome> {
                   ),
                 );
               }
-              return ListView.separated(
-                padding: EdgeInsets.all(16),
-                itemCount: appointments.length,
-                separatorBuilder: (context, index) => SizedBox(height: 12),
-                itemBuilder: (context, index) {
-                  var appointment = appointments[index];
-                  return _buildAppointmentCard(appointment);
-                },
+
+              // Pagination (10 per page)
+              final total = appointments.length;
+              final totalPages = (total + 9) ~/ 10;
+              int page = _homePage;
+              if (page >= totalPages) page = totalPages - 1;
+              if (page < 0) page = 0;
+              final start = page * 10;
+              final end = (start + 10 > total) ? total : start + 10;
+              final pageItems = appointments.sublist(start, end);
+
+              return Column(
+                children: [
+                  Expanded(
+                    child: ListView.separated(
+                      padding: EdgeInsets.all(16),
+                      itemCount: pageItems.length,
+                      separatorBuilder: (context, index) => SizedBox(height: 12),
+                      itemBuilder: (context, index) {
+                        var appointment = pageItems[index];
+                        return _buildAppointmentCard(appointment);
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Page ${page + 1} of $totalPages', style: const TextStyle(fontFamily: 'Arimo')),
+                        Row(
+                          children: [
+                            OutlinedButton(
+                              onPressed: page > 0 ? () => setState(() => _homePage = page - 1) : null,
+                              child: const Text('Previous'),
+                            ),
+                            const SizedBox(width: 8),
+                            OutlinedButton(
+                              onPressed: page < totalPages - 1 ? () => setState(() => _homePage = page + 1) : null,
+                              child: const Text('Next'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               );
             },
           ),
@@ -804,7 +906,11 @@ class _OnSpotRequestSheetState extends State<_OnSpotRequestSheet> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Center(
-                child: Container(width: 44, height: 5, decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(3))),
+                child: Container(
+                  width: 44,
+                  height: 5,
+                  decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(3)),
+                ),
               ),
               const SizedBox(height: 12),
               const Text('Create On-the-spot Request', style: TextStyle(fontFamily: 'Arimo', fontWeight: FontWeight.bold, fontSize: 18)),
@@ -823,10 +929,11 @@ class _OnSpotRequestSheetState extends State<_OnSpotRequestSheet> {
                   });
                 },
               ),
-              if (_teacherName.isNotEmpty) Padding(
-                padding: const EdgeInsets.only(top: 6.0),
-                child: Text('Selected: $_teacherName', style: const TextStyle(fontFamily: 'Arimo', color: Colors.green)),
-              ),
+              if (_teacherName.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 6.0),
+                  child: Text('Selected: $_teacherName', style: const TextStyle(fontFamily: 'Arimo', color: Colors.green)),
+                ),
 
               const SizedBox(height: 16),
               // Step 2: Student search
@@ -848,10 +955,11 @@ class _OnSpotRequestSheetState extends State<_OnSpotRequestSheet> {
                   ),
                 ),
               ),
-              if (_studentName.isNotEmpty) Padding(
-                padding: const EdgeInsets.only(top: 6.0),
-                child: Text('Selected: $_studentName', style: const TextStyle(fontFamily: 'Arimo', color: Colors.green)),
-              ),
+              if (_studentName.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 6.0),
+                  child: Text('Selected: $_studentName', style: const TextStyle(fontFamily: 'Arimo', color: Colors.green)),
+                ),
 
               const SizedBox(height: 16),
               // Step 3: Reason
@@ -890,7 +998,9 @@ class _OnSpotRequestSheetState extends State<_OnSpotRequestSheet> {
                     child: Container(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          colors: canSubmit ? const [Color(0xFFFFD54F), Color(0xFFFFB300)] : [Colors.grey.shade300, Colors.grey.shade400],
+                          colors: canSubmit
+                              ? const [Color(0xFFFFD54F), Color(0xFFFFB300)]
+                              : [Colors.grey.shade300, Colors.grey.shade400],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),

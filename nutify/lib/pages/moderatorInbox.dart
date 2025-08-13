@@ -20,6 +20,10 @@ class _ModeratorInboxState extends State<ModeratorInbox> with SingleTickerProvid
   final TextEditingController _studentsLogSearchCtrl = TextEditingController();
   final TextEditingController _otsSearchCtrl = TextEditingController();
   DateTime? _studentsLogDateFilter;
+  // Pagination state per tab
+  int _requestsPage = 0;
+  int _approvalsPage = 0;
+  int _onHoldPage = 0;
 
   @override
   void initState() {
@@ -309,11 +313,14 @@ class _ModeratorInboxState extends State<ModeratorInbox> with SingleTickerProvid
               final keys = grouped.keys.toList()
                 ..sort((a, b) => b.compareTo(a)); // latest first
 
+              // Limit to 2 most recent days when no date filter is applied
+              final keysToShow = _studentsLogDateFilter == null ? keys.take(2).toList() : keys;
+
               return ListView.builder(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                itemCount: keys.length,
+                itemCount: keysToShow.length,
                 itemBuilder: (context, idx) {
-                  final k = keys[idx];
+                  final k = keysToShow[idx];
                   DateTime? d;
                   try { d = DateTime.parse(k); } catch (_) {}
                   final pretty = d != null ? DateFormat('MMMM d, y').format(d) : k;
@@ -470,7 +477,7 @@ class _ModeratorInboxState extends State<ModeratorInbox> with SingleTickerProvid
               ),
               prefixIcon: const Icon(Icons.search),
             ),
-            onChanged: (_) => setState(() {}),
+            onChanged: (_) => setState(() { _requestsPage = 0; }),
           ),
         ),
         Expanded(
@@ -492,11 +499,48 @@ class _ModeratorInboxState extends State<ModeratorInbox> with SingleTickerProvid
                   child: Text('No on-the-spot requests found', style: TextStyle(fontFamily: 'Arimo', color: Colors.grey)),
                 );
               }
-              return ListView.separated(
-                padding: const EdgeInsets.all(16),
-                itemCount: list.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 12),
-                itemBuilder: (context, i) => _requestCard(list[i]),
+
+              // Pagination: 10 per page
+              final total = list.length;
+              final totalPages = (total + 9) ~/ 10;
+              int page = _requestsPage;
+              if (page >= totalPages) page = totalPages - 1;
+              if (page < 0) page = 0;
+              final start = page * 10;
+              final end = (start + 10 > total) ? total : start + 10;
+              final pageItems = list.sublist(start, end);
+
+              return Column(
+                children: [
+                  Expanded(
+                    child: ListView.separated(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: pageItems.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 12),
+                      itemBuilder: (context, i) => _requestCard(pageItems[i]),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Page ${page + 1} of $totalPages', style: const TextStyle(fontFamily: 'Arimo')),
+                        Row(children: [
+                          OutlinedButton(
+                            onPressed: page > 0 ? () => setState(() => _requestsPage = page - 1) : null,
+                            child: const Text('Previous'),
+                          ),
+                          const SizedBox(width: 8),
+                          OutlinedButton(
+                            onPressed: page < totalPages - 1 ? () => setState(() => _requestsPage = page + 1) : null,
+                            child: const Text('Next'),
+                          ),
+                        ]),
+                      ],
+                    ),
+                  ),
+                ],
               );
             },
           ),
@@ -523,11 +567,11 @@ class _ModeratorInboxState extends State<ModeratorInbox> with SingleTickerProvid
               ),
               prefixIcon: const Icon(Icons.search),
             ),
-            onChanged: (_) => setState(() {}),
+            onChanged: (_) => setState(() { _approvalsPage = 0; }),
           ),
         ),
         Expanded(
-          child: FutureBuilder<List<_UserApprovalItem>>( 
+          child: FutureBuilder<List<_UserApprovalItem>>(
             future: _fetchPendingUsers(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
@@ -541,89 +585,126 @@ class _ModeratorInboxState extends State<ModeratorInbox> with SingleTickerProvid
               if (users.isEmpty) {
                 return const Center(child: Text('No pending accounts', style: TextStyle(fontFamily: 'Arimo', color: Colors.grey)));
               }
-              return ListView.separated(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                itemCount: users.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 12),
-                itemBuilder: (context, i) {
-                  final u = users[i];
-                  return Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(14),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.08),
-                          blurRadius: 10,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
+
+              // Pagination: 10 per page
+              final total = users.length;
+              final totalPages = (total + 9) ~/ 10;
+              int page = _approvalsPage;
+              if (page >= totalPages) page = totalPages - 1;
+              if (page < 0) page = 0;
+              final start = page * 10;
+              final end = (start + 10 > total) ? total : start + 10;
+              final pageItems = users.sublist(start, end);
+
+              return Column(
+                children: [
+                  Expanded(
+                    child: ListView.separated(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      itemCount: pageItems.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 12),
+                      itemBuilder: (context, i) {
+                        final u = pageItems[i];
+                        return Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(14),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.08),
+                                blurRadius: 10,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(u.name, style: const TextStyle(fontFamily: 'Arimo', fontWeight: FontWeight.bold, fontSize: 16)),
+                              const SizedBox(height: 6),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: ElevatedButton(
+                                      onPressed: () async {
+                                        await _updateVerification(u.userId, 2);
+                                        if (mounted) {
+                                          setState(() {});
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(content: const Text('Moved to hold'), backgroundColor: Colors.red.shade600),
+                                          );
+                                        }
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.grey.shade300,
+                                        foregroundColor: Colors.black,
+                                        padding: const EdgeInsets.symmetric(vertical: 12),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                      ),
+                                      child: const Text('Hold', style: TextStyle(fontFamily: 'Arimo', fontWeight: FontWeight.bold)),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        gradient: const LinearGradient(
+                                          colors: [Color(0xFFFFD54F), Color(0xFFFFB300)],
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                        ),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: ElevatedButton(
+                                        onPressed: () async {
+                                          await _updateVerification(u.userId, 1);
+                                          if (mounted) {
+                                            setState(() {});
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(content: const Text('Verified'), backgroundColor: Colors.green.shade600),
+                                            );
+                                          }
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.transparent,
+                                          shadowColor: Colors.transparent,
+                                          padding: const EdgeInsets.symmetric(vertical: 12),
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                        ),
+                                        child: const Text('Verify', style: TextStyle(fontFamily: 'Arimo', fontWeight: FontWeight.bold, color: Colors.white)),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(u.name, style: const TextStyle(fontFamily: 'Arimo', fontWeight: FontWeight.bold, fontSize: 16)),
-                        const SizedBox(height: 6),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed: () async {
-                                  await _updateVerification(u.userId, 2);
-                                  if (mounted) {
-                                    setState(() {});
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: const Text('Moved to hold'), backgroundColor: Colors.red.shade600),
-                                    );
-                                  }
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.grey.shade300,
-                                  foregroundColor: Colors.black,
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                ),
-                                child: const Text('Hold', style: TextStyle(fontFamily: 'Arimo', fontWeight: FontWeight.bold)),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  gradient: const LinearGradient(
-                                    colors: [Color(0xFFFFD54F), Color(0xFFFFB300)],
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                  ),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: ElevatedButton(
-                                  onPressed: () async {
-                                    await _updateVerification(u.userId, 1);
-                                    if (mounted) {
-                                      setState(() {});
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: const Text('Verified'), backgroundColor: Colors.green.shade600),
-                                      );
-                                    }
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.transparent,
-                                    shadowColor: Colors.transparent,
-                                    padding: const EdgeInsets.symmetric(vertical: 12),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                  ),
-                                  child: const Text('Verify', style: TextStyle(fontFamily: 'Arimo', fontWeight: FontWeight.bold, color: Colors.white)),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                        Text('Page ${page + 1} of $totalPages', style: const TextStyle(fontFamily: 'Arimo')),
+                        Row(children: [
+                          OutlinedButton(
+                            onPressed: page > 0 ? () => setState(() => _approvalsPage = page - 1) : null,
+                            child: const Text('Previous'),
+                          ),
+                          const SizedBox(width: 8),
+                          OutlinedButton(
+                            onPressed: page < totalPages - 1 ? () => setState(() => _approvalsPage = page + 1) : null,
+                            child: const Text('Next'),
+                          ),
+                        ]),
                       ],
                     ),
-                  );
-                },
+                  ),
+                ],
               );
             },
           ),
@@ -650,11 +731,11 @@ class _ModeratorInboxState extends State<ModeratorInbox> with SingleTickerProvid
               ),
               prefixIcon: const Icon(Icons.search),
             ),
-            onChanged: (_) => setState(() {}),
+            onChanged: (_) => setState(() { _onHoldPage = 0; }),
           ),
         ),
         Expanded(
-          child: FutureBuilder<List<_UserApprovalItem>>( 
+          child: FutureBuilder<List<_UserApprovalItem>>(
             future: _fetchHoldUsers(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
@@ -668,68 +749,105 @@ class _ModeratorInboxState extends State<ModeratorInbox> with SingleTickerProvid
               if (users.isEmpty) {
                 return const Center(child: Text('No accounts on hold', style: TextStyle(fontFamily: 'Arimo', color: Colors.grey)));
               }
-              return ListView.separated(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                itemCount: users.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 12),
-                itemBuilder: (context, i) {
-                  final u = users[i];
-                  return Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(14),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.08),
-                          blurRadius: 10,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(u.name, style: const TextStyle(fontFamily: 'Arimo', fontWeight: FontWeight.bold, fontSize: 16)),
-                        const SizedBox(height: 6),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  gradient: const LinearGradient(
-                                    colors: [Color(0xFFFFD54F), Color(0xFFFFB300)],
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                  ),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: ElevatedButton(
-                                  onPressed: () async {
-                                    await _updateVerification(u.userId, 1);
-                                    if (mounted) {
-                                      setState(() {});
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: const Text('Verified'), backgroundColor: Colors.green.shade600),
-                                      );
-                                    }
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.transparent,
-                                    shadowColor: Colors.transparent,
-                                    padding: const EdgeInsets.symmetric(vertical: 12),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                  ),
-                                  child: const Text('Verify', style: TextStyle(fontFamily: 'Arimo', fontWeight: FontWeight.bold, color: Colors.white)),
-                                ),
+
+              // Pagination: 10 per page
+              final total = users.length;
+              final totalPages = (total + 9) ~/ 10;
+              int page = _onHoldPage;
+              if (page >= totalPages) page = totalPages - 1;
+              if (page < 0) page = 0;
+              final start = page * 10;
+              final end = (start + 10 > total) ? total : start + 10;
+              final pageItems = users.sublist(start, end);
+
+              return Column(
+                children: [
+                  Expanded(
+                    child: ListView.separated(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      itemCount: pageItems.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 12),
+                      itemBuilder: (context, i) {
+                        final u = pageItems[i];
+                        return Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(14),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.08),
+                                blurRadius: 10,
+                                offset: const Offset(0, 3),
                               ),
-                            ),
-                          ],
-                        ),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(u.name, style: const TextStyle(fontFamily: 'Arimo', fontWeight: FontWeight.bold, fontSize: 16)),
+                              const SizedBox(height: 6),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        gradient: const LinearGradient(
+                                          colors: [Color(0xFFFFD54F), Color(0xFFFFB300)],
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                        ),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: ElevatedButton(
+                                        onPressed: () async {
+                                          await _updateVerification(u.userId, 1);
+                                          if (mounted) {
+                                            setState(() {});
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(content: const Text('Verified'), backgroundColor: Colors.green.shade600),
+                                            );
+                                          }
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.transparent,
+                                          shadowColor: Colors.transparent,
+                                          padding: const EdgeInsets.symmetric(vertical: 12),
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                        ),
+                                        child: const Text('Verify', style: TextStyle(fontFamily: 'Arimo', fontWeight: FontWeight.bold, color: Colors.white)),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Page ${page + 1} of $totalPages', style: const TextStyle(fontFamily: 'Arimo')),
+                        Row(children: [
+                          OutlinedButton(
+                            onPressed: page > 0 ? () => setState(() => _onHoldPage = page - 1) : null,
+                            child: const Text('Previous'),
+                          ),
+                          const SizedBox(width: 8),
+                          OutlinedButton(
+                            onPressed: page < totalPages - 1 ? () => setState(() => _onHoldPage = page + 1) : null,
+                            child: const Text('Next'),
+                          ),
+                        ]),
                       ],
                     ),
-                  );
-                },
+                  ),
+                ],
               );
             },
           ),
