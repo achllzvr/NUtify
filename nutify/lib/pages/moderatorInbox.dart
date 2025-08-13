@@ -372,6 +372,44 @@ class _ModeratorInboxState extends State<ModeratorInbox> with SingleTickerProvid
     );
   }
 
+  // Status gradient colors to match Student/Teacher roles
+  List<Color> _getStatusGradientColors(String status) {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return const [Color(0xFF2196F3), Color(0xFF0D47A1)]; // Blue
+      case 'declined':
+        return const [Color(0xFFF44336), Color(0xFFB71C1C)]; // Red
+      case 'missed':
+        return const [Color(0xFFFF9800), Color(0xFFE65100)]; // Orange
+      case 'completed':
+        return const [Color(0xFF4CAF50), Color(0xFF2E7D32)]; // Green
+      case 'accepted':
+        return const [Color(0xFF4CAF50), Color(0xFF2E7D32)]; // Green (same as completed)
+      default:
+        return const [Color(0xFF9E9E9E), Color(0xFF616161)]; // Grey fallback
+    }
+  }
+
+  String _capitalize(String s) => s.isEmpty ? s : s[0].toUpperCase() + s.substring(1).toLowerCase();
+
+  Widget _buildStatusBadge(String status) {
+    final colors = _getStatusGradientColors(status);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(colors: colors, begin: Alignment.topLeft, end: Alignment.bottomRight),
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(color: colors.first.withOpacity(0.25), blurRadius: 6, offset: const Offset(0, 2)),
+        ],
+      ),
+      child: Text(
+        _capitalize(status),
+        style: const TextStyle(fontFamily: 'Arimo', fontWeight: FontWeight.w600, color: Colors.white, fontSize: 12),
+      ),
+    );
+  }
+
   Widget _requestCard(ModeratorRequestItem item) {
     String created = item.createdAt;
     try {
@@ -400,7 +438,12 @@ class _ModeratorInboxState extends State<ModeratorInbox> with SingleTickerProvid
           const SizedBox(height: 6),
           Text('Reason: ${item.reason}', style: const TextStyle(fontFamily: 'Arimo')),
           const SizedBox(height: 6),
-          Text('Status: ${item.status}', style: const TextStyle(fontFamily: 'Arimo')),
+          Row(
+            children: [
+              const Text('Status: ', style: TextStyle(fontFamily: 'Arimo')),
+              _buildStatusBadge(item.status),
+            ],
+          ),
           const SizedBox(height: 6),
           Text('Timestamp: $created', style: const TextStyle(fontFamily: 'Arimo')),
         ],
