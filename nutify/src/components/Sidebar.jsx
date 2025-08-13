@@ -6,20 +6,26 @@ import menuIcon from '../assets/icons/menu.svg';
 import homeIcon from '../assets/icons/home.svg';
 import mailIcon from '../assets/icons/mail.svg';
 import settingsIcon from '../assets/icons/settings.svg';
-import userIcon from '../assets/icons/user.svg';
+
+const getInitialSidebarState = () => {
+  if (typeof window !== 'undefined') {
+    const savedState = localStorage.getItem('sidebarExpanded');
+    return savedState === 'true';
+  }
+  return false;
+};
 
 const Sidebar = ({ userType, userName, userRole, userAvatar }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  // Load sidebar state BEFORE first render
+  const [isExpanded, setIsExpanded] = useState(getInitialSidebarState);
   const [showSettingsDropdown, setShowSettingsDropdown] = useState(false);
+  const [shouldAnimate, setShouldAnimate] = useState(false); // controls CSS transition
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Load sidebar state from localStorage
+  // After first mount, enable animation for subsequent toggles
   useEffect(() => {
-    const savedState = localStorage.getItem('sidebarExpanded');
-    if (savedState === 'true') {
-      setIsExpanded(true);
-    }
+    setShouldAnimate(true);
   }, []);
 
   // Save sidebar state to localStorage
@@ -28,9 +34,10 @@ const Sidebar = ({ userType, userName, userRole, userAvatar }) => {
   };
 
   const toggleSidebar = () => {
-    const newState = !isExpanded;
-    setIsExpanded(newState);
-    saveSidebarState(newState);
+    setIsExpanded((prev) => {
+      saveSidebarState(!prev);
+      return !prev;
+    });
   };
 
   const toggleSettingsDropdown = (e) => {
@@ -59,10 +66,13 @@ const Sidebar = ({ userType, userName, userRole, userAvatar }) => {
     }
   };
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (showSettingsDropdown && !e.target.closest('.settings-dropdown') && !e.target.closest('.settings-icon')) {
+      if (
+        showSettingsDropdown &&
+        !e.target.closest('.settings-dropdown') &&
+        !e.target.closest('.settings-icon')
+      ) {
         setShowSettingsDropdown(false);
       }
     };
@@ -71,10 +81,13 @@ const Sidebar = ({ userType, userName, userRole, userAvatar }) => {
     return () => document.removeEventListener('click', handleClickOutside);
   }, [showSettingsDropdown]);
 
-  // Close sidebar on mobile when clicking outside
   useEffect(() => {
     const handleMobileClickOutside = (e) => {
-      if (window.innerWidth <= 768 && isExpanded && !e.target.closest('.sidebar')) {
+      if (
+        window.innerWidth <= 768 &&
+        isExpanded &&
+        !e.target.closest('.sidebar')
+      ) {
         setIsExpanded(false);
         saveSidebarState(false);
       }
@@ -87,7 +100,9 @@ const Sidebar = ({ userType, userName, userRole, userAvatar }) => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <div className={`sidebar ${isExpanded ? 'expanded' : ''}`}>
+    <div
+      className={`sidebar${isExpanded ? ' expanded' : ''}${shouldAnimate ? ' animate' : ''}`}
+    >
       <div className="sidebar-content">
         <div className="sidebar-header">
           <div className="sidebar-logo">
@@ -102,14 +117,14 @@ const Sidebar = ({ userType, userName, userRole, userAvatar }) => {
         </div>
 
         <div className="sidebar-nav">
-          <div 
+          <div
             className={`sidebar-icon ${isActive(`/${userType}/home`) ? 'active' : ''}`}
             onClick={() => handleNavigation(`/${userType}/home`)}
           >
             <img src={homeIcon} alt="Home" className="icon" />
             <span className="nav-text">Home</span>
           </div>
-          <div 
+          <div
             className={`sidebar-icon ${isActive(`/${userType}/history`) ? 'active' : ''}`}
             onClick={() => handleNavigation(`/${userType}/history`)}
           >
@@ -134,7 +149,7 @@ const Sidebar = ({ userType, userName, userRole, userAvatar }) => {
         </div>
       </div>
 
-      <div className={`settings-dropdown ${showSettingsDropdown ? 'show' : ''}`}>
+      <div className={`settings-dropdown${showSettingsDropdown ? ' show' : ''}`}>
         <div className="dropdown-item" onClick={() => handleSettingsAction('profile')}>
           Edit Profile Details
         </div>

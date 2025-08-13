@@ -1,7 +1,7 @@
 .student-history-main-content {
   margin-left: 80px;
-  margin-top: 80px;
-  min-height: calc(100vh - 80px);
+  margin-top: 88px;
+  min-height: calc(100vh - 88px);
   padding: 20px;
   transition: margin-left 0.3s ease;
   display: flex;
