@@ -19,6 +19,10 @@ import StudentHistory from './pages/StudentHistory';
 import FacultyHome from './pages/FacultyHome';
 import FacultyHistory from './pages/FacultyHistory';
 
+// Moderator Pages
+import ModeratorHome from './pages/ModeratorHome';
+import ModeratorHistory from './pages/ModeratorHistory';
+
 // Component that uses the page title hook
 function AppContent() {
   // This hook will automatically update the page title based on the current route
@@ -42,6 +46,10 @@ function AppContent() {
         {/* Faculty Routes */}
         <Route path="/faculty/home" element={<FacultyHome />} />
         <Route path="/faculty/history" element={<FacultyHistory />} />
+
+        {/* Moderator Routes */}
+        <Route path="/moderator/home" element={<ModeratorHome />} />
+        <Route path="/moderator/history" element={<ModeratorHistory />} />
       </Routes>
     </div>
   );

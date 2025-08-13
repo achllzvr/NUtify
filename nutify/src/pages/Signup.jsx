@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import userIcon from '../assets/icons/user.svg';
+import idIcon from '../assets/icons/credit-card.svg';
 import lockIcon from '../assets/icons/lock.svg';
 import eyeIcon from '../assets/icons/eye.svg';
 import eyeOffIcon from '../assets/icons/eye-off.svg';
-import chevronDownIcon from '../assets/icons/chevron-down.svg';
 
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -13,10 +13,9 @@ const Signup = () => {
     firstName: '',
     lastName: '',
     username: '',
+    idNumber: '',
     password: '',
-    confirmPassword: '',
-    userType: '',
-    department: ''
+    confirmPassword: ''
   });
   const navigate = useNavigate();
 
@@ -54,7 +53,7 @@ const Signup = () => {
           <p className="login-subtitle">Join us today. Stay connected.</p>
 
           <form onSubmit={handleSubmit}>
-            <div className="dropdown-row">
+            <div className="name-row" style={{ display: 'flex', gap: '16px', marginBottom: '5px' }}>
               <div className="input-group">
                 <img src={userIcon} alt="First Name" className="input-icon" />
                 <input
@@ -95,40 +94,17 @@ const Signup = () => {
               />
             </div>
 
-            <div className="dropdown-row">
-              <div className="dropdown-group">
-                <img src={userIcon} alt="User Type" className="input-icon" />
-                <select
-                  className="login-select"
-                  name="userType"
-                  value={formData.userType}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="" disabled>Select User Type</option>
-                  <option value="student">Student</option>
-                  <option value="faculty">Faculty</option>
-                </select>
-                <img src={chevronDownIcon} alt="Dropdown" className="dropdown-chevron" />
-              </div>
-
-              <div className="dropdown-group">
-                <img src={userIcon} alt="Department" className="input-icon" />
-                <select
-                  className="login-select"
-                  name="department"
-                  value={formData.department}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="" disabled>Select Department</option>
-                  <option value="sace">SACE</option>
-                  <option value="coe">COE</option>
-                  <option value="cba">CBA</option>
-                  <option value="cas">CAS</option>
-                </select>
-                <img src={chevronDownIcon} alt="Dropdown" className="dropdown-chevron" />
-              </div>
+            <div className="input-group">
+              <img src={idIcon} alt="ID Number" className="input-icon" />
+              <input
+                type="text"
+                className="login-input"
+                placeholder="ID Number"
+                name="idNumber"
+                value={formData.idNumber}
+                onChange={handleInputChange}
+                required
+              />
             </div>
 
             <div className="input-group">

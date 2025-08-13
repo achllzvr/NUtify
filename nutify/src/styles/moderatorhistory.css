@@ -1,4 +1,4 @@
-.faculty-history-main-content {
+.moderator-history-main-content {
   margin-left: 80px;
   margin-top: 88px;
   min-height: calc(100vh - 88px);
@@ -9,14 +9,14 @@
   align-items: flex-start;
 }
 
-.faculty-history-content-container {
+.moderator-history-content-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0;
   width: 100%;
 }
 
-.faculty-history-left-column {
+.moderator-history-left-column {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -24,7 +24,7 @@
 }
 
 /* Filter Tabs */
-.faculty-history-filter-tabs {
+.moderator-history-filter-tabs {
   display: flex;
   gap: 0;
   margin-bottom: 25px;
@@ -38,7 +38,7 @@
   border-bottom: 2px solid #e8e8e8;
 }
 
-.faculty-history-filter-tabs::after {
+.moderator-history-filter-tabs::after {
   content: "";
   position: absolute;
   bottom: -2px;
@@ -49,7 +49,7 @@
   z-index: 1;
 }
 
-.faculty-history-filter-btn {
+.moderator-history-filter-btn {
   background: transparent;
   border: none;
   border-radius: 0;
@@ -66,48 +66,48 @@
   flex: 1;
 }
 
-.faculty-history-filter-btn:hover {
+.moderator-history-filter-btn:hover {
   color: #5a6c7d;
   background: rgba(53, 64, 142, 0.05);
 }
 
-.faculty-history-filter-btn.active {
+.moderator-history-filter-btn.active {
   color: #35408e;
   font-weight: 600;
   background: rgba(53, 64, 142, 0.08);
 }
 
-.faculty-history-filter-tabs[data-active="all"]::after {
+.moderator-history-filter-tabs[data-active="all"]::after {
   width: 14.28%;
   left: 0;
 }
-.faculty-history-filter-tabs[data-active="pending"]::after {
+.moderator-history-filter-tabs[data-active="pending"]::after {
   width: 14.28%;
   left: 14.28%;
 }
-.faculty-history-filter-tabs[data-active="accepted"]::after {
+.moderator-history-filter-tabs[data-active="accepted"]::after {
   width: 14.28%;
   left: 28.56%;
 }
-.faculty-history-filter-tabs[data-active="completed"]::after {
+.moderator-history-filter-tabs[data-active="completed"]::after {
   width: 14.28%;
   left: 42.84%;
 }
-.faculty-history-filter-tabs[data-active="missed"]::after {
+.moderator-history-filter-tabs[data-active="missed"]::after {
   width: 14.28%;
   left: 57.12%;
 }
-.faculty-history-filter-tabs[data-active="cancelled"]::after {
+.moderator-history-filter-tabs[data-active="cancelled"]::after {
   width: 14.28%;
   left: 71.4%;
 }
-.faculty-history-filter-tabs[data-active="declined"]::after {
+.moderator-history-filter-tabs[data-active="declined"]::after {
   width: 14.28%;
   left: 85.68%;
 }
 
 /* History Section */
-.faculty-history-section {
+.moderator-history-section {
   background: #f0f0f0;
   border-radius: 20px;
   padding: 25px;
@@ -116,8 +116,8 @@
   transition: all 0.3s ease;
 }
 
-.faculty-history-appointment-item,
-.faculty-history-item {
+.moderator-history-appointment-item,
+.moderator-history-item {
   display: flex;
   align-items: center;
   padding: 12px 15px;
@@ -129,13 +129,13 @@
   transition: all 0.3s ease;
 }
 
-.faculty-history-appointment-item:hover,
-.faculty-history-item:hover {
+.moderator-history-appointment-item:hover,
+.moderator-history-item:hover {
   box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.08),
     inset -5px -5px 10px rgba(255, 255, 255, 0.9);
 }
 
-.faculty-history-appointment-avatar {
+.moderator-history-appointment-avatar {
   width: 80px;
   height: 80px;
   border-radius: 50%;
@@ -146,21 +146,21 @@
   flex-shrink: 0;
 }
 
-.faculty-history-avatar-img {
+.moderator-history-avatar-img {
   width: 70px;
   height: 70px;
   border-radius: 50%;
   object-fit: cover;
 }
 
-.faculty-history-appointment-info {
+.moderator-history-appointment-info {
   flex: 1;
   display: flex;
   flex-direction: column;
 }
 
-.faculty-history-appointment-name,
-.faculty-history-name {
+.moderator-history-appointment-name,
+.moderator-history-name {
   font-family: "Montserrat", sans-serif;
   font-size: 20px;
   font-weight: 700;
@@ -168,25 +168,25 @@
   margin-bottom: 4px;
 }
 
-.faculty-history-appointment-details,
-.faculty-history-details {
+.moderator-history-appointment-details,
+.moderator-history-details {
   font-family: "Helvetica", sans-serif;
   font-size: 15px;
   color: #7f8c8d;
   margin-bottom: 2px;
 }
 
-.faculty-history-appointment-time {
+.moderator-history-appointment-time {
   font-family: "Helvetica", sans-serif;
   font-size: 14px;
   color: #b2b2b2;
 }
 
-.faculty-history-status-mobile {
+.moderator-history-status-mobile {
   display: none;
 }
 
-.faculty-history-see-more-btn {
+.moderator-history-see-more-btn {
   background: #f0f0f0;
   width: 13%;
   margin-top: 5px;
@@ -207,7 +207,7 @@
   overflow: hidden;
 }
 
-.faculty-history-see-more-btn:active {
+.moderator-history-see-more-btn:active {
   box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.1),
     inset -5px -5px 10px rgba(255, 255, 255, 0.8),
     0 0 20px rgba(127, 140, 141, 0.1);
@@ -215,40 +215,40 @@
   transition: all 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-.faculty-history-card-list {
+.moderator-history-card-list {
   max-height: 520px;
   overflow-y: auto;
   padding: 10px 12px 10px 0;
   margin-right: -12px;
 }
 
-.faculty-history-card-list::-webkit-scrollbar {
+.moderator-history-card-list::-webkit-scrollbar {
   width: 6px;
 }
 
-.faculty-history-card-list::-webkit-scrollbar-track {
+.moderator-history-card-list::-webkit-scrollbar-track {
   background: rgba(240, 240, 240, 0.5);
   border-radius: 3px;
 }
 
-.faculty-history-card-list::-webkit-scrollbar-thumb {
+.moderator-history-card-list::-webkit-scrollbar-thumb {
   background: rgba(53, 64, 142, 0.4);
   border-radius: 3px;
 }
 
-.faculty-history-card-list::-webkit-scrollbar-thumb:hover {
+.moderator-history-card-list::-webkit-scrollbar-thumb:hover {
   background: rgba(53, 64, 142, 0.6);
 }
 
 /* Filter Modal */
-.faculty-history-filter-modal-options {
+.moderator-history-filter-modal-options {
   display: flex;
   flex-direction: column;
   gap: 15px;
   padding: 10px 0;
 }
 
-.faculty-history-filter-option {
+.moderator-history-filter-option {
   display: flex;
   align-items: center;
   padding: 15px 20px;
@@ -263,19 +263,19 @@
   color: #2c3e50;
 }
 
-.faculty-history-filter-option:hover {
+.moderator-history-filter-option:hover {
   background: #f0f0f0;
   border-color: #e8e8e8;
 }
 
-.faculty-history-filter-option.selected {
+.moderator-history-filter-option.selected {
   background: rgba(53, 64, 142, 0.1);
   border-color: #35408e;
   color: #35408e;
   font-weight: 600;
 }
 
-.faculty-history-filter-option-icon {
+.moderator-history-filter-option-icon {
   width: 20px;
   height: 20px;
   margin-right: 15px;
@@ -283,12 +283,12 @@
     hue-rotate(200deg) brightness(95%) contrast(90%);
 }
 
-.faculty-history-filter-option.selected .faculty-history-filter-option-icon {
+.moderator-history-filter-option.selected .moderator-history-filter-option-icon {
   filter: brightness(0) saturate(100%) invert(28%) sepia(80%) saturate(1000%)
     hue-rotate(215deg) brightness(95%) contrast(90%);
 }
 
-#faculty-history-filterModalBtn {
+#moderator-history-filterModalBtn {
   position: relative;
   width: 100%;
   padding: 12px;
@@ -306,7 +306,7 @@
   overflow: hidden;
 }
 
-#faculty-history-filterModalBtn::before {
+#moderator-history-filterModalBtn::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -317,11 +317,11 @@
   pointer-events: none;
 }
 
-#faculty-history-filterModalBtn:active::before {
+#moderator-history-filterModalBtn:active::before {
   opacity: 1;
 }
 
-.faculty-history-status {
+.moderator-history-status {
   display: inline-block;
   padding: 6px 0;
   border-radius: 16px;
@@ -334,48 +334,48 @@
     -6px -6px 12px rgba(255, 255, 255, 0.8);
 }
 
-.faculty-history-status-pending {
+.moderator-history-status-pending {
   background: #ffd36b;
   color: #7a5c00;
 }
 
-.faculty-history-status-missed {
+.moderator-history-status-missed {
   background: #ff7a7a;
   color: #fff;
 }
 
-.faculty-history-status-completed {
+.moderator-history-status-completed {
   background: #4caf50;
   color: #fff;
 }
 
-.faculty-history-status-cancelled {
+.moderator-history-status-cancelled {
   background: #ff7a7a;
   color: #fff;
 }
 
-.faculty-history-status-declined {
+.moderator-history-status-declined {
   background: #ff7a7a;
   color: #fff;
 }
 
-.faculty-history-status-accepted {
+.moderator-history-status-accepted {
   background: #4caf50;
   color: #fff;
 }
 
-.faculty-history-filter-mobile-btn {
+.moderator-history-filter-mobile-btn {
   display: none;
 }
 
 /* History Details Modal */
-.faculty-history-details-modal-content {
+.moderator-history-details-modal-content {
   background: linear-gradient(145deg, #ffffff, #d7d7d7);
   border-radius: 20px;
   border: none !important;
 }
 
-.faculty-history-details-modal-body {
+.moderator-history-details-modal-body {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -383,7 +383,7 @@
   padding: 12px 0;
 }
 
-.faculty-history-details-modal-title {
+.moderator-history-details-modal-title {
   font-family: "Montserrat", sans-serif;
   font-size: 2rem;
   font-weight: 700;
@@ -391,7 +391,7 @@
   text-align: center;
 }
 
-.faculty-history-details-modal-time {
+.moderator-history-details-modal-time {
   font-family: "Helvetica", sans-serif;
   font-size: 1rem;
   color: #2c3e50;
@@ -400,7 +400,7 @@
   margin-bottom: 1em;
 }
 
-.faculty-history-details-modal-status {
+.moderator-history-details-modal-status {
   width: 100%;
   max-width: 320px;
   padding: 10px 0;
@@ -412,30 +412,30 @@
   box-shadow: 6px 6px 12px rgba(53, 64, 142, 0.1), -6px -6px 12px rgba(255, 255, 255, 0.8);
 }
 
-.faculty-history-details-modal-status.completed,
-.faculty-history-details-modal-status.accepted {
+.moderator-history-details-modal-status.completed,
+.moderator-history-details-modal-status.accepted {
   background: #4caf50;
   color: #fff;
 }
 
-.faculty-history-details-modal-status.pending {
+.moderator-history-details-modal-status.pending {
   background: #e8e8e8;
   color: #7f8c8d;
 }
 
-.faculty-history-details-modal-status.missed,
-.faculty-history-details-modal-status.cancelled,
-.faculty-history-details-modal-status.declined {
+.moderator-history-details-modal-status.missed,
+.moderator-history-details-modal-status.cancelled,
+.moderator-history-details-modal-status.declined {
   background: #ff7a7a;
   color: #fff;
 }
 
-.faculty-history-details-modal-status.secondary {
+.moderator-history-details-modal-status.secondary {
   background: #e8e8e8;
   color: #7f8c8d;
 }
 
-.faculty-history-pending-badge {
+.moderator-history-pending-badge {
   background: rgba(53, 64, 142, 0.1) !important;
   color: #35408e !important;
   border: 1px solid #35408e;
@@ -467,7 +467,7 @@
 
 /* Responsive Design */
 @media (max-width: 1024px) {
-  .faculty-history-filter-mobile-btn {
+  .moderator-history-filter-mobile-btn {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -489,47 +489,47 @@
     max-width: none;
   }
 
-  .faculty-history-content-container {
+  .moderator-history-content-container {
     padding: 0 10px;
   }
 
-  .faculty-history-filter-tabs {
+  .moderator-history-filter-tabs {
     display: none;
   }
 
-  .faculty-history-filter-mobile-btn:active {
+  .moderator-history-filter-mobile-btn:active {
     box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.1),
       inset -5px -5px 10px rgba(255, 255, 255, 0.8);
   }
 
-  .faculty-history-filter-mobile-btn .faculty-history-filter-icon {
+  .moderator-history-filter-mobile-btn .moderator-history-filter-icon {
     width: 16px;
     height: 16px;
     filter: brightness(0) saturate(100%) invert(28%) sepia(80%) saturate(1000%)
       hue-rotate(215deg) brightness(95%) contrast(90%);
   }
 
-  .faculty-history-section {
+  .moderator-history-section {
     padding: 20px;
   }
 
-  .faculty-history-item {
+  .moderator-history-item {
     padding: 12px 15px;
     gap: 12px;
   }
 
-  .faculty-history-see-more-btn {
+  .moderator-history-see-more-btn {
     width: 25%;
   }
 }
 
 @media (max-width: 768px) {
-  .faculty-history-main-content {
+  .moderator-history-main-content {
     margin-left: 3.7em;
-    margin-top: 150px;
+    margin-top: 130px;
   }
 
-  .faculty-history-see-more-btn {
+  .moderator-history-see-more-btn {
     padding: 8px 0;
     font-size: 14px;
     border-radius: 16px;
@@ -539,11 +539,11 @@
     margin-top: 5px;
   }
 
-  .faculty-history-status {
+  .moderator-history-status {
     display: none !important;
   }
   
-  .faculty-history-status-mobile {
+  .moderator-history-status-mobile {
     display: block !important;
     width: 100%;
     margin: 0 0 8px 0;
@@ -556,77 +556,78 @@
     padding: 4px 0;
   }
   
-  .faculty-history-status-pending.faculty-history-status-mobile {
+  .moderator-history-status-pending.moderator-history-status-mobile {
     background: #ffd36b;
     color: #7a5c00;
   }
   
-  .faculty-history-status-missed.faculty-history-status-mobile {
+  .moderator-history-status-missed.moderator-history-status-mobile {
     background: #ff7a7a;
     color: #fff;
   }
   
-  .faculty-history-status-completed.faculty-history-status-mobile {
+  .moderator-history-status-completed.moderator-history-status-mobile {
     background: #4caf50;
     color: #fff;
   }
   
-  .faculty-history-status-cancelled.faculty-history-status-mobile {
+  .moderator-history-status-cancelled.moderator-history-status-mobile {
     background: #ff7a7a;
     color: #fff;
   }
   
-  .faculty-history-status-declined.faculty-history-status-mobile {
+  .moderator-history-status-declined.moderator-history-status-mobile {
     background: #ff7a7a;
     color: #fff;
   }
 
-  .faculty-history-status-accepted.faculty-history-status-mobile {
+  .moderator-history-status-accepted.moderator-history-status-mobile {
     background: #4caf50;
     color: #fff;
   }
 }
 
 @media (max-width: 576px) {
-  .faculty-history-appointment-item,
-  .faculty-history-item {
+  .moderator-history-appointment-item,
+  .moderator-history-item {
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
   }
   
-  .faculty-history-appointment-avatar {
+  .moderator-history-appointment-avatar {
     align-self: center;
     margin-right: 0;
     width: 40px;
     height: 40px;
   }
   
-  .faculty-history-avatar-img {
+  .moderator-history-avatar-img {
     width: 100%;
     height: 100%;
   }
   
-  .faculty-history-appointment-info {
+  .moderator-history-appointment-info {
     text-align: center;
     align-self: stretch;
   }
   
-  .faculty-history-see-more-btn {
+  .moderator-history-see-more-btn {
     padding: 5px 10px;
     font-size: 11px;
     border-radius: 10px;
   }
 
-  .faculty-history-details-modal-content {
+  .moderator-history-details-modal-content {
     border-radius: 12px;
   }
   
-  .faculty-history-details-modal-title {
+  .moderator-history-details-modal-title {
     font-size: 1.3rem;
   }
   
-  .faculty-history-details-modal-body {
+  .moderator-history-details-modal-body {
     gap: 12px;
   }
 }
+

@@ -1,5 +1,5 @@
 /* Content Container */
-.student-home-main-content {
+.moderator-home-main-content {
   margin-left: 80px;
   margin-top: 80px;
   min-height: calc(100vh - 80px);
@@ -10,7 +10,7 @@
   align-items: flex-start;
 }
 
-.student-home-content-container {
+.moderator-home-content-container {
   display: flex;
   gap: 30px;
   max-width: 1200px;
@@ -19,20 +19,20 @@
   width: 100%;
 }
 
-.student-home-left-column {
+.moderator-home-left-column {
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 30px;
 }
 
-.student-home-right-column {
+.moderator-home-right-column {
   flex: 0 0 350px;
 }
 
 /* Appointment Sections */
-.student-home-appointment-section,
-.student-home-faculty-section {
+.moderator-home-appointment-section,
+.moderator-home-faculty-section {
   background: #f0f0f0;
   border-radius: 20px;
   padding: 25px;
@@ -41,18 +41,18 @@
   transition: all 0.3s ease;
 }
 
-.student-home-faculty-section {
+.moderator-home-faculty-section {
   padding: 25px 20px 25px 25px;
 }
 
-.student-home-section-header {
+.moderator-home-section-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 20px;
 }
 
-.student-home-section-header h2 {
+.moderator-home-section-header h2 {
   font-family: "Montserrat", sans-serif;
   font-size: 18px;
   font-weight: 600;
@@ -60,7 +60,7 @@
   margin: 0;
 }
 
-.student-home-see-more-btn {
+.moderator-home-see-more-btn {
   background: #f0f0f0;
   border: none;
   border-radius: 15px;
@@ -79,7 +79,7 @@
   overflow: hidden;
 }
 
-.student-home-see-more-btn:active {
+.moderator-home-see-more-btn:active {
   box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.1),
     inset -5px -5px 10px rgba(255, 255, 255, 0.8),
     0 0 20px rgba(127, 140, 141, 0.1);
@@ -88,15 +88,15 @@
 }
 
 /* Appointment List */
-.student-home-appointment-list,
-.student-home-faculty-list {
+.moderator-home-appointment-list,
+.moderator-home-faculty-list {
   display: flex;
   flex-direction: column;
   gap: 15px;
 }
 
 /* Faculty List Scrollable */
-.student-home-faculty-list {
+.moderator-home-faculty-list {
   max-height: 720px;
   overflow-y: scroll;
   padding-right: 8px;
@@ -104,28 +104,28 @@
 }
 
 /* Minimal Scrollbar Styling */
-.student-home-faculty-list::-webkit-scrollbar {
+.moderator-home-faculty-list::-webkit-scrollbar {
   width: 6px;
 }
 
-.student-home-faculty-list::-webkit-scrollbar-track {
+.moderator-home-faculty-list::-webkit-scrollbar-track {
   background: rgba(240, 240, 240, 0.5);
   border-radius: 3px;
 }
 
-.student-home-faculty-list::-webkit-scrollbar-thumb {
+.moderator-home-faculty-list::-webkit-scrollbar-thumb {
   background: rgba(53, 64, 142, 0.4);
   border-radius: 3px;
 }
 
-.student-home-faculty-list::-webkit-scrollbar-button {
+.moderator-home-faculty-list::-webkit-scrollbar-button {
   display: none;
   height: 0;
   width: 0;
 }
 
-.student-home-appointment-item,
-.student-home-faculty-item {
+.moderator-home-appointment-item,
+.moderator-home-faculty-item {
   display: flex;
   align-items: center;
   padding: 12px 15px;
@@ -137,7 +137,7 @@
   transition: all 0.3s ease;
 }
 
-.student-home-faculty-item {
+.moderator-home-faculty-item {
   min-height: 72px;
   height: 77px;
   box-sizing: border-box;
@@ -146,14 +146,14 @@
   cursor: pointer;
 }
 
-.student-home-appointment-item:hover,
-.student-home-faculty-item:hover {
+.moderator-home-appointment-item:hover,
+.moderator-home-faculty-item:hover {
   box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.08),
     inset -5px -5px 10px rgba(255, 255, 255, 0.9);
 }
 
-.student-home-appointment-avatar,
-.student-home-faculty-avatar {
+.moderator-home-appointment-avatar,
+.moderator-home-faculty-avatar {
   width: 50px;
   height: 50px;
   border-radius: 50%;
@@ -162,21 +162,21 @@
   flex-shrink: 0;
 }
 
-.student-home-avatar-img {
+.moderator-home-avatar-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.student-home-appointment-info,
-.student-home-faculty-info {
+.moderator-home-appointment-info,
+.moderator-home-faculty-info {
   flex: 1;
   display: flex;
   flex-direction: column;
 }
 
-.student-home-appointment-name,
-.student-home-faculty-name {
+.moderator-home-appointment-name,
+.moderator-home-faculty-name {
   font-family: "Montserrat", sans-serif;
   font-size: 16px;
   font-weight: 600;
@@ -184,22 +184,22 @@
   margin-bottom: 4px;
 }
 
-.student-home-appointment-details,
-.student-home-faculty-department {
+.moderator-home-appointment-details,
+.moderator-home-faculty-department {
   font-family: "Helvetica", sans-serif;
   font-size: 14px;
   color: #7f8c8d;
   margin-bottom: 2px;
 }
 
-.student-home-appointment-time {
+.moderator-home-appointment-time {
   font-family: "Helvetica", sans-serif;
   font-size: 13px;
   color: #95a5a6;
 }
 
 /* Faculty Status */
-.student-home-faculty-status {
+.moderator-home-faculty-status {
   width: 12px;
   height: 12px;
   border-radius: 50%;
@@ -209,7 +209,7 @@
     -3px -3px 6px rgba(255, 255, 255, 0.8);
 }
 
-.student-home-faculty-status.online {
+.moderator-home-faculty-status.online {
   background: #27ae60;
   box-shadow: 3px 3px 6px rgba(39, 174, 96, 0.3),
     -3px -3px 6px rgba(255, 255, 255, 0.8),
@@ -217,7 +217,7 @@
     inset -2px -2px 4px rgba(46, 204, 113, 0.8);
 }
 
-.student-home-faculty-status.offline {
+.moderator-home-faculty-status.offline {
   background: #e74c3c;
   box-shadow: 3px 3px 6px rgba(231, 76, 60, 0.3),
     -3px -3px 6px rgba(255, 255, 255, 0.8),
@@ -226,14 +226,14 @@
 }
 
 /* Schedule Modal Styles */
-.student-home-schedule-times-container {
+.moderator-home-schedule-times-container {
   margin: 20px 0 0 0;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.student-home-schedule-time-card {
+.moderator-home-schedule-time-card {
   background: #ededed;
   border-radius: 10px;
   padding: 12px 24px;
@@ -258,12 +258,12 @@
   transition: box-shadow 0.2s, background 0.2s;
 }
 
-.student-home-schedule-time-card.selected {
+.moderator-home-schedule-time-card.selected {
   box-shadow: inset 6px 6px 12px #d1d1d1, inset -6px -6px 12px #ffffff;
   background: #e0e0e0;
 }
 
-.student-home-schedule-btn {
+.moderator-home-schedule-btn {
   background: linear-gradient(145deg, #3c489f, #323c86);
   box-shadow: 6px 6px 12px rgba(53, 64, 142, 0.2),
     -6px -6px 12px rgba(255, 255, 255, 0.8);
@@ -277,7 +277,7 @@
   font-family: "Helvetica", sans-serif;
 }
 
-.student-home-schedule-btn:active {
+.moderator-home-schedule-btn:active {
   box-shadow: inset 15px 15px 30px #35408e, inset -15px -15px 30px #3b469c;
 }
 
@@ -324,97 +324,98 @@
 
 /* Responsive Design */
 @media (max-width: 1024px) {
-  .student-home-content-container {
+  .moderator-home-content-container {
     flex-direction: column;
     gap: 20px;
   }
 
-  .student-home-right-column {
+  .moderator-home-right-column {
     flex: none;
   }
 }
 
 @media (max-width: 768px) {
-  .student-home-main-content {
+  .moderator-home-main-content {
     margin-left: 3.7em;
     margin-top: 110px;
   }
-  #student-home-upcomingAppointments {
+  
+  /* Appointment Sections */
+  #moderator-home-upcomingAppointments {
     margin-top: 2.5em;
   }
-
-  .student-home-appointment-section,
-  .student-home-faculty-section {
+  
+  .moderator-home-appointment-section,
+  .moderator-home-faculty-section {
     width: 20em;
   }
 
-  .student-home-content-container {
+  .moderator-home-content-container {
     padding: 15px;
     align-items: center;
   }
 
-  .student-home-section-header h2 {
+  .moderator-home-section-header h2 {
     font-size: 15px;
   }
 
-  .student-home-see-more-btn {
+  .moderator-home-see-more-btn {
     padding: 6px 12px;
     font-size: 12px;
     border-radius: 12px;
     white-space: nowrap;
   }
 
-  .student-home-appointment-item,
-  .student-home-faculty-item {
+  .moderator-home-appointment-item,
+  .moderator-home-faculty-item {
     padding: 12px;
   }
 
-  .student-home-appointment-avatar,
-  .student-home-faculty-avatar {
+  .moderator-home-appointment-avatar,
+  .moderator-home-faculty-avatar {
     width: 45px;
     height: 45px;
     margin-right: 12px;
   }
 
-  .student-home-appointment-name,
-  .student-home-faculty-name {
+  .moderator-home-appointment-name,
+  .moderator-home-faculty-name {
     font-size: 15px;
   }
 
-  .student-home-appointment-details,
-  .student-home-faculty-department {
+  .moderator-home-appointment-details,
+  .moderator-home-faculty-department {
     font-size: 13px;
   }
 
-  .student-home-appointment-time {
+  .moderator-home-appointment-time {
     font-size: 12px;
   }
 
   /* Mobile Faculty List - Remove scrollbar and limit items */
-  .student-home-faculty-list {
+  .moderator-home-faculty-list {
     max-height: none;
     overflow-y: visible;
     padding-right: 0;
     margin-right: 0;
   }
 
-  .student-home-faculty-list::-webkit-scrollbar {
+  .moderator-home-faculty-list::-webkit-scrollbar {
     display: none;
   }
 
   /* Hide faculty items beyond the 4th item on mobile */
-  .student-home-faculty-item:nth-child(n + 5) {
+  .moderator-home-faculty-item:nth-child(n + 5) {
     display: none;
   }
 
   /* Show all faculty items when expanded */
-  .student-home-faculty-list.expanded
-    .student-home-faculty-item:nth-child(n + 5) {
+  .moderator-home-faculty-list.expanded .moderator-home-faculty-item:nth-child(n + 5) {
     display: flex;
   }
 
   /* Add "See More" option styling for mobile */
-  .student-home-faculty-list::after {
+  .moderator-home-faculty-list::after {
     content: "See More";
     display: block;
     text-align: center;
@@ -433,17 +434,17 @@
   }
 
   /* Change content when expanded */
-  .student-home-faculty-list.expanded::after {
+  .moderator-home-faculty-list.expanded::after {
     content: "See Less";
   }
 
-  .student-home-faculty-list::after:hover {
+  .moderator-home-faculty-list::after:hover {
     box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.12),
       -6px -6px 12px rgba(255, 255, 255, 0.9);
     transform: translateY(-1px);
   }
 
-  .student-home-faculty-list::after:active {
+  .moderator-home-faculty-list::after:active {
     box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.08),
       -4px -4px 8px rgba(255, 255, 255, 0.7);
     transform: translateY(0);
@@ -451,7 +452,7 @@
 }
 
 @media (max-width: 576px) {
-  .student-home-content-container {
+  .moderator-home-content-container {
     padding: 0;
     display: flex;
     flex-direction: column;
@@ -462,26 +463,26 @@
     width: 100%;
   }
 
-  .student-home-left-column {
+  .moderator-home-left-column {
     width: 100%;
     max-width: 400px;
     align-items: center;
   }
 
-  .student-home-section-header {
+  .moderator-home-section-header {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
     gap: 10px;
   }
 
-  .student-home-section-header h2 {
+  .moderator-home-section-header h2 {
     font-size: 14px;
     flex: 1;
     margin-right: 10px;
   }
 
-  .student-home-see-more-btn {
+  .moderator-home-see-more-btn {
     padding: 5px 10px;
     font-size: 11px;
     border-radius: 10px;
@@ -489,19 +490,19 @@
     flex-shrink: 0;
   }
 
-  .student-home-appointment-item,
-  .student-home-faculty-item {
+  .moderator-home-appointment-item,
+  .moderator-home-faculty-item {
     padding: 10px;
   }
 
-  .student-home-appointment-avatar,
-  .student-home-faculty-avatar {
+  .moderator-home-appointment-avatar,
+  .moderator-home-faculty-avatar {
     width: 40px;
     height: 40px;
     margin-right: 10px;
   }
 
-  .student-home-schedule-time-card {
+  .moderator-home-schedule-time-card {
     font-size: 14px;
     padding: 10px 12px;
   }

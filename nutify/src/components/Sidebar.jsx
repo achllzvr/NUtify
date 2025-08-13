@@ -129,7 +129,9 @@ const Sidebar = ({ userType, userName, userRole, userAvatar }) => {
             onClick={() => handleNavigation(`/${userType}/history`)}
           >
             <img src={mailIcon} alt="History" className="icon" />
-            <span className="nav-text">History</span>
+            <span className="nav-text">
+              {userType === "moderator" ? "Inbox" : "History"}
+            </span>
           </div>
         </div>
 

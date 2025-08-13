@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import userIcon from '../assets/icons/user.svg';
+import creditCardIcon from '../assets/icons/credit-card.svg';
 
 const ForgotPassword = () => {
   const [formData, setFormData] = useState({
-    username: ''
+    idNumber: ''
   });
   const navigate = useNavigate();
 
@@ -28,17 +28,17 @@ const ForgotPassword = () => {
       <div className="login-container">
         <div className="login-card">
           <h1 className="login-title">Forgot Password</h1>
-          <p className="login-subtitle">Enter your username to reset your password.</p>
+          <p className="login-subtitle">Enter your ID Number to reset your password.</p>
 
           <form onSubmit={handleSubmit}>
             <div className="input-group">
-              <img src={userIcon} alt="User" className="input-icon" />
+              <img src={creditCardIcon} alt="ID Number" className="input-icon" />
               <input
                 type="text"
                 className="login-input"
-                placeholder="Username"
-                name="username"
-                value={formData.username}
+                placeholder="ID Number"
+                name="idNumber"
+                value={formData.idNumber}
                 onChange={handleInputChange}
                 required
               />
@@ -47,7 +47,7 @@ const ForgotPassword = () => {
             <button type="submit" className="login-button">Reset Password</button>
 
             <div className="signup-link">
-              Remember your password? <Link to="/login">Login</Link>
+              Remember your password? <Link to="/login">Back</Link>
             </div>
           </form>
         </div>

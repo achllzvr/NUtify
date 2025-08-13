@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import userIcon from '../assets/icons/user.svg';
-import lockIcon from '../assets/icons/lock.svg';
-import eyeIcon from '../assets/icons/eye.svg';
-import eyeOffIcon from '../assets/icons/eye-off.svg';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import userID from "../assets/icons/credit-card.svg";
+import lockIcon from "../assets/icons/lock.svg";
+import eyeIcon from "../assets/icons/eye.svg";
+import eyeOffIcon from "../assets/icons/eye-off.svg";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
-    username: '',
-    password: '',
-    remember: false
+    idNumber: "",
+    password: "",
+    remember: false,
   });
   const navigate = useNavigate();
 
@@ -20,19 +20,19 @@ const Login = () => {
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // For demo purposes, redirect based on username
-    if (formData.username.toLowerCase().includes('faculty')) {
-      navigate('/faculty/home');
+    // For demo purposes, redirect based on idNumber
+    if (formData.idNumber.toLowerCase().includes("faculty")) {
+      navigate("/faculty/home");
     } else {
-      navigate('/student/home');
+      navigate("/student/home");
     }
   };
 
@@ -45,13 +45,13 @@ const Login = () => {
 
           <form onSubmit={handleSubmit}>
             <div className="input-group">
-              <img src={userIcon} alt="User" className="input-icon" />
+              <img src={userID} alt="User" className="input-icon" />
               <input
                 type="text"
                 className="login-input"
-                placeholder="Username"
-                name="username"
-                value={formData.username}
+                placeholder="ID Number"
+                name="idNumber"
+                value={formData.idNumber}
                 onChange={handleInputChange}
                 required
               />
@@ -60,7 +60,7 @@ const Login = () => {
             <div className="input-group">
               <img src={lockIcon} alt="Password" className="input-icon" />
               <input
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 className="login-input"
                 placeholder="Password"
                 name="password"
@@ -68,9 +68,9 @@ const Login = () => {
                 onChange={handleInputChange}
                 required
               />
-              <img 
-                src={showPassword ? eyeOffIcon : eyeIcon} 
-                alt="Toggle Password" 
+              <img
+                src={showPassword ? eyeOffIcon : eyeIcon}
+                alt="Toggle Password"
                 className="toggle-password"
                 onClick={togglePasswordVisibility}
               />
@@ -87,15 +87,22 @@ const Login = () => {
                     checked={formData.remember}
                     onChange={handleInputChange}
                   />
-                  <label className="form-check-label remember-label" htmlFor="remember">
+                  <label
+                    className="form-check-label remember-label"
+                    htmlFor="remember"
+                  >
                     Remember me
                   </label>
                 </div>
               </div>
-              <Link to="/forgot-password" className="forgot-password">Forgot Password?</Link>
+              <Link to="/forgot-password" className="forgot-password">
+                Forgot Password?
+              </Link>
             </div>
 
-            <button type="submit" className="login-button">Login</button>
+            <button type="submit" className="login-button">
+              Login
+            </button>
 
             <div className="signup-link">
               Don't have an account? <Link to="/signup">Sign up</Link>

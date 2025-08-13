@@ -290,6 +290,11 @@
 }
 
 @media (max-width: 768px) {
+  .faculty-home-main-content {
+    margin-left: 3.7em;
+    margin-top: 110px;
+  }
+  
   .faculty-home-see-more-btn {
     padding: 8px 0;
     font-size: 14px;

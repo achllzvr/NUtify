@@ -524,6 +524,11 @@
 }
 
 @media (max-width: 768px) {
+  .student-history-main-content {
+    margin-left: 3.7em;
+    margin-top: 130px;
+  }
+
   .student-history-see-more-btn {
     padding: 8px 0;
     font-size: 14px;
