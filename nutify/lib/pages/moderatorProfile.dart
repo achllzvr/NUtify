@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nutify/pages/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nutify/pages/moderatorHome.dart';
+import 'package:nutify/pages/moderatorInbox.dart';
 
 class ModeratorProfile extends StatefulWidget {
   ModeratorProfile({super.key});
@@ -459,17 +460,24 @@ class _ModeratorProfileState extends State<ModeratorProfile> {
               IconButton(
                 icon: const Icon(Icons.inbox, color: Colors.white),
                 onPressed: () {
-                  // TODO: Replace with actual ModeratorInbox navigation when available
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Inbox page not implemented yet',
-                        style: TextStyle(fontFamily: 'Arimo'),
+                  if (ModalRoute.of(context)?.settings.name == '/moderatorInbox') {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('You are already on the Inbox page', style: TextStyle(fontFamily: 'Arimo')),
+                        duration: Duration(seconds: 2),
+                        backgroundColor: Color(0xFF35408E),
                       ),
-                      duration: Duration(seconds: 2),
-                      backgroundColor: Color(0xFF35408E),
-                    ),
-                  );
+                    );
+                  } else {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ModeratorInbox(),
+                        settings: const RouteSettings(name: '/moderatorInbox'),
+                      ),
+                      (Route<dynamic> route) => false,
+                    );
+                  }
                 },
               ),
             ],
