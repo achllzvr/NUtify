@@ -1,3 +1,4 @@
+/* Main content container layout */
 .moderator-history-main-content {
   margin-left: 80px;
   margin-top: 88px;
@@ -9,6 +10,7 @@
   align-items: flex-start;
 }
 
+/* Content container: centers left column */
 .moderator-history-content-container {
   max-width: 1200px;
   margin: 0 auto;
@@ -16,6 +18,7 @@
   width: 100%;
 }
 
+/* Left column for history/cards */
 .moderator-history-left-column {
   flex: 1;
   display: flex;
@@ -23,7 +26,7 @@
   gap: 30px;
 }
 
-/* Filter Tabs */
+/* Filter tabs for history status */
 .moderator-history-filter-tabs {
   display: flex;
   gap: 0;
@@ -49,6 +52,7 @@
   z-index: 1;
 }
 
+/* Filter tab button */
 .moderator-history-filter-btn {
   background: transparent;
   border: none;
@@ -77,36 +81,19 @@
   background: rgba(53, 64, 142, 0.08);
 }
 
-.moderator-history-filter-tabs[data-active="all"]::after {
-  width: 14.28%;
-  left: 0;
-}
-.moderator-history-filter-tabs[data-active="pending"]::after {
-  width: 14.28%;
-  left: 14.28%;
-}
-.moderator-history-filter-tabs[data-active="accepted"]::after {
-  width: 14.28%;
-  left: 28.56%;
-}
-.moderator-history-filter-tabs[data-active="completed"]::after {
-  width: 14.28%;
-  left: 42.84%;
-}
-.moderator-history-filter-tabs[data-active="missed"]::after {
-  width: 14.28%;
-  left: 57.12%;
-}
-.moderator-history-filter-tabs[data-active="cancelled"]::after {
-  width: 14.28%;
-  left: 71.4%;
-}
-.moderator-history-filter-tabs[data-active="declined"]::after {
-  width: 14.28%;
-  left: 85.68%;
-}
+/* Active tab indicator width/position per status */
+.moderator-history-filter-tabs[data-active="pending"]::after { width: 14.28%; left: 14.28%; }
+.moderator-history-filter-tabs[data-active="accepted"]::after { width: 14.28%; left: 28.56%; }
+.moderator-history-filter-tabs[data-active="completed"]::after { width: 14.28%; left: 42.84%; }
+.moderator-history-filter-tabs[data-active="missed"]::after { width: 14.28%; left: 57.12%; }
+.moderator-history-filter-tabs[data-active="cancelled"]::after { width: 14.28%; left: 71.4%; }
+.moderator-history-filter-tabs[data-active="declined"]::after { width: 14.28%; left: 85.68%; }
+.moderator-history-filter-tabs[data-active="dailylog"]::after { width: 25%; left: 0; }
+.moderator-history-filter-tabs[data-active="request"]::after { width: 25%; left: 25%; }
+.moderator-history-filter-tabs[data-active="approval"]::after { width: 25%; left: 50%; }
+.moderator-history-filter-tabs[data-active="onhold"]::after { width: 25%; left: 75%; }
 
-/* History Section */
+/* History card section */
 .moderator-history-section {
   background: #f0f0f0;
   border-radius: 20px;
@@ -114,27 +101,35 @@
   box-shadow: 20px 20px 40px rgba(0, 0, 0, 0.1),
     -20px -20px 40px rgba(255, 255, 255, 0.8);
   transition: all 0.3s ease;
+  height: 780px;
+  display: flex;
+  flex-direction: column;
 }
 
+/* Card list: scrollable container for history items */
+.moderator-history-card-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 12px 10px 0;
+  margin-right: -12px;
+}
+
+/* History appointment/card item */
 .moderator-history-appointment-item,
 .moderator-history-item {
   display: flex;
   align-items: center;
-  padding: 12px 15px;
+  padding: 24px 15px;
   margin: 0 2px 24px 2px;
   background: #f0f0f0;
   border-radius: 15px;
   box-shadow: inset 8px 8px 15px rgba(0, 0, 0, 0.1),
     inset -8px -8px 15px rgba(255, 255, 255, 0.8);
   transition: all 0.3s ease;
+  min-height: 140px;
 }
 
-.moderator-history-appointment-item:hover,
-.moderator-history-item:hover {
-  box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.08),
-    inset -5px -5px 10px rgba(255, 255, 255, 0.9);
-}
-
+/* Avatar for history cards */
 .moderator-history-appointment-avatar {
   width: 80px;
   height: 80px;
@@ -153,12 +148,14 @@
   object-fit: cover;
 }
 
+/* Info panel inside card */
 .moderator-history-appointment-info {
   flex: 1;
   display: flex;
   flex-direction: column;
 }
 
+/* Name/title in card */
 .moderator-history-appointment-name,
 .moderator-history-name {
   font-family: "Montserrat", sans-serif;
@@ -168,6 +165,7 @@
   margin-bottom: 4px;
 }
 
+/* Details/extra info */
 .moderator-history-appointment-details,
 .moderator-history-details {
   font-family: "Helvetica", sans-serif;
@@ -186,6 +184,7 @@
   display: none;
 }
 
+/* See more button for pagination */
 .moderator-history-see-more-btn {
   background: #f0f0f0;
   width: 13%;
@@ -215,13 +214,7 @@
   transition: all 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-.moderator-history-card-list {
-  max-height: 520px;
-  overflow-y: auto;
-  padding: 10px 12px 10px 0;
-  margin-right: -12px;
-}
-
+/* Custom scrollbar for card list */
 .moderator-history-card-list::-webkit-scrollbar {
   width: 6px;
 }
@@ -240,7 +233,7 @@
   background: rgba(53, 64, 142, 0.6);
 }
 
-/* Filter Modal */
+/* Filter modal options */
 .moderator-history-filter-modal-options {
   display: flex;
   flex-direction: column;
@@ -248,6 +241,7 @@
   padding: 10px 0;
 }
 
+/* Filter option in modal */
 .moderator-history-filter-option {
   display: flex;
   align-items: center;
@@ -288,6 +282,7 @@
     hue-rotate(215deg) brightness(95%) contrast(90%);
 }
 
+/* Filter modal open button */
 #moderator-history-filterModalBtn {
   position: relative;
   width: 100%;
@@ -321,6 +316,7 @@
   opacity: 1;
 }
 
+/* Appointment status badge */
 .moderator-history-status {
   display: inline-block;
   padding: 6px 0;
@@ -334,41 +330,23 @@
     -6px -6px 12px rgba(255, 255, 255, 0.8);
 }
 
-.moderator-history-status-pending {
-  background: #ffd36b;
-  color: #7a5c00;
-}
-
-.moderator-history-status-missed {
-  background: #ff7a7a;
-  color: #fff;
-}
-
-.moderator-history-status-completed {
-  background: #4caf50;
-  color: #fff;
-}
-
-.moderator-history-status-cancelled {
-  background: #ff7a7a;
-  color: #fff;
-}
-
-.moderator-history-status-declined {
-  background: #ff7a7a;
-  color: #fff;
-}
-
-.moderator-history-status-accepted {
-  background: #4caf50;
-  color: #fff;
-}
+/* Status badge colors per state */
+.moderator-history-status-pending { background: #ffd36b; color: #7a5c00; }
+.moderator-history-status-missed { background: #ff7a7a; color: #fff; }
+.moderator-history-status-completed { background: #4caf50; color: #fff; }
+.moderator-history-status-cancelled { background: #ff7a7a; color: #fff; }
+.moderator-history-status-declined { background: #ff7a7a; color: #fff; }
+.moderator-history-status-accepted { background: #4caf50; color: #fff; }
+.moderator-history-status-dailylog { background: #4caf50; color: #fff; }
+.moderator-history-status-request { background: #ffd36b; color: #7a5c00; }
+.moderator-history-status-approval { background: #4caf50; color: #fff; }
+.moderator-history-status-onhold { background: #ff7a7a; color: #fff; }
 
 .moderator-history-filter-mobile-btn {
   display: none;
 }
 
-/* History Details Modal */
+/* History details modal */
 .moderator-history-details-modal-content {
   background: linear-gradient(145deg, #ffffff, #d7d7d7);
   border-radius: 20px;
@@ -412,24 +390,22 @@
   box-shadow: 6px 6px 12px rgba(53, 64, 142, 0.1), -6px -6px 12px rgba(255, 255, 255, 0.8);
 }
 
+/* Modal status colors per state */
 .moderator-history-details-modal-status.completed,
 .moderator-history-details-modal-status.accepted {
   background: #4caf50;
   color: #fff;
 }
-
 .moderator-history-details-modal-status.pending {
   background: #e8e8e8;
   color: #7f8c8d;
 }
-
 .moderator-history-details-modal-status.missed,
 .moderator-history-details-modal-status.cancelled,
 .moderator-history-details-modal-status.declined {
   background: #ff7a7a;
   color: #fff;
 }
-
 .moderator-history-details-modal-status.secondary {
   background: #e8e8e8;
   color: #7f8c8d;
@@ -441,7 +417,7 @@
   border: 1px solid #35408e;
 }
 
-/* Modal Styles */
+/* Modal content base style */
 .modal-content {
   background: linear-gradient(145deg, #ffffff, #d7d7d7);
   border: none !important;
@@ -465,7 +441,7 @@
   box-shadow: none !important;
 }
 
-/* Responsive Design */
+/* Responsive design */
 @media (max-width: 1024px) {
   .moderator-history-filter-mobile-btn {
     display: flex;
@@ -488,47 +464,41 @@
     width: 100%;
     max-width: none;
   }
-
-  .moderator-history-content-container {
-    padding: 0 10px;
+  .moderator-history-content-container { padding: 0 10px; }
+  .moderator-history-filter-tabs { display: none; }
+  .moderator-history-see-more-btn {
+    width: 15%;
+    padding: 4px 8px;
+    font-size: 12px;
+    border-radius: 10px;
   }
-
-  .moderator-history-filter-tabs {
-    display: none;
-  }
-
   .moderator-history-filter-mobile-btn:active {
     box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.1),
       inset -5px -5px 10px rgba(255, 255, 255, 0.8);
   }
-
   .moderator-history-filter-mobile-btn .moderator-history-filter-icon {
     width: 16px;
     height: 16px;
     filter: brightness(0) saturate(100%) invert(28%) sepia(80%) saturate(1000%)
       hue-rotate(215deg) brightness(95%) contrast(90%);
   }
-
   .moderator-history-section {
     padding: 20px;
+    min-height: 1200px;
+    display: flex;
+    flex-direction: column;
   }
-
-  .moderator-history-item {
-    padding: 12px 15px;
-    gap: 12px;
-  }
-
-  .moderator-history-see-more-btn {
-    width: 25%;
+  .moderator-history-card-list {
+    max-height: calc(100% - 60px);
+    flex: 1;
   }
 }
 
 @media (max-width: 768px) {
   .moderator-history-main-content {
     margin-left: 3.7em;
-    margin-top: 130px;
+    margin-top: 150px;
   }
-
   .moderator-history-see-more-btn {
     padding: 8px 0;
     font-size: 14px;
@@ -536,13 +506,9 @@
     width: 100%;
     display: block;
     text-align: center;
-    margin-top: 5px;
+    margin-top: 10px;
   }
-
-  .moderator-history-status {
-    display: none !important;
-  }
-  
+  .moderator-history-status { display: none !important; }
   .moderator-history-status-mobile {
     display: block !important;
     width: 100%;
@@ -555,36 +521,16 @@
       -6px -6px 12px rgba(255, 255, 255, 0.8);
     padding: 4px 0;
   }
-  
-  .moderator-history-status-pending.moderator-history-status-mobile {
-    background: #ffd36b;
-    color: #7a5c00;
-  }
-  
-  .moderator-history-status-missed.moderator-history-status-mobile {
-    background: #ff7a7a;
-    color: #fff;
-  }
-  
-  .moderator-history-status-completed.moderator-history-status-mobile {
-    background: #4caf50;
-    color: #fff;
-  }
-  
-  .moderator-history-status-cancelled.moderator-history-status-mobile {
-    background: #ff7a7a;
-    color: #fff;
-  }
-  
-  .moderator-history-status-declined.moderator-history-status-mobile {
-    background: #ff7a7a;
-    color: #fff;
-  }
-
-  .moderator-history-status-accepted.moderator-history-status-mobile {
-    background: #4caf50;
-    color: #fff;
-  }
+  .moderator-history-status-pending.moderator-history-status-mobile { background: #ffd36b; color: #7a5c00; }
+  .moderator-history-status-missed.moderator-history-status-mobile { background: #ff7a7a; color: #fff; }
+  .moderator-history-status-completed.moderator-history-status-mobile { background: #4caf50; color: #fff; }
+  .moderator-history-status-cancelled.moderator-history-status-mobile { background: #ff7a7a; color: #fff; }
+  .moderator-history-status-declined.moderator-history-status-mobile { background: #ff7a7a; color: #fff; }
+  .moderator-history-status-accepted.moderator-history-status-mobile { background: #4caf50; color: #fff; }
+  .moderator-history-status-dailylog.moderator-history-status-mobile { background: #4caf50; color: #fff; }
+  .moderator-history-status-request.moderator-history-status-mobile { background: #ffd36b; color: #7a5c00; }
+  .moderator-history-status-approval.moderator-history-status-mobile { background: #4caf50; color: #fff; }
+  .moderator-history-status-onhold.moderator-history-status-mobile { background: #ff7a7a; color: #fff; }
 }
 
 @media (max-width: 576px) {
@@ -593,41 +539,37 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
+    min-height: 100px;
+    padding: 18px 10px;
   }
-  
   .moderator-history-appointment-avatar {
     align-self: center;
     margin-right: 0;
     width: 40px;
     height: 40px;
   }
-  
-  .moderator-history-avatar-img {
-    width: 100%;
-    height: 100%;
-  }
-  
+  .moderator-history-avatar-img { width: 100%; height: 100%; }
   .moderator-history-appointment-info {
     text-align: center;
     align-self: stretch;
   }
-  
   .moderator-history-see-more-btn {
     padding: 5px 10px;
     font-size: 11px;
     border-radius: 10px;
   }
-
-  .moderator-history-details-modal-content {
-    border-radius: 12px;
+  .moderator-history-details-modal-content { border-radius: 12px; }
+  .moderator-history-details-modal-title { font-size: 1.3rem; }
+  .moderator-history-details-modal-body { gap: 12px; }
+  .moderator-history-section {
+    min-height: 760px;
+    height: 350px;
+    display: flex;
+    flex-direction: column;
   }
-  
-  .moderator-history-details-modal-title {
-    font-size: 1.3rem;
-  }
-  
-  .moderator-history-details-modal-body {
-    gap: 12px;
+  .moderator-history-card-list {
+    max-height: calc(100% - 50px);
+    flex: 1;
   }
 }
 

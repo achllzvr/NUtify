@@ -1,137 +1,45 @@
-import React, { useState, useEffect } from 'react';
-import Sidebar from '../components/Sidebar';
-import Header from '../components/Header';
-import '../styles/dashboard.css';
-import '../styles/moderatorhistory.css'; // changed from studenthistory.css
+// Moderator history list UI
+import React, { useState, useEffect } from "react";
+import Sidebar from "../components/Sidebar";
+import Header from "../components/Header";
+import DailyLogHistory from "../pages/components/DailyLogHistory";
+import RequestHistory, {
+  requestHistoryItems,
+} from "../pages/components/RequestHistory";
+import ApprovalHistory from "../pages/components/ApprovalHistory";
+import OnHoldHistory from "../pages/components/OnHoldHistory";
+import "../styles/dashboard.css";
+import "../styles/moderatorhistory.css";
 
-// Import avatar images
-import johnDoeAvatar from '../assets/images/avatars/1c9a4dd0bbd964e3eecbd40caf3b7e37.jpg';
-import jeiPastranaAvatar from '../assets/images/avatars/1c9a4dd0bbd964e3eecbd40caf3b7e37.jpg';
-import ireneBalmes from '../assets/images/avatars/c33237da3438494d1abc67166196484e.jpg';
-import filterIcon from '../assets/icons/filter.svg';
+import johnDoeAvatar from "../assets/images/avatars/1c9a4dd0bbd964e3eecbd40caf3b7e37.jpg";
+import filterIcon from "../assets/icons/filter.svg";
+import checkIcon from "../assets/icons/check.svg";
 
-const ModeratorHistory = () => { // changed from StudentHistory
-  const [activeFilter, setActiveFilter] = useState('all');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [showFilterModal, setShowFilterModal] = useState(false);
-  const [showDetailsModal, setShowDetailsModal] = useState(false);
+const formatDateMMDDYYYY = (dateStr) => {
+  const d = new Date(dateStr);
+  return isNaN(d.getTime())
+    ? dateStr
+    : `${(d.getMonth() + 1).toString().padStart(2, "0")}/${d
+        .getDate()
+        .toString()
+        .padStart(2, "0")}/${d.getFullYear()}`;
+};
+
+const ModeratorHistory = () => {
+  const [activeFilter, setActiveFilter] = useState("dailylog");
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedItem, setSelectedItem] = useState(null);
+  const [verifyAlertVisible, setVerifyAlertVisible] = useState(false);
+  const [verifyAlertTransition, setVerifyAlertTransition] = useState(false);
+  const [filterModalOpen, setFilterModalOpen] = useState(false);
 
-  // Sample history data
-  const historyItems = [
-    {
-      id: 1,
-      name: 'Jei Pastrana',
-      details: 'Faculty - SACE',
-      time: 'June 15 - 09:00 am',
-      status: 'pending',
-      avatar: jeiPastranaAvatar
-    },
-    {
-      id: 2,
-      name: 'Irene Balmes',
-      details: 'Faculty - SACE',
-      time: 'June 14 - 09:00 am',
-      status: 'accepted',
-      avatar: ireneBalmes
-    },
-    {
-      id: 3,
-      name: 'Jei Pastrana',
-      details: 'Faculty - SACE',
-      time: 'June 13 - 09:00 am',
-      status: 'completed',
-      avatar: jeiPastranaAvatar
-    },
-    {
-      id: 4,
-      name: 'Irene Balmes',
-      details: 'Faculty - SACE',
-      time: 'June 12 - 09:00 am',
-      status: 'missed',
-      avatar: ireneBalmes
-    },
-    {
-      id: 5,
-      name: 'Jei Pastrana',
-      details: 'Faculty - SACE',
-      time: 'June 11 - 09:00 am',
-      status: 'cancelled',
-      avatar: jeiPastranaAvatar
-    },
-    {
-      id: 6,
-      name: 'Irene Balmes',
-      details: 'Faculty - SACE',
-      time: 'June 10 - 09:00 am',
-      status: 'declined',
-      avatar: ireneBalmes
-    }
-  ];
-
+  // Filter options for tabs
   const filterOptions = [
-    { value: 'all', label: 'All', icon: filterIcon },
-    { value: 'pending', label: 'Pending', icon: filterIcon },
-    { value: 'accepted', label: 'Accepted', icon: filterIcon },
-    { value: 'completed', label: 'Completed', icon: filterIcon },
-    { value: 'missed', label: 'Missed', icon: filterIcon },
-    { value: 'cancelled', label: 'Cancelled', icon: filterIcon },
-    { value: 'declined', label: 'Declined', icon: filterIcon }
+    { value: "dailylog", label: "Daily Log", icon: filterIcon },
+    { value: "request", label: "Request", icon: filterIcon },
+    { value: "approval", label: "Approval", icon: filterIcon },
+    { value: "onhold", label: "On Hold", icon: filterIcon },
   ];
-
-  const statusModalMap = {
-    pending: {
-      main: { text: "-", class: "pending" },
-      secondary: [
-        { text: "-", class: "secondary" },
-        { text: "Pending - June 11; 6:00 pm", class: "secondary" }
-      ]
-    },
-    completed: {
-      main: { text: "Completed - June 13; 9:23 am", class: "completed" },
-      secondary: [
-        { text: "Accepted - June 12; 12:00 am", class: "secondary" },
-        { text: "Pending - June 11; 6:00 pm", class: "secondary" }
-      ]
-    },
-    accepted: {
-      main: { text: "-", class: "pending" },
-      secondary: [
-        { text: "Accepted - June 13; 9:23 am", class: "accepted" },
-        { text: "Pending - June 11; 6:00 pm", class: "secondary" }
-      ]
-    },
-    missed: {
-      main: { text: "Missed - June 13; 9:23 am", class: "missed" },
-      secondary: [
-        { text: "Accepted - June 12; 12:00 am", class: "secondary" },
-        { text: "Pending - June 11; 6:00 pm", class: "secondary" }
-      ]
-    },
-    declined: {
-      main: { text: "-", class: "pending" },
-      secondary: [
-        { text: "Declined - June 13; 9:23 am", class: "declined" },
-        { text: "Pending - June 11; 6:00 pm", class: "secondary" }
-      ]
-    },
-    cancelled: {
-      main: { text: "Cancelled - June 13; 9:23 am", class: "cancelled" },
-      secondary: [
-        { text: "Accepted - June 12; 12:00 am", class: "secondary" },
-        { text: "Pending - June 11; 6:00 pm", class: "secondary" }
-      ]
-    }
-  };
-
-  // Filter items based on active filter and search term
-  const filteredItems = historyItems.filter(item => {
-    const matchesFilter = activeFilter === 'all' || item.status === activeFilter;
-    const matchesSearch = !searchTerm || 
-      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.details.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesFilter && matchesSearch;
-  });
 
   const handleFilterChange = (filter) => {
     setActiveFilter(filter);
@@ -141,20 +49,45 @@ const ModeratorHistory = () => { // changed from StudentHistory
     setSearchTerm(term);
   };
 
-  const handleSeeMore = (item) => {
+  const handleViewDetails = (item) => {
     setSelectedItem(item);
-    setShowDetailsModal(true);
   };
 
-  const handleMobileFilterApply = () => {
-    setShowFilterModal(false);
+  // Show verify alert and play sound
+  const handleVerify = (item) => {
+    const audio = new window.Audio("/nutified.wav");
+    audio.play();
+    setVerifyAlertVisible(true);
+    setTimeout(() => setVerifyAlertTransition(true), 10);
+    setTimeout(() => {
+      setVerifyAlertTransition(false);
+      setTimeout(() => setVerifyAlertVisible(false), 350);
+    }, 2500);
+  };
+
+  const handleVerifyAlertClose = () => {
+    setVerifyAlertTransition(false);
+    setTimeout(() => setVerifyAlertVisible(false), 350);
+  };
+
+  const handleMobileFilterBtnClick = () => {
+    setFilterModalOpen(true);
+  };
+
+  const handleFilterModalClose = () => {
+    setFilterModalOpen(false);
+  };
+
+  const handleFilterSelect = (filter) => {
+    setActiveFilter(filter);
+    setFilterModalOpen(false);
   };
 
   // Check for URL parameters on component mount
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const filterParam = urlParams.get('filter');
-    if (filterParam && filterOptions.some(opt => opt.value === filterParam)) {
+    const filterParam = urlParams.get("filter");
+    if (filterParam && filterOptions.some((opt) => opt.value === filterParam)) {
       setActiveFilter(filterParam);
     }
   }, []);
@@ -166,17 +99,76 @@ const ModeratorHistory = () => { // changed from StudentHistory
 
   return (
     <div>
-      <Sidebar 
+      {/* Verified alert */}
+      {verifyAlertVisible && (
+        <div
+          style={{
+            position: "fixed",
+            top: "32px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            minWidth: "320px",
+            maxWidth: "90vw",
+            background: "#D4F7DC",
+            color: "#1c1d1e",
+            borderRadius: "8px",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.12)",
+            padding: "10px 18px",
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            zIndex: 3000,
+            fontFamily: "Helvetica, Arial, sans-serif",
+            fontSize: "15px",
+            fontWeight: 500,
+            opacity: verifyAlertTransition ? 1 : 0,
+            transform: verifyAlertTransition
+              ? "translateX(-50%) translateY(0)"
+              : "translateX(-50%) translateY(-12px)",
+            transition: "opacity 0.35s, transform 0.35s",
+          }}
+        >
+          <span
+            style={{
+              display: "flex",
+              alignItems: "center",
+              marginRight: "2px",
+            }}
+          >
+            <img src={checkIcon} alt="Check" width="22" height="22" />
+          </span>
+          <span style={{ fontWeight: 600, marginRight: "2px" }}>Verified:</span>
+          <span style={{ marginRight: "8px" }}>Successfully Verified!</span>
+          <span
+            style={{
+              marginLeft: "auto",
+              cursor: "pointer",
+              fontSize: "18px",
+              color: "#1c1d1e",
+              fontWeight: 700,
+              lineHeight: "1",
+              paddingLeft: "8px",
+            }}
+            onClick={handleVerifyAlertClose}
+            aria-label="Close"
+            title="Close"
+          >
+            &#10005;
+          </span>
+        </div>
+      )}
+
+      <Sidebar
         userType="moderator"
         userName="John Doe"
-        userRole="Moderator - SACE"
+        userRole="Moderator"
         userAvatar={johnDoeAvatar}
       />
-      
-      <Header 
+
+      <Header
         title="Hello, John Doe"
-        subtitle="View your appointment history and status"
-        searchPlaceholder="Search History"
+        subtitle="Manage your appointments and consultations in one place"
+        searchPlaceholder="Search Entries"
         onSearch={handleSearch}
       />
 
@@ -186,12 +178,16 @@ const ModeratorHistory = () => { // changed from StudentHistory
             {/* History Section */}
             <div className="moderator-history-section">
               {/* Desktop Filter Tabs */}
-              <div className="moderator-history-filter-tabs" data-active={activeFilter}>
-                {filterOptions.map(option => (
-                  // changed from student-history-filter-btn
+              <div
+                className="moderator-history-filter-tabs"
+                data-active={activeFilter}
+              >
+                {filterOptions.map((option) => (
                   <button
                     key={option.value}
-                    className={`moderator-history-filter-btn ${activeFilter === option.value ? 'active' : ''}`}
+                    className={`moderator-history-filter-btn ${
+                      activeFilter === option.value ? "active" : ""
+                    }`}
                     data-filter={option.value}
                     onClick={() => handleFilterChange(option.value)}
                   >
@@ -201,143 +197,239 @@ const ModeratorHistory = () => { // changed from StudentHistory
               </div>
 
               {/* Mobile Filter Button */}
-              {/* changed from student-history-filter-mobile-btn */}
               <button
                 className="moderator-history-filter-mobile-btn"
-                onClick={() => setShowFilterModal(true)}
+                onClick={handleMobileFilterBtnClick}
+                style={{ opacity: 1, cursor: "pointer" }}
               >
-                <img src={filterIcon} alt="Filter" className="moderator-history-filter-icon" />
-                <span>{filterOptions.find(opt => opt.value === activeFilter)?.label || 'All'}</span>
+                <img
+                  src={filterIcon}
+                  alt="Filter"
+                  className="moderator-history-filter-icon"
+                />
+                <span>
+                  {filterOptions.find((opt) => opt.value === activeFilter)
+                    ?.label || "Daily Log"}
+                </span>
               </button>
 
-              <div className="moderator-history-card-list">
-                {filteredItems.map(item => (
-                  // changed from student-history-item
-                  <div key={item.id} className="moderator-history-item" data-status={item.status}>
-                    <div className="moderator-history-appointment-avatar">
-                      <img src={item.avatar} alt={item.name} className="moderator-history-avatar-img" />
-                    </div>
-                    <div className="moderator-history-appointment-info">
-                      {/* changed from student-history-appointment-name student-history-name */}
-                      <div className="moderator-history-appointment-name moderator-history-name">{item.name}</div>
-                      {/* changed from student-history-appointment-details student-history-details */}
-                      <div className="moderator-history-appointment-details moderator-history-details">{item.details}</div>
-                      <div className="moderator-history-appointment-time">{item.time}</div>
-                      {/* changed from student-history-see-more-btn */}
-                      <button
-                        className="moderator-history-see-more-btn"
-                        onClick={() => handleSeeMore(item)}
+              {/* Filter Modal for Mobile */}
+              {filterModalOpen && (
+                <div
+                  className="modal fade show"
+                  style={{
+                    display: "block",
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    width: "100vw",
+                    height: "100vh",
+                    background: "rgba(0,0,0,0.18)",
+                    zIndex: 4000,
+                  }}
+                >
+                  <div
+                    className="modal-dialog"
+                    style={{
+                      maxWidth: "340px",
+                      margin: "80px auto",
+                      borderRadius: "18px",
+                      background: "#fff",
+                      boxShadow: "0 2px 16px rgba(0,0,0,0.12)",
+                      padding: "18px 0",
+                    }}
+                  >
+                    <div className="modal-content" style={{ borderRadius: "18px" }}>
+                      <div
+                        className="modal-header"
+                        style={{
+                          borderBottom: "none",
+                          padding: "0 18px 8px 18px",
+                          fontWeight: 700,
+                          fontSize: "18px",
+                        }}
                       >
-                        See More
-                      </button>
-                    </div>
-                    {/* changed from student-history-status student-history-status-${item.status} */}
-                    <div className={`moderator-history-status moderator-history-status-${item.status}`}>
-                      {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
-                    </div>
-                    {/* changed from student-history-status-mobile student-history-status-${item.status} */}
-                    <div className={`moderator-history-status-mobile moderator-history-status-${item.status}`}>
-                      {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+                        <span>Choose Filter</span>
+                        <span
+                          style={{
+                            position: "absolute",
+                            right: "18px",
+                            top: "18px",
+                            fontSize: "22px",
+                            cursor: "pointer",
+                            color: "#888",
+                          }}
+                          onClick={handleFilterModalClose}
+                          aria-label="Close"
+                          title="Close"
+                        >
+                          &#10005;
+                        </span>
+                      </div>
+                      <div className="modal-body" style={{ padding: "0 18px" }}>
+                        <div className="moderator-history-filter-modal-options">
+                          {filterOptions.map((option) => (
+                            <button
+                              key={option.value}
+                              className={`moderator-history-filter-option${
+                                activeFilter === option.value ? " selected" : ""
+                              }`}
+                              onClick={() => handleFilterSelect(option.value)}
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                width: "100%",
+                                marginBottom: "8px",
+                                border: "none",
+                                background: "none",
+                                fontSize: "16px",
+                                fontWeight: activeFilter === option.value ? 600 : 500,
+                                color: activeFilter === option.value ? "#35408e" : "#2c3e50",
+                                cursor: "pointer",
+                                padding: "12px 0",
+                                borderRadius: "12px",
+                                background:
+                                  activeFilter === option.value
+                                    ? "rgba(53,64,142,0.08)"
+                                    : "#f8f8f8",
+                                border:
+                                  activeFilter === option.value
+                                    ? "2px solid #35408e"
+                                    : "2px solid transparent",
+                                transition: "all 0.2s",
+                              }}
+                            >
+                              <img
+                                src={option.icon}
+                                alt=""
+                                className="moderator-history-filter-option-icon"
+                                style={{
+                                  width: "20px",
+                                  height: "20px",
+                                  marginRight: "15px",
+                                  filter:
+                                    activeFilter === option.value
+                                      ? "brightness(0) saturate(100%) invert(28%) sepia(80%) saturate(1000%) hue-rotate(215deg) brightness(95%) contrast(90%)"
+                                      : "brightness(0) saturate(100%) invert(25%) sepia(15%) saturate(1000%) hue-rotate(200deg) brightness(95%) contrast(90%)",
+                                }}
+                              />
+                              {option.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   </div>
-                ))}
+                </div>
+              )}
+              {filterModalOpen && (
+                <div
+                  className="modal-backdrop fade show"
+                  style={{
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    width: "100vw",
+                    height: "100vh",
+                    background: "rgba(0,0,0,0.18)",
+                    zIndex: 3999,
+                  }}
+                ></div>
+              )}
+
+              <div className="moderator-history-card-list">
+                {activeFilter === "dailylog" ? (
+                  <DailyLogHistory
+                    onViewDetails={handleViewDetails}
+                    searchTerm={searchTerm}
+                  />
+                ) : activeFilter === "request" ? (
+                  <RequestHistory
+                    onViewDetails={handleViewDetails}
+                    searchTerm={searchTerm}
+                  />
+                ) : activeFilter === "approval" ? (
+                  <ApprovalHistory
+                    onVerify={handleVerify}
+                    searchTerm={searchTerm}
+                  />
+                ) : activeFilter === "onhold" ? (
+                  <OnHoldHistory
+                    onVerify={handleVerify}
+                    searchTerm={searchTerm}
+                  />
+                ) : null}
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Mobile Filter Modal */}
-      {showFilterModal && (
-        <div className="modal fade show" style={{ display: 'block' }}>
+      {/* Details modal */}
+      {selectedItem && (
+        <div className="modal fade show" style={{ display: "block" }}>
           <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Filter History</h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={() => setShowFilterModal(false)}
-                ></button>
-              </div>
-              <div className="modal-body">
-                <div className="moderator-history-filter-modal-options">
-                  {filterOptions.map(option => (
-                    // changed from student-history-filter-option
-                    <div
-                      key={option.value}
-                      className={`moderator-history-filter-option ${activeFilter === option.value ? 'selected' : ''}`}
-                      data-filter={option.value}
-                      onClick={() => handleFilterChange(option.value)}
-                    >
-                      <img src={option.icon} alt={option.label} className="moderator-history-filter-option-icon" />
-                      <span>{option.label}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="modal-footer">
-                {/* changed from student-history-filterModalBtn */}
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  id="moderator-history-filterModalBtn"
-                  onClick={handleMobileFilterApply}
+            <div className="modal-content" style={{ borderRadius: "20px" }}>
+              <div
+                className="modal-header"
+                style={{ borderBottom: "none", position: "relative" }}
+              >
+                <h5 className="modal-title" style={{ fontWeight: 700 }}>
+                  {selectedItem.studentName || selectedItem.name}
+                </h5>
+                <span
+                  style={{
+                    position: "absolute",
+                    right: "18px",
+                    top: "18px",
+                    fontSize: "22px",
+                    cursor: "pointer",
+                    color: "#888",
+                  }}
+                  onClick={() => setSelectedItem(null)}
+                  aria-label="Close"
+                  title="Close"
                 >
-                  Apply Filter
-                </button>
+                  &#10005;
+                </span>
               </div>
+              <div className="modal-body" style={{ paddingBottom: 0 }}>
+                {selectedItem.name && (
+                  <div style={{ fontSize: "16px", marginBottom: "10px" }}>
+                    <strong>Faculty:</strong> {selectedItem.name}
+                  </div>
+                )}
+                {selectedItem.time && (
+                  <>
+                    <div style={{ fontSize: "16px", marginBottom: "10px" }}>
+                      <strong>Date:</strong>{" "}
+                      {formatDateMMDDYYYY(selectedItem.time)}
+                    </div>
+                    <div style={{ fontSize: "16px", marginBottom: "10px" }}>
+                      <strong>Time:</strong>{" "}
+                      {selectedItem.time.split(" ")[1] ||
+                        selectedItem.time.split(" - ")[1] ||
+                        "00:00 am"}
+                    </div>
+                  </>
+                )}
+                {selectedItem.reason && (
+                  <div style={{ fontSize: "16px", marginBottom: "10px" }}>
+                    <strong>Reason:</strong> {selectedItem.reason}
+                  </div>
+                )}
+                {activeFilter === "request" && (
+                  <div style={{ fontSize: "16px", marginBottom: "10px" }}>
+                    <strong>Status:</strong> Pending
+                  </div>
+                )}
+              </div>
+              <div className="modal-footer" style={{ borderTop: "none" }}></div>
             </div>
           </div>
         </div>
       )}
-
-      {/* History Details Modal */}
-      {showDetailsModal && selectedItem && (
-        <div className="modal fade show" style={{ display: 'block' }}>
-          <div className="modal-dialog modal-dialog-centered">
-            {/* changed from student-history-details-modal-content */}
-            <div className="modal-content moderator-history-details-modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Appointment Status</h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={() => setShowDetailsModal(false)}
-                ></button>
-              </div>
-              <div className="modal-body">
-                {/* changed from student-history-details-modal-body */}
-                <div className="moderator-history-details-modal-body">
-                  {/* changed from student-history-details-modal-title */}
-                  <div className="moderator-history-details-modal-title">{selectedItem.name}</div>
-                  {/* changed from student-history-details-modal-time */}
-                  <div className="moderator-history-details-modal-time">{selectedItem.time}</div>
-                  
-                  {statusModalMap[selectedItem.status] && (
-                    <>
-                      {/* changed from student-history-details-modal-status */}
-                      <div className={`moderator-history-details-modal-status ${statusModalMap[selectedItem.status].main.class}`}>
-                        {statusModalMap[selectedItem.status].main.text}
-                      </div>
-                      {statusModalMap[selectedItem.status].secondary?.map((sec, index) => (
-                        <div key={index} className={`moderator-history-details-modal-status ${sec.class}`}>
-                          {sec.text}
-                        </div>
-                      ))}
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Modal backdrop */}
-      {(showFilterModal || showDetailsModal) && (
-        <div className="modal-backdrop fade show"></div>
-      )}
+      {selectedItem && <div className="modal-backdrop fade show"></div>}
     </div>
   );
 };
