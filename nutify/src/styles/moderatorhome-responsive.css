@@ -1,0 +1,16 @@
+@media (max-width: 768px) {
+  .small-btn-text {
+    font-size: 14px !important;
+    padding: 5px 11px !important;
+  }
+
+  .moderator-home-appointment-item {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+  .moderator-home-appointment-avatar {
+    align-self: flex-start !important;
+    margin-bottom: 8px !important;
+    margin-right: 0 !important;
+  }
+}

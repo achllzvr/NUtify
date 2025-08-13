@@ -99,6 +99,14 @@ const Sidebar = ({ userType, userName, userRole, userAvatar }) => {
 
   const isActive = (path) => location.pathname === path;
 
+  const getSidebarIconClass = (path) => {
+    let base = 'sidebar-icon';
+    if (isActive(path)) {
+      base += ' active active-animate';
+    }
+    return base;
+  };
+
   return (
     <div
       className={`sidebar${isExpanded ? ' expanded' : ''}${shouldAnimate ? ' animate' : ''}`}
@@ -118,19 +126,21 @@ const Sidebar = ({ userType, userName, userRole, userAvatar }) => {
 
         <div className="sidebar-nav">
           <div
-            className={`sidebar-icon ${isActive(`/${userType}/home`) ? 'active' : ''}`}
+            key={`home-${isActive(`/${userType}/home`)}`}
+            className={getSidebarIconClass(`/${userType}/home`)}
             onClick={() => handleNavigation(`/${userType}/home`)}
           >
             <img src={homeIcon} alt="Home" className="icon" />
             <span className="nav-text">Home</span>
           </div>
           <div
-            className={`sidebar-icon ${isActive(`/${userType}/history`) ? 'active' : ''}`}
+            key={`history-${isActive(`/${userType}/history`)}`}
+            className={getSidebarIconClass(`/${userType}/history`)}
             onClick={() => handleNavigation(`/${userType}/history`)}
           >
-            <img src={mailIcon} alt="History" className="icon" />
+            <img src={mailIcon} alt={userType === 'moderator' ? 'Inbox' : 'History'} className="icon" />
             <span className="nav-text">
-              {userType === "moderator" ? "Inbox" : "History"}
+              {userType === 'moderator' ? 'Inbox' : 'History'}
             </span>
           </div>
         </div>
@@ -167,3 +177,22 @@ const Sidebar = ({ userType, userName, userRole, userAvatar }) => {
 };
 
 export default Sidebar;
+
+// Add the following CSS to your sidebar stylesheet:
+/*
+.sidebar-icon {
+  transition: background 0.3s, transform 0.3s;
+}
+.sidebar-icon.active {
+  background: #2d3748; // example highlight
+  transform: scale(1.05);
+}
+.sidebar-icon.active-animate {
+  animation: pop-in 0.25s;
+}
+@keyframes pop-in {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  60% { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1.05); opacity: 1; }
+}
+*/
