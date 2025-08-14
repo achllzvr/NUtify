@@ -1,4 +1,3 @@
-// Moderator home page UI
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
@@ -29,7 +28,6 @@ import checkIcon from '../assets/icons/check.svg';
 import CurrentQueue from '../components/CurrentQueue';
 import FacultyList from '../components/FacultyList';
 
-// Truncate long reason text
 const truncateReason = (reason, maxLength = 40) => {
   if (!reason) return '';
   return reason.length > maxLength ? reason.slice(0, maxLength) + '...' : reason;
@@ -54,18 +52,15 @@ const ModeratorHome = () => {
   const [requestAlertTransition, setRequestAlertTransition] = useState(false);
   const [facultyStatusFilter, setFacultyStatusFilter] = useState('all');
 
-  // Faculty selection click
   const handleFacultyClick = (faculty) => {
     setSelectedFaculty(faculty);
     setShowScheduleModal(true);
   };
 
-  // Schedule selection
   const handleScheduleSelect = (schedule) => {
     setSelectedSchedule(schedule);
   };
 
-  // Schedule submit
   const handleScheduleSubmit = () => {
     if (selectedSchedule) {
       setShowScheduleModal(false);
@@ -73,22 +68,18 @@ const ModeratorHome = () => {
     }
   };
 
-  // Main search input
   const handleMainSearchInputChange = (value) => {
     setMainSearchInput(value);
   };
 
-  // Main search click
   const handleSearch = () => {
     setMainSearch(mainSearchInput);
   };
 
-  // View details for appointment
   const handleViewDetails = (appointment) => {
     setDetailsModalAppointment(appointment);
   };
 
-  // Notify appointees button
   const handleNotifyAppointees = (appointment) => {
     const audio = new window.Audio('/nutified.wav');
     audio.play();
@@ -100,13 +91,11 @@ const ModeratorHome = () => {
     }, 2500);
   };
 
-  // Alert close
   const handleAlertClose = () => {
     setAlertTransition(false);
     setTimeout(() => setAlertVisible(false), 350);
   };
 
-  // Dummy data for request dropdowns
   const facultyDropdownList = [
     { id: 1, name: 'Jayson Guia', avatar: jaysonGuia },
     { id: 2, name: 'Jei Pastrana', avatar: jeiPastranaAvatar },
@@ -128,17 +117,14 @@ const ModeratorHome = () => {
     { name: 'Niel Cerezo', avatar: nielCerezo }
   ];
 
-  // Faculty search filter
   const filteredFaculty = facultyDropdownList.filter(f =>
     f.name.toLowerCase().includes(facultySearch.toLowerCase())
   );
 
-  // Student search filter
   const filteredStudents = studentDropdownList.filter(s =>
     s.name.toLowerCase().includes(studentSearch.toLowerCase())
   );
 
-  // Request scheduling handler
   const handleSchedule = () => {
     setFacultySelected('');
     setFacultySearch('');
@@ -155,7 +141,6 @@ const ModeratorHome = () => {
     }, 2500);
   };
 
-  // Request alert close
   const handleRequestAlertClose = () => {
     setRequestAlertTransition(false);
     setTimeout(() => setRequestAlertVisible(false), 350);
@@ -179,7 +164,6 @@ const ModeratorHome = () => {
 
   return (
     <div>
-      {/* Success alert for Notify Appointees */}
       {alertVisible && (
         <div
           style={{
@@ -236,7 +220,6 @@ const ModeratorHome = () => {
         </div>
       )}
 
-      {/* Green alert for Request */}
       {requestAlertVisible && (
         <div
           style={{
@@ -312,7 +295,6 @@ const ModeratorHome = () => {
       <div className="moderator-home-main-content">
         <div className="moderator-home-content-container">
           <div className="moderator-home-left-column">
-            {/* Current Queue Section */}
             <CurrentQueue
               mainSearch={mainSearch}
               onViewDetails={handleViewDetails}
@@ -320,12 +302,10 @@ const ModeratorHome = () => {
               truncateReason={truncateReason}
             />
 
-            {/* Create On-the-spot Request Section */}
             <div className="moderator-home-appointment-section">
               <div className="moderator-home-section-header">
                 <h2>Create On-the-spot Request</h2>
               </div>
-              {/* Faculty selection */}
               <div style={{ fontWeight: 500, marginBottom: '6px' }}>Select Faculty</div>
               <div className="input-group" style={{ marginBottom: '18px', position: 'relative' }}>
                 <img src={searchIcon} alt="Search" className="input-icon" style={{ left: 18, width: 22, height: 22 }} />
@@ -379,7 +359,6 @@ const ModeratorHome = () => {
                 )}
               </div>
 
-              {/* Student selection */}
               <div style={{ fontWeight: 500, marginBottom: '6px' }}>Select Student</div>
               <div className="input-group" style={{ marginBottom: '18px', position: 'relative' }}>
                 <img src={searchIcon} alt="Search" className="input-icon" style={{ left: 18, width: 22, height: 22 }} />
@@ -433,7 +412,6 @@ const ModeratorHome = () => {
                 )}
               </div>
 
-              {/* Reason input */}
               <div style={{ fontWeight: 500, marginBottom: '6px' }}>Reason</div>
               <div style={{ marginBottom: '18px' }}>
                 <input
@@ -449,7 +427,6 @@ const ModeratorHome = () => {
                   }}
                 />
               </div>
-              {/* Schedule button */}
               <button
                 className="Schedule-Button"
                 style={{
@@ -466,7 +443,6 @@ const ModeratorHome = () => {
           </div>
 
           <div className="moderator-home-right-column">
-            {/* All Faculty List Section */}
             <FacultyList
               mainSearch={mainSearch}
               facultyStatusFilter={facultyStatusFilter}
@@ -476,7 +452,6 @@ const ModeratorHome = () => {
         </div>
       </div>
 
-      {/* Appointment details modal */}
       {detailsModalAppointment && (
         <div className="modal fade show" style={{ display: 'block' }}>
           <div className="modal-dialog modal-dialog-centered">

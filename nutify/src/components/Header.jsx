@@ -9,7 +9,7 @@ const Header = ({ title, subtitle, searchPlaceholder, searchValue, onSearchChang
     </div>
     <div className="header-right">
       <div className="search-container">
-        <div className="search-input-wrapper">
+        <div className="search-input-wrapper" style={{ position: 'relative' }}>
           <input
             type="text"
             className="search-input"
@@ -17,6 +17,11 @@ const Header = ({ title, subtitle, searchPlaceholder, searchValue, onSearchChang
             value={searchValue}
             onChange={e => onSearchChange(e.target.value)}
             style={{ paddingLeft: '55px', borderRadius: '15px' }}
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                onSearch();
+              }
+            }}
           />
           <img
             src={searchIcon}

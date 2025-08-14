@@ -28,6 +28,7 @@ const formatDateMMDDYYYY = (dateStr) => {
 const ModeratorHistory = () => {
   const [activeFilter, setActiveFilter] = useState("dailylog");
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchInput, setSearchInput] = useState(""); // add controlled input state
   const [selectedItem, setSelectedItem] = useState(null);
   const [verifyAlertVisible, setVerifyAlertVisible] = useState(false);
   const [verifyAlertTransition, setVerifyAlertTransition] = useState(false);
@@ -45,8 +46,12 @@ const ModeratorHistory = () => {
     setActiveFilter(filter);
   };
 
-  const handleSearch = (term) => {
-    setSearchTerm(term);
+  const handleSearchChange = (value) => {
+    setSearchInput(value);
+  };
+
+  const handleSearch = () => {
+    setSearchTerm(searchInput);
   };
 
   const handleViewDetails = (item) => {
@@ -179,6 +184,8 @@ const ModeratorHistory = () => {
         title="Hello, John Doe"
         subtitle="Manage your appointments and consultations in one place"
         searchPlaceholder="Search Entries"
+        searchValue={searchInput}
+        onSearchChange={handleSearchChange}
         onSearch={handleSearch}
       />
 
