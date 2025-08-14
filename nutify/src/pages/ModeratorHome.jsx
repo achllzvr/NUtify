@@ -170,7 +170,6 @@ const ModeratorHome = () => {
             position: 'fixed',
             top: '32px',
             left: '50%',
-            transform: 'translateX(-50%)',
             minWidth: '320px',
             maxWidth: '90vw',
             background: '#F7E57F',
@@ -186,9 +185,7 @@ const ModeratorHome = () => {
             fontSize: '15px',
             fontWeight: 500,
             opacity: alertTransition ? 1 : 0,
-            transform: alertTransition
-              ? 'translateX(-50%) translateY(0)'
-              : 'translateX(-50%) translateY(-12px)',
+            transform: `translateX(-50%) ${alertTransition ? 'translateY(0)' : 'translateY(-12px)'}`,
             transition: 'opacity 0.35s, transform 0.35s'
           }}
         >
@@ -226,7 +223,6 @@ const ModeratorHome = () => {
             position: 'fixed',
             top: '32px',
             left: '50%',
-            transform: 'translateX(-50%)',
             minWidth: '320px',
             maxWidth: '90vw',
             background: '#D4F7DC',
@@ -242,9 +238,7 @@ const ModeratorHome = () => {
             fontSize: '15px',
             fontWeight: 500,
             opacity: requestAlertTransition ? 1 : 0,
-            transform: requestAlertTransition
-              ? 'translateX(-50%) translateY(0)'
-              : 'translateX(-50%) translateY(-12px)',
+            transform: `translateX(-50%) ${requestAlertTransition ? 'translateY(0)' : 'translateY(-12px)'}`,
             transition: 'opacity 0.35s, transform 0.35s'
           }}
         >

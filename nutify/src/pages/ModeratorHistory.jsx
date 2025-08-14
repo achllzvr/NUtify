@@ -121,7 +121,6 @@ const ModeratorHistory = () => {
             position: "fixed",
             top: "32px",
             left: "50%",
-            transform: "translateX(-50%)",
             minWidth: "320px",
             maxWidth: "90vw",
             background: "#D4F7DC",
@@ -137,9 +136,7 @@ const ModeratorHistory = () => {
             fontSize: "15px",
             fontWeight: 500,
             opacity: verifyAlertTransition ? 1 : 0,
-            transform: verifyAlertTransition
-              ? "translateX(-50%) translateY(0)"
-              : "translateX(-50%) translateY(-12px)",
+            transform: `translateX(-50%) ${verifyAlertTransition ? 'translateY(0)' : 'translateY(-12px)'}`,
             transition: "opacity 0.35s, transform 0.35s",
           }}
         >
@@ -305,14 +302,12 @@ const ModeratorHistory = () => {
                                 cursor: "pointer",
                                 padding: "12px 0",
                                 borderRadius: "12px",
-                                background:
-                                  activeFilter === option.value
-                                    ? "rgba(53,64,142,0.08)"
-                                    : "#f8f8f8",
-                                border:
-                                  activeFilter === option.value
-                                    ? "2px solid #35408e"
-                                    : "2px solid transparent",
+                                background: activeFilter === option.value
+                                  ? "rgba(53,64,142,0.08)"
+                                  : "#f8f8f8",
+                                border: activeFilter === option.value
+                                  ? "2px solid #35408e"
+                                  : "2px solid transparent",
                                 transition: "all 0.2s",
                               }}
                             >
@@ -452,3 +447,4 @@ const ModeratorHistory = () => {
 };
 
 export default ModeratorHistory;
+ 
