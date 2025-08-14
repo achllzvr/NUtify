@@ -26,6 +26,8 @@ import nielCerezo from '../assets/images/avatars/237d3876ef98d5364ed1326813f4ed5
 import pennyLumbera from '../assets/images/avatars/237d3876ef98d5364ed1326813f4ed5b.jpg';
 import bobbyBuendia from '../assets/images/avatars/237d3876ef98d5364ed1326813f4ed5b.jpg';
 import checkIcon from '../assets/icons/check.svg';
+import CurrentQueue from '../components/CurrentQueue';
+import FacultyList from '../components/FacultyList';
 
 // Truncate long reason text
 const truncateReason = (reason, maxLength = 40) => {
@@ -51,73 +53,6 @@ const ModeratorHome = () => {
   const [requestAlertVisible, setRequestAlertVisible] = useState(false);
   const [requestAlertTransition, setRequestAlertTransition] = useState(false);
   const [facultyStatusFilter, setFacultyStatusFilter] = useState('all');
-
-  // Example student list
-  const facultyHistoryStudents = [
-    { name: 'Beatriz Solis', avatar: beatrizSolis },
-    { name: 'John Clarenz Dimazana', avatar: johnClarenz },
-    { name: 'Kriztopher Kier Estioco', avatar: kriztopher },
-    { name: 'Niel Cerezo', avatar: nielCerezo }
-  ];
-
-  // Example upcoming appointments
-  const upcomingAppointments = [
-    { id: 1, name: 'Jei Pastrana', studentName: 'Beatriz Solis', department: 'Faculty - SACE', time: 'June 15 • 09:00 - 10:00', avatar: jeiPastranaAvatar, reason: 'Consultation about thesis proposal and research direction.' },
-    { id: 2, name: 'Irene Balmes', studentName: 'John Clarenz Dimazana', department: 'Faculty - SACE', time: 'June 14 • 09:00 - 10:00', avatar: ireneBalmes, reason: 'Grade inquiry for last semester.' },
-    { id: 3, name: 'Jei Pastrana', studentName: 'Kriztopher Kier Estioco', department: 'Faculty - SACE', time: 'June 15 • 09:00 - 10:00', avatar: jeiPastranaAvatar, reason: 'Requesting recommendation letter for scholarship application.' },
-    { id: 4, name: 'Carlo Torres', studentName: 'Niel Cerezo', department: 'Faculty - SACE', time: 'June 16 • 10:00 - 11:00', avatar: carloTorres, reason: 'Follow-up on project feedback.' },
-    { id: 5, name: 'Archie Menisis', studentName: 'Ella Ramos', department: 'Faculty - SACE', time: 'June 17 • 11:00 - 12:00', avatar: archieMenisis, reason: 'Consultation regarding course requirements and deadlines.' },
-    { id: 6, name: 'Michael Joseph Aramil', studentName: 'Francis Lee', department: 'Faculty - SACE', time: 'June 18 • 12:00 - 01:00', avatar: michaelAramil, reason: 'Request for extension on assignment submission.' },
-    { id: 7, name: 'Erwin De Castro', studentName: 'Grace Uy', department: 'Faculty - SACE', time: 'June 19 • 01:00 - 02:00', avatar: erwinDeCastro, reason: 'Discussion about internship opportunities.' },
-    { id: 8, name: 'Joel Enriquez', studentName: 'Henry Sy', department: 'Faculty - SACE', time: 'June 20 • 02:00 - 03:00', avatar: joelEnriquez, reason: 'Clarification on exam coverage.' },
-    { id: 9, name: 'Bernie Fabito', studentName: 'Ivy Dela Cruz', department: 'Faculty - SACE', time: 'June 21 • 03:00 - 04:00', avatar: bernieFabito, reason: 'Request for additional consultation slot due to schedule conflict.' }
-  ];
-
-  // Example recent appointments
-  const recentAppointments = [
-    { id: 1, name: 'Appointment done - June 24, 2025 - 00:00', details: 'Jei Pastrana - Faculty - SACE', avatar: jeiPastranaAvatar },
-    { id: 2, name: 'Appointment done - June 18, 2025 - 00:00', details: 'Irene Balmes - Faculty - SACE', avatar: ireneBalmes },
-    { id: 3, name: 'Appointment done - June 13, 2025 - 00:00', details: 'Jei Pastrana - Faculty - SACE', avatar: jeiPastranaAvatar }
-  ];
-
-  // Example faculty list
-  const facultyList = [
-    { id: 1, name: 'Jayson Guia', department: 'Faculty - SACE', status: 'online', avatar: jaysonGuia },
-    { id: 2, name: 'Jei Pastrana', department: 'Faculty - SACE', status: 'offline', avatar: jeiPastranaAvatar },
-    { id: 3, name: 'Irene Balmes', department: 'Faculty - SACE', status: 'online', avatar: ireneBalmes },
-    { id: 4, name: 'Carlo Torres', department: 'Faculty - SACE', status: 'offline', avatar: carloTorres },
-    { id: 5, name: 'Archie Menisis', department: 'Faculty - SACE', status: 'online', avatar: archieMenisis },
-    { id: 6, name: 'Michael Joseph Aramil', department: 'Faculty - SACE', status: 'offline', avatar: michaelAramil },
-    { id: 7, name: 'Erwin De Castro', department: 'Faculty - SACE', status: 'online', avatar: erwinDeCastro },
-    { id: 8, name: 'Joel Enriquez', department: 'Faculty - SACE', status: 'offline', avatar: joelEnriquez },
-    { id: 9, name: 'Bernie Fabito', department: 'Faculty - SACE', status: 'online', avatar: bernieFabito },
-    { id: 10, name: 'Bobby Buendia', department: 'Faculty - SAHS', status: 'online', avatar: bobbyBuendia },
-    { id: 11, name: 'Penny Lumbera', department: 'Faculty - SAHS', status: 'offline', avatar: pennyLumbera }
-  ];
-
-  // Example schedules
-  const facultySchedules = {
-    "Jayson Guia": [
-      "Monday - 9:00 - 10:00",
-      "Tuesday - 9:00 - 10:00",
-      "Wednesday - 10:00 - 11:00",
-      "Thursday - 1:00 - 2:00",
-      "Friday - 9:00 - 10:00",
-      "Friday - 2:00 - 3:00"
-    ],
-    "Jei Pastrana": [
-      "Monday - 9:00 - 10:00",
-      "Tuesday - 9:00 - 10:00",
-      "Friday - 9:00 - 10:00"
-    ],
-    "Irene Balmes": [
-      "Monday - 8:00 - 9:00",
-      "Tuesday - 10:00 - 11:00",
-      "Wednesday - 1:00 - 2:00",
-      "Thursday - 3:00 - 4:00",
-      "Friday - 11:00 - 12:00"
-    ]
-  };
 
   // Faculty selection click
   const handleFacultyClick = (faculty) => {
@@ -171,26 +106,36 @@ const ModeratorHome = () => {
     setTimeout(() => setAlertVisible(false), 350);
   };
 
+  // Dummy data for request dropdowns
+  const facultyDropdownList = [
+    { id: 1, name: 'Jayson Guia', avatar: jaysonGuia },
+    { id: 2, name: 'Jei Pastrana', avatar: jeiPastranaAvatar },
+    { id: 3, name: 'Irene Balmes', avatar: ireneBalmes },
+    { id: 4, name: 'Carlo Torres', avatar: carloTorres },
+    { id: 5, name: 'Archie Menisis', avatar: archieMenisis },
+    { id: 6, name: 'Michael Joseph Aramil', avatar: michaelAramil },
+    { id: 7, name: 'Erwin De Castro', avatar: erwinDeCastro },
+    { id: 8, name: 'Joel Enriquez', avatar: joelEnriquez },
+    { id: 9, name: 'Bernie Fabito', avatar: bernieFabito },
+    { id: 10, name: 'Bobby Buendia', avatar: bobbyBuendia },
+    { id: 11, name: 'Penny Lumbera', avatar: pennyLumbera }
+  ];
+
+  const studentDropdownList = [
+    { name: 'Beatriz Solis', avatar: beatrizSolis },
+    { name: 'John Clarenz Dimazana', avatar: johnClarenz },
+    { name: 'Kriztopher Kier Estioco', avatar: kriztopher },
+    { name: 'Niel Cerezo', avatar: nielCerezo }
+  ];
+
   // Faculty search filter
-  const filteredFaculty = facultyList.filter(f =>
+  const filteredFaculty = facultyDropdownList.filter(f =>
     f.name.toLowerCase().includes(facultySearch.toLowerCase())
   );
 
   // Student search filter
-  const filteredStudents = facultyHistoryStudents.filter(s =>
+  const filteredStudents = studentDropdownList.filter(s =>
     s.name.toLowerCase().includes(studentSearch.toLowerCase())
-  );
-
-  // Main queue search filter
-  const filteredQueue = upcomingAppointments.filter(a =>
-    a.name.toLowerCase().includes(mainSearch.toLowerCase()) ||
-    a.studentName.toLowerCase().includes(mainSearch.toLowerCase()) ||
-    a.department.toLowerCase().includes(mainSearch.toLowerCase())
-  );
-  const filteredFacultyList = facultyList.filter(f =>
-    (facultyStatusFilter === 'all' || f.status === facultyStatusFilter) &&
-    (f.name.toLowerCase().includes(mainSearch.toLowerCase()) ||
-    f.department.toLowerCase().includes(mainSearch.toLowerCase()))
   );
 
   // Request scheduling handler
@@ -367,48 +312,15 @@ const ModeratorHome = () => {
       <div className="moderator-home-main-content">
         <div className="moderator-home-content-container">
           <div className="moderator-home-left-column">
-            <div className="moderator-home-appointment-section" id="moderator-home-upcomingAppointments">
-              <div className="moderator-home-section-header">
-                <h2>Current Queue</h2>
-              </div>
-              <div className="moderator-home-queue-list">
-                {filteredQueue.map(appointment => (
-                  <div key={appointment.id} className="moderator-home-appointment-item">
-                    <div className="moderator-home-appointment-avatar">
-                      <img src={appointment.avatar} alt={appointment.name} className="moderator-home-avatar-img" />
-                    </div>
-                    <div className="moderator-home-appointment-info" style={{ flex: 1 }}>
-                      <div className="moderator-home-appointment-name">{appointment.name}</div>
-                      <div className="moderator-home-appointment-details">
-                        Student: {appointment.studentName}
-                      </div>
-                      <div className="moderator-home-appointment-time">
-                        {appointment.time}
-                      </div>
-                      <div className="moderator-home-appointment-details" style={{ marginTop: '2px', marginBottom: '8px' }}>
-                        Reason: {truncateReason(appointment.reason)}
-                      </div>
-                      {/* Appointment actions */}
-                      <div style={{ display: 'flex', gap: '10px', marginTop: '6px' }}>
-                        <button
-                          className="moderator-home-see-more-btn small-btn-text"
-                          onClick={() => handleViewDetails(appointment)}
-                        >
-                          View Details
-                        </button>
-                        <button
-                          className="moderator-home-notify-btn small-btn-text"
-                          onClick={() => handleNotifyAppointees(appointment)}
-                        >
-                          Notify Appointees
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            {/* Current Queue Section */}
+            <CurrentQueue
+              mainSearch={mainSearch}
+              onViewDetails={handleViewDetails}
+              onNotifyAppointees={handleNotifyAppointees}
+              truncateReason={truncateReason}
+            />
 
+            {/* Create On-the-spot Request Section */}
             <div className="moderator-home-appointment-section">
               <div className="moderator-home-section-header">
                 <h2>Create On-the-spot Request</h2>
@@ -539,7 +451,7 @@ const ModeratorHome = () => {
               </div>
               {/* Schedule button */}
               <button
-                className="login-button"
+                className="Schedule-Button"
                 style={{
                   background: (facultySelected && studentName && reason) ? undefined : '#d3d3d3',
                   color: (facultySelected && studentName && reason) ? '#fff' : '#888',
@@ -554,38 +466,12 @@ const ModeratorHome = () => {
           </div>
 
           <div className="moderator-home-right-column">
-            <div className="moderator-home-faculty-section">
-              <div className="moderator-home-section-header" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-                <h2 style={{ margin: 0 }}>All Faculty List</h2>
-                <select
-                  id="faculty-status-filter"
-                  value={facultyStatusFilter}
-                  onChange={e => setFacultyStatusFilter(e.target.value)}
-                  className="moderator-home-faculty-filter-dropdown"
-                >
-                  <option value="all">All</option>
-                  <option value="online">Online</option>
-                  <option value="offline">Offline</option>
-                </select>
-              </div>
-              <div className="moderator-home-faculty-list">
-                {filteredFacultyList.map(faculty => (
-                  <div
-                    key={faculty.id}
-                    className="moderator-home-faculty-item"
-                  >
-                    <div className="moderator-home-faculty-avatar">
-                      <img src={faculty.avatar} alt={faculty.name} className="moderator-home-avatar-img" />
-                    </div>
-                    <div className="moderator-home-faculty-info">
-                      <div className="moderator-home-faculty-name">{faculty.name}</div>
-                      <div className="moderator-home-faculty-department">{faculty.department}</div>
-                    </div>
-                    <div className={`moderator-home-faculty-status ${faculty.status}`}></div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            {/* All Faculty List Section */}
+            <FacultyList
+              mainSearch={mainSearch}
+              facultyStatusFilter={facultyStatusFilter}
+              setFacultyStatusFilter={setFacultyStatusFilter}
+            />
           </div>
         </div>
       </div>

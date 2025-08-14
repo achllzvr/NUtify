@@ -97,6 +97,16 @@ const ModeratorHistory = () => {
     document.title = "Inbox - NUtify";
   }, []);
 
+  // Close
+  useEffect(() => {
+    if (!selectedItem) return;
+    const handleEsc = (e) => {
+      if (e.key === "Escape") setSelectedItem(null);
+    };
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, [selectedItem]);
+
   return (
     <div>
       {/* Verified alert */}
