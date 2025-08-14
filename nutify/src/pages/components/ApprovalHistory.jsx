@@ -93,11 +93,6 @@ const ApprovalHistory = ({ onVerify, searchTerm }) => {
               </button>
               <button
                 className="moderator-history-see-more-btn"
-                style={{
-                  background: "#ffd36b",
-                  color: "#7a5c00",
-                  fontWeight: 600,
-                }}
                 onClick={() => handleVerify(item)}
               >
                 Verify

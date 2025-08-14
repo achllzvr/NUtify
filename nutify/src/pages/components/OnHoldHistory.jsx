@@ -82,11 +82,6 @@ const OnHoldHistory = ({ onVerify, searchTerm }) => {
             <div style={{ display: "flex", gap: "12px", marginTop: "12px" }}>
               <button
                 className="moderator-history-see-more-btn"
-                style={{
-                  background: "#ffd36b",
-                  color: "#7a5c00",
-                  fontWeight: 600,
-                }}
                 onClick={() => handleVerify(item)}
               >
                 Verify
