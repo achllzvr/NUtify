@@ -790,6 +790,9 @@ void showAppointmentRequestModal(BuildContext context, String facultyName, int f
   print('[DEBUG] Available schedules:');
   print(availableSchedules);
 
+  // Keep a reference to the root (caller) context to show nested pickers above the dialog
+  final BuildContext rootContext = context;
+
   // Define the order of days for sorting
   const List<String> dayOrder = [
     'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
@@ -813,26 +816,51 @@ void showAppointmentRequestModal(BuildContext context, String facultyName, int f
   print(days);
   String selectedDay = days.isNotEmpty ? days[0] : '';
   int? selectedIndex;
+  DateTime? selectedDate; // NEW: appointment calendar date matching selectedDay
+
+  // Helper to map day name to weekday int (Mon=1..Sun=7)
+  int _weekdayFromDayName(String day) {
+    switch (day) {
+      case 'Monday':
+        return DateTime.monday;
+      case 'Tuesday':
+        return DateTime.tuesday;
+      case 'Wednesday':
+        return DateTime.wednesday;
+      case 'Thursday':
+        return DateTime.thursday;
+      case 'Friday':
+        return DateTime.friday;
+      case 'Saturday':
+        return DateTime.saturday;
+      case 'Sunday':
+        return DateTime.sunday;
+      default:
+        return -1;
+    }
+  }
 
   showDialog(
-    context: context,
+    context: rootContext,
     barrierDismissible: false,
-    builder: (context) {
+    builder: (dialogContext) {
       final TextEditingController reasonController = TextEditingController();
       return StatefulBuilder(
-        builder: (context, setState) {
+        builder: (sbContext, setState) {
           // Filter available schedules for the selected day (exact match)
           List<Map<String, dynamic>> availableTimes = availableSchedules.where((s) {
             String day = (s['day_of_week'] ?? s['day'] ?? '').toString();
             return day == selectedDay;
           }).toList();
 
-        // Button enabled only if a day is selected, there are available times, and a schedule is selected
-        bool isScheduleButtonEnabled = 
-          selectedDay.isNotEmpty &&
-          availableTimes.isNotEmpty &&
-          selectedIndex != null &&
-          reasonController.text.trim().isNotEmpty;
+          // Button enabled only if a day is selected, there are available times, a schedule is selected,
+          // a valid date matching the selected day is chosen, and a reason is provided
+          bool isScheduleButtonEnabled = 
+            selectedDay.isNotEmpty &&
+            availableTimes.isNotEmpty &&
+            selectedIndex != null &&
+            selectedDate != null &&
+            reasonController.text.trim().isNotEmpty;
 
           return Dialog(
           shape: RoundedRectangleBorder(
@@ -917,7 +945,8 @@ void showAppointmentRequestModal(BuildContext context, String facultyName, int f
                           onChanged: (val) {
                             setState(() {
                               selectedDay = val!;
-                              selectedIndex = null;
+                              selectedIndex = null; // reset selected schedule for new day
+                              selectedDate = null; // reset date since day changed
                             });
                           },
                         ),
@@ -996,6 +1025,109 @@ void showAppointmentRequestModal(BuildContext context, String facultyName, int f
                             },
                           ),
                   ),
+
+                  SizedBox(height: 16),
+                  // NEW: Appointment Date selector (only dates matching selectedDay are enabled)
+                  Text(
+                    'Select Appointment Date:',
+                    style: TextStyle(
+                      fontFamily: 'Arimo',
+                      fontSize: 16,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                          decoration: BoxDecoration(
+                            color: Color(0xFFF5F5F5),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.grey.shade300),
+                          ),
+                          child: Text(
+                            selectedDate == null
+                                ? 'No date selected'
+                                : '${selectedDate!.year.toString().padLeft(4, '0')}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.day.toString().padLeft(2, '0')}',
+                            style: TextStyle(
+                              fontFamily: 'Arimo',
+                              fontSize: 15,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 10),
+                      ElevatedButton.icon(
+                        onPressed: selectedDay.isEmpty
+                            ? null
+                            : () async {
+                                print('[DEBUG] Opening date picker');
+                                final now = DateTime.now();
+                                final first = DateTime(now.year, now.month, now.day);
+                                final last = DateTime(now.year + 1, now.month, now.day);
+                                final targetWeekday = _weekdayFromDayName(selectedDay);
+
+                                // Ensure initialDate satisfies selectableDayPredicate
+                                DateTime _nextMatchingWeekday(DateTime start, int weekday) {
+                                  final int delta = (weekday - start.weekday) % 7;
+                                  return start.add(Duration(days: delta));
+                                }
+                                final DateTime initial = selectedDate ?? _nextMatchingWeekday(first, targetWeekday);
+
+                                final picked = await showDatePicker(
+                                  context: rootContext,
+                                  useRootNavigator: true,
+                                  initialDate: initial,
+                                  firstDate: first,
+                                  lastDate: last,
+                                  initialEntryMode: DatePickerEntryMode.calendarOnly,
+                                  selectableDayPredicate: (DateTime day) {
+                                    // Only allow dates whose weekday matches selectedDay
+                                    return day.weekday == targetWeekday;
+                                  },
+                                  builder: (ctx, child) {
+                                    final theme = Theme.of(rootContext);
+                                    return Theme(
+                                      data: theme.copyWith(
+                                        colorScheme: const ColorScheme.light(
+                                          primary: Color(0xFF35408E),
+                                          secondary: Color(0xFFFFD418),
+                                          onPrimary: Colors.white,
+                                          onSurface: Color(0xFF1A2049),
+                                        ),
+                                        textButtonTheme: TextButtonThemeData(
+                                          style: TextButton.styleFrom(
+                                            foregroundColor: const Color(0xFF35408E),
+                                          ),
+                                        ),
+                                      ),
+                                      child: child!,
+                                    );
+                                  },
+                                );
+                                if (picked != null) {
+                                  setState(() => selectedDate = picked);
+                                }
+                              },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFFFD418),
+                          foregroundColor: Colors.black,
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          elevation: 0,
+                        ),
+                        icon: const Icon(Icons.event),
+                        label: const Text(
+                          'Pick date',
+                          style: TextStyle(fontFamily: 'Arimo', fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+
                   SizedBox(height: 16),
                   // Reason for Appointment Text Field
                   Text(
@@ -1048,7 +1180,8 @@ void showAppointmentRequestModal(BuildContext context, String facultyName, int f
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () {
-                            Navigator.of(context).pop();
+                            // Use the dialog's context to pop the route to avoid deactivated ancestor errors
+                            Navigator.of(dialogContext).pop();
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.grey.shade300,
@@ -1099,7 +1232,6 @@ void showAppointmentRequestModal(BuildContext context, String facultyName, int f
                           child: ElevatedButton(
                             onPressed: isScheduleButtonEnabled
                                 ? () async {
-                                    
                                     final prefs = await SharedPreferences.getInstance();
                                     final String? studentIdStr = prefs.getString('userId');
                                     if (studentIdStr == null) {
@@ -1117,6 +1249,7 @@ void showAppointmentRequestModal(BuildContext context, String facultyName, int f
                                     }
                                     int scheduleId = availableTimes[selectedIndex!]['schedule_id'];
                                     String reason = reasonController.text.trim();
+                                    final String appointmentDate = '${selectedDate!.year.toString().padLeft(4, '0')}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.day.toString().padLeft(2, '0')}';
 
                                     if (scheduleId > 0 && reason.isNotEmpty) {
                                       var result = await postSetAppointment(
@@ -1124,14 +1257,16 @@ void showAppointmentRequestModal(BuildContext context, String facultyName, int f
                                         teacherId: facultyId,
                                         scheduleId: scheduleId,
                                         reason: reason,
+                                        appointmentDate: appointmentDate, // NEW
                                       );
                                       if (result['error'] == true) {
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           SnackBar(content: Text(result['message'])),
                                         );
                                       } else {
-                                        Navigator.of(context).pop(); // Close dialog on success
-                                        showRequestSnackBar(context, 'Appointment request sent successfully!');
+                                        // Close dialog on success using the dialog context
+                                        Navigator.of(dialogContext).pop();
+                                        showRequestSnackBar(rootContext, 'Appointment request sent successfully!');
                                       }
                                     } else {
                                       showRequestSnackBarError(context, 'There was an error. Appointment could not be scheduled.');
@@ -1222,16 +1357,28 @@ Future<Map<String, dynamic>> postSetAppointment({
   required int teacherId,
   required int scheduleId,
   required String reason,
+  required String appointmentDate, // NEW param
 }) async {
   const String apiUrl = 'https://nutify.site/api.php?action=studentSetAppointment';
   try {
+    // Include created_at from the app (current timestamp in MySQL DATETIME format)
+    final now = DateTime.now();
+    final createdAt = '${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')} '
+        '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}';
+
     final response = await http.post(
       Uri.parse(apiUrl),
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
+        'Accept': 'application/json',
+      },
       body: {
         'studentID': studentId.toString(),
         'teacherID': teacherId.toString(),
         'schedule_id': scheduleId.toString(),
         'appointment_reason': reason,
+        'appointment_date': appointmentDate, // NEW field sent to backend (YYYY-MM-DD)
+        'created_at': createdAt, // NEW: creation timestamp from app
       },
     );
     if (response.statusCode == 200) {
