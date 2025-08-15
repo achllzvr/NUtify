@@ -300,7 +300,7 @@ class _ModeratorInboxState extends State<ModeratorInbox> with SingleTickerProvid
               }
               if (items.isEmpty) {
                 return const Center(
-                  child: Text('No completed visits found', style: TextStyle(fontFamily: 'Arimo', color: Colors.grey)),
+                  child: Text('No completed appointments for today yet', style: TextStyle(fontFamily: 'Arimo', color: Colors.grey)),
                 );
               }
 
@@ -496,7 +496,7 @@ class _ModeratorInboxState extends State<ModeratorInbox> with SingleTickerProvid
               }
               if (list.isEmpty) {
                 return const Center(
-                  child: Text('No on-the-spot requests found', style: TextStyle(fontFamily: 'Arimo', color: Colors.grey)),
+                  child: Text('No on-the-spot requests made today', style: TextStyle(fontFamily: 'Arimo', color: Colors.grey)),
                 );
               }
 
