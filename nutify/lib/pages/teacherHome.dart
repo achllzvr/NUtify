@@ -5,6 +5,7 @@ import 'package:nutify/models/teacherHomeAppointments.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 
 class TeacherHome extends StatefulWidget {
   TeacherHome({super.key});
@@ -14,7 +15,6 @@ class TeacherHome extends StatefulWidget {
 }
 
 class _TeacherHomeState extends State<TeacherHome> {
-
   String? teacherUserId;
   
   @override
@@ -40,70 +40,140 @@ class _TeacherHomeState extends State<TeacherHome> {
   }
 
   Widget _buildMainContent() {
-    return Column(
-      children: [
-        Expanded(
-          child: _buildUpcomingAppointments(),
-        ),
-      ],
+    // Fetch once and split into two scrollable sections
+    return FutureBuilder<List<TeacherHomeAppointments>>(
+      future: TeacherHomeAppointments.getTeacherHomeAppointments(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        List<TeacherHomeAppointments> all = snapshot.data ?? [];
+
+        final now = DateTime.now();
+        final startOfToday = DateTime(now.year, now.month, now.day);
+
+        // Upcoming: only today and not in the past (relative to now)
+        final upcomingToday = all.where((a) {
+          final start = _parseStartDateTime(a);
+          if (start != null) {
+            final isToday = start.year == startOfToday.year && start.month == startOfToday.month && start.day == startOfToday.day;
+            return isToday && !start.isBefore(now);
+          }
+          final d = _parseDateOnly(a.scheduleDate);
+          return d != null && d.year == startOfToday.year && d.month == startOfToday.month && d.day == startOfToday.day;
+        }).toList();
+
+        // Missed: strictly before today (yesterday and earlier)
+        final missed = all.where((a) {
+          final start = _parseStartDateTime(a);
+          if (start != null) {
+            return start.isBefore(startOfToday);
+          }
+          final d = _parseDateOnly(a.scheduleDate);
+          return d != null && d.isBefore(startOfToday);
+        }).toList();
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 12),
+            const Padding(
+              padding: EdgeInsets.only(left: 20.0),
+              child: Text(
+                'Your Upcoming Appointments...',
+                style: TextStyle(
+                  fontFamily: 'Arimo',
+                  fontSize: 12,
+                  color: Colors.black87,
+                ),
+              ),
+            ),
+            const SizedBox(height: 6),
+            Expanded(
+              child: upcomingToday.isEmpty
+                  ? const Center(
+                      child: Text(
+                        'No upcoming appointments',
+                        style: TextStyle(fontFamily: 'Arimo', fontSize: 14, color: Colors.grey),
+                      ),
+                    )
+                  : ListView.separated(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: upcomingToday.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 12),
+                      itemBuilder: (context, index) => _buildAppointmentCard(upcomingToday[index]),
+                    ),
+            ),
+            const SizedBox(height: 8),
+            const Padding(
+              padding: EdgeInsets.only(left: 20.0),
+              child: Text(
+                'Your Missed Appointments...',
+                style: TextStyle(
+                  fontFamily: 'Arimo',
+                  fontSize: 12,
+                  color: Colors.black87,
+                ),
+              ),
+            ),
+            const SizedBox(height: 6),
+            Expanded(
+              child: missed.isEmpty
+                  ? const Center(
+                      child: Text(
+                        'No missed appointments',
+                        style: TextStyle(fontFamily: 'Arimo', fontSize: 14, color: Colors.grey),
+                      ),
+                    )
+                  : ListView.separated(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: missed.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 12),
+                      itemBuilder: (context, index) => _buildAppointmentCard(missed[index]),
+                    ),
+            ),
+          ],
+        );
+      },
     );
   }
 
-  Widget _buildUpcomingAppointments() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(height: 10),
-        Padding(
-          padding: const EdgeInsets.only(left: 20.0),
-          child: Text(
-            'Your Upcoming Appointments...',
-            style: TextStyle(
-              fontFamily: 'Arimo',
-              fontSize: 12,
-              color: Colors.black87,
-            ),
-          ),
-        ),
-        SizedBox(height: 5),
-        Expanded(
-          child: FutureBuilder<List<TeacherHomeAppointments>>(
-            future: TeacherHomeAppointments.getTeacherHomeAppointments(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
-              }
-              
-              List<TeacherHomeAppointments> appointments = snapshot.data ?? [];
-              
-              if (appointments.isEmpty) {
-                return Center(
-                  child: Text(
-                    'No upcoming appointments',
-                    style: TextStyle(
-                      fontFamily: 'Arimo',
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
-                  ),
-                );
-              }
-              
-              return ListView.separated(
-                padding: EdgeInsets.all(16),
-                itemCount: appointments.length,
-                separatorBuilder: (context, index) => SizedBox(height: 12),
-                itemBuilder: (context, index) {
-                  var appointment = appointments[index];
-                  // Since API now only returns accepted appointments, use the main card
-                  return _buildAppointmentCard(appointment);
-                },
-              );
-            },
-          ),
-        ),
-      ],
-    );
+  DateTime? _parseStartDateTime(TeacherHomeAppointments a) {
+    try {
+      // Parse date (handles 'YYYY-MM-DD' or 'YYYY-MM-DD HH:mm:ss')
+      DateTime date;
+      try {
+        date = DateTime.parse(a.scheduleDate);
+      } catch (_) {
+        final dOnly = a.scheduleDate.split(' ').first;
+        date = DateTime.parse(dOnly);
+      }
+
+      // Extract start time
+      String startStr = a.scheduleTime.contains('-')
+          ? a.scheduleTime.split('-')[0].trim()
+          : a.scheduleTime.trim();
+
+      DateTime t;
+      try {
+        t = DateFormat('HH:mm:ss').parse(startStr);
+      } catch (_) {
+        t = DateFormat('HH:mm').parse(startStr);
+      }
+
+      return DateTime(date.year, date.month, date.day, t.hour, t.minute, t.second);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  DateTime? _parseDateOnly(String scheduleDate) {
+    try {
+      return DateTime.parse(scheduleDate.split(' ').first);
+    } catch (_) {
+      return null;
+    }
   }
 
   Widget _buildAppointmentCard(TeacherHomeAppointments appointment) {
