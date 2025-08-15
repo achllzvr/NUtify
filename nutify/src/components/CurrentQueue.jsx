@@ -18,10 +18,9 @@ const upcomingAppointments = [
   { id: 7, name: 'Erwin De Castro', studentName: 'Grace Uy', department: 'Faculty - SACE', time: 'June 19 • 01:00 - 02:00', avatar: erwinDeCastro, reason: 'Discussion about internship opportunities.' },
   { id: 8, name: 'Joel Enriquez', studentName: 'Henry Sy', department: 'Faculty - SACE', time: 'June 20 • 02:00 - 03:00', avatar: joelEnriquez, reason: 'Clarification on exam coverage.' },
   { id: 9, name: 'Bernie Fabito', studentName: 'Ivy Dela Cruz', department: 'Faculty - SACE', time: 'June 21 • 03:00 - 04:00', avatar: bernieFabito, reason: 'Request for additional consultation slot due to schedule conflict.' }
-  
 ];
 
-const QUEUE_PER_PAGE = 5;
+const QUEUE_PER_PAGE = 10;
 
 const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, truncateReason }) => {
   const [page, setPage] = useState(1);
@@ -42,11 +41,31 @@ const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, truncateR
   const handleNext = () => setPage(prev => Math.min(prev + 1, totalPages));
 
   return (
-    <div className="moderator-home-appointment-section" id="moderator-home-upcomingAppointments">
+    <div
+      className="moderator-home-appointment-section"
+      id="moderator-home-upcomingAppointments"
+      style={{
+        height: '780px', // fixed height
+        display: 'flex',
+        flexDirection: 'column'
+      }}
+    >
       <div className="moderator-home-section-header">
         <h2>Current Queue</h2>
       </div>
-      <div className="moderator-home-queue-list">
+      <div
+        className="moderator-home-queue-list"
+        style={{
+          flex: '1 1 auto',
+          minHeight: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-start',
+          overflowY: 'auto',
+          paddingRight: '8px',
+          marginRight: '-8px'
+        }}
+      >
         {paginatedQueue.map(appointment => (
           <div
             key={appointment.id}
@@ -85,18 +104,18 @@ const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, truncateR
               }}
             >
               <button
-                className="moderator-home-see-more-btn small-btn-text"
+                className="moderator-home-see-more-btn gray details small-btn-text"
                 style={{ width: '130px', fontSize: '12px', padding: '8px 15px' }}
                 onClick={() => onViewDetails(appointment)}
               >
                 View Details
               </button>
               <button
-                className="moderator-home-notify-btn small-btn-text"
+                className="moderator-home-notify-btn verify small-btn-text"
                 style={{ width: '130px', fontSize: '12px', padding: '8px 15px' }}
                 onClick={() => onNotifyAppointees(appointment)}
               >
-                Notify Appointees
+                <span style={{ display: 'block', lineHeight: '1.2' }}>Notify<br />Appointees</span>
               </button>
             </div>
           </div>
@@ -113,7 +132,8 @@ const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, truncateR
             background: '#f0f0f0',
             color: '#7f8c8d',
             cursor: page === 1 ? 'not-allowed' : 'pointer',
-            fontWeight: 500
+            fontWeight: 500,
+            boxShadow: '4px 4px 8px #e0e0e0, -4px -4px 8px #fff'
           }}
         >
           Prev
@@ -127,7 +147,8 @@ const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, truncateR
           padding: '6px 14px',
           border: 'none',
           display: 'flex',
-          alignItems: 'center'
+          alignItems: 'center',
+          boxShadow: '4px 4px 8px #e0e0e0, -4px -4px 8px #fff'
         }}>
           Page {page} of {totalPages}
         </span>
@@ -141,7 +162,8 @@ const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, truncateR
             background: '#f0f0f0',
             color: '#7f8c8d',
             cursor: page === totalPages ? 'not-allowed' : 'pointer',
-            fontWeight: 500
+            fontWeight: 500,
+            boxShadow: '4px 4px 8px #e0e0e0, -4px -4px 8px #fff'
           }}
         >
           Next

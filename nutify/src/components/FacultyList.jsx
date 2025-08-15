@@ -27,8 +27,7 @@ const facultyList = [
   { id: 12, name: 'Larry Fronda', department: 'Faculty - SAHS', status: 'offline', avatar: larryFronda }
 ];
 
-// Pagination constants
-const FACULTY_PER_PAGE = 9;
+const FACULTY_PER_PAGE = 10;
 
 const FacultyList = ({ mainSearch, facultyStatusFilter, setFacultyStatusFilter }) => {
   const [page, setPage] = useState(1);
@@ -40,7 +39,7 @@ const FacultyList = ({ mainSearch, facultyStatusFilter, setFacultyStatusFilter }
   );
 
   const totalPages = Math.max(1, Math.ceil(filteredFacultyList.length / FACULTY_PER_PAGE));
-  const paginatedFacultyList = filteredFacultyList.slice(
+  const paginatedFaculty = filteredFacultyList.slice(
     (page - 1) * FACULTY_PER_PAGE,
     page * FACULTY_PER_PAGE
   );
@@ -49,7 +48,14 @@ const FacultyList = ({ mainSearch, facultyStatusFilter, setFacultyStatusFilter }
   const handleNext = () => setPage(prev => Math.min(prev + 1, totalPages));
 
   return (
-    <div className="moderator-home-faculty-section">
+    <div
+      className="moderator-home-faculty-section"
+      style={{
+        height: '780px', // fixed height
+        display: 'flex',
+        flexDirection: 'column'
+      }}
+    >
       <div className="moderator-home-section-header" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
         <h2 style={{ margin: 0 }}>All Faculty List</h2>
         <select
@@ -63,8 +69,20 @@ const FacultyList = ({ mainSearch, facultyStatusFilter, setFacultyStatusFilter }
           <option value="offline">Offline</option>
         </select>
       </div>
-      <div className="moderator-home-faculty-list">
-        {paginatedFacultyList.map(faculty => (
+      <div
+        className="moderator-home-faculty-list"
+        style={{
+          flex: '1 1 auto',
+          minHeight: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-start',
+          overflowY: 'auto',
+          paddingRight: '8px',
+          marginRight: '-8px'
+        }}
+      >
+        {paginatedFaculty.map(faculty => (
           <div
             key={faculty.id}
             className="moderator-home-faculty-item"
@@ -91,7 +109,8 @@ const FacultyList = ({ mainSearch, facultyStatusFilter, setFacultyStatusFilter }
             background: '#f0f0f0',
             color: '#7f8c8d',
             cursor: page === 1 ? 'not-allowed' : 'pointer',
-            fontWeight: 500
+            fontWeight: 500,
+            boxShadow: '4px 4px 8px #e0e0e0, -4px -4px 8px #fff'
           }}
         >
           Prev
@@ -105,7 +124,8 @@ const FacultyList = ({ mainSearch, facultyStatusFilter, setFacultyStatusFilter }
           padding: '6px 14px',
           border: 'none',
           display: 'flex',
-          alignItems: 'center'
+          alignItems: 'center',
+          boxShadow: '4px 4px 8px #e0e0e0, -4px -4px 8px #fff'
         }}>
           Page {page} of {totalPages}
         </span>
@@ -119,7 +139,8 @@ const FacultyList = ({ mainSearch, facultyStatusFilter, setFacultyStatusFilter }
             background: '#f0f0f0',
             color: '#7f8c8d',
             cursor: page === totalPages ? 'not-allowed' : 'pointer',
-            fontWeight: 500
+            fontWeight: 500,
+            boxShadow: '4px 4px 8px #e0e0e0, -4px -4px 8px #fff'
           }}
         >
           Next

@@ -131,7 +131,7 @@
   box-shadow: 20px 20px 40px rgba(0, 0, 0, 0.1),
     -20px -20px 40px rgba(255, 255, 255, 0.8);
   transition: all 0.3s ease;
-  height: 780px;
+  height: 780px; /* fixed height */
   display: flex;
   flex-direction: column;
   width: 100%; /* ensure card fills container width */
@@ -139,10 +139,21 @@
 
 /* Card list: scrollable container for history items */
 .moderator-history-card-list {
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
   overflow-y: auto;
   padding: 10px 12px 10px 0;
   margin-right: -12px;
+  scrollbar-width: none;
+}
+
+.moderator-history-card-list::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  background: transparent;
 }
 
 /* History appointment/card item */
@@ -271,6 +282,7 @@
   color: #2c3e50 !important;
   box-shadow: 8px 8px 15px rgba(44, 62, 80, 0.13),
     -8px -8px 15px rgba(255, 255, 255, 0);
+  font-weight: 700 !important;
 }
 .moderator-history-see-more-btn.gray:active,
 .moderator-history-see-more-btn.hold:active,
@@ -290,6 +302,7 @@
   color: #2c3e50 !important;
   box-shadow: 8px 8px 15px rgba(44, 62, 80, 0.13),
     -8px -8px 15px rgba(255, 255, 255, 0);
+  font-weight: 700 !important;
 }
 .moderator-home-see-more-btn.gray:active,
 .moderator-home-see-more-btn.hold:active,
@@ -307,6 +320,7 @@
   color: #7a5c00 !important;
   box-shadow: 8px 8px 15px rgba(44, 62, 80, 0.13),
     -8px -8px 15px rgba(255, 255, 255, 0);
+  font-weight: 700 !important;
 }
 .moderator-history-see-more-btn.verify:active {
   box-shadow: inset 10px 10px 22px rgba(44, 62, 80, 0.22),
@@ -322,6 +336,7 @@
   color: #7a5c00 !important;
   box-shadow: 8px 8px 15px rgba(44, 62, 80, 0.13),
     -8px -8px 15px rgba(255, 255, 255, 0);
+  font-weight: 700 !important;
 }
 .moderator-home-see-more-btn.verify:active {
   box-shadow: inset 10px 10px 22px rgba(44, 62, 80, 0.22),
@@ -644,13 +659,19 @@
   .moderator-history-section {
     padding: 20px;
     min-width: 0;
-    width: 100%; /* ensure card fills container width */
+    width: 100%;
     display: flex;
     flex-direction: column;
+    height: 780px; /* ensure fixed height */
   }
   .moderator-history-card-list {
-    max-height: calc(100% - 60px);
-    flex: 1;
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    overflow-y: auto;
+    /* Remove max-height */
   }
 }
 
@@ -782,7 +803,64 @@
     flex-direction: column;
   }
   .moderator-history-card-list {
-    max-height: calc(100% - 50px);
-    flex: 1;
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    overflow-y: auto;
+    /* Remove max-height */
   }
 }
+
+/* Slightly increase card info font size (smaller than before) */
+.moderator-history-item .moderator-history-appointment-info,
+.moderator-history-appointment-item .moderator-history-appointment-info {
+  font-size: 1.03em;
+}
+
+.moderator-history-item .moderator-history-appointment-name,
+.moderator-history-appointment-item .moderator-history-appointment-name,
+.moderator-history-item .moderator-history-name,
+.moderator-history-appointment-item .moderator-history-name {
+  font-size: 1.08em;
+}
+
+.moderator-history-item .moderator-history-appointment-details,
+.moderator-history-appointment-item .moderator-history-appointment-details,
+.moderator-history-item .moderator-history-details,
+.moderator-history-appointment-item .moderator-history-details,
+.moderator-history-item .moderator-history-appointment-time,
+.moderator-history-appointment-item .moderator-history-appointment-time {
+  font-size: 1.04em;
+}
+
+/* Make buttons a bit smaller */
+.moderator-history-see-more-btn,
+.moderator-home-see-more-btn {
+  font-size: 1em !important;
+  padding: 10px 0 !important;
+  min-height: 38px;
+}
+.moderator-history-appointment-item .moderator-history-appointment-time {
+  font-size: 1.04em;
+}
+
+/* Make buttons a bit smaller */
+.moderator-history-see-more-btn,
+.moderator-home-see-more-btn {
+  font-size: 1em !important;
+  padding: 10px 0 !important;
+  min-height: 38px;
+}
+
+/* Hide scrollbar for approval and on hold history lists */
+.moderator-history-card-list {
+  scrollbar-width: none;
+}
+.moderator-history-card-list::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  background: transparent;
+}
+

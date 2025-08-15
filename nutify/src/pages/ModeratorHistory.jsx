@@ -349,7 +349,19 @@ const ModeratorHistory = () => {
                 ></div>
               )}
 
-              <div className="moderator-history-card-list">
+              <div
+                className="moderator-history-card-list"
+                style={{
+                  flex: '1 1 auto',
+                  minHeight: 0,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'flex-start',
+                  overflowY: 'auto',
+                  padding: '10px 12px 10px 0',
+                  marginRight: '-12px'
+                }}
+              >
                 {activeFilter === "dailylog" ? (
                   <DailyLogHistory
                     onViewDetails={handleViewDetails}
@@ -447,4 +459,3 @@ const ModeratorHistory = () => {
 };
 
 export default ModeratorHistory;
- 

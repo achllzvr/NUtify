@@ -38,8 +38,11 @@ const initialOnHoldItems = [
   },
 ];
 
+const ITEMS_PER_PAGE = 10;
+
 const OnHoldHistory = ({ onVerify, searchTerm }) => {
   const [onHoldItems, setOnHoldItems] = useState(initialOnHoldItems);
+  const [page, setPage] = useState(1);
 
   const handleVerify = (item) => {
     setOnHoldItems((items) => items.filter((i) => i.id !== item.id));
@@ -53,6 +56,12 @@ const OnHoldHistory = ({ onVerify, searchTerm }) => {
       item.details.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const totalPages = Math.max(1, Math.ceil(filteredItems.length / ITEMS_PER_PAGE));
+  const paginatedItems = filteredItems.slice(
+    (page - 1) * ITEMS_PER_PAGE,
+    page * ITEMS_PER_PAGE
+  );
+
   if (filteredItems.length === 0) {
     return (
       <div style={{ textAlign: "center", color: "#888", marginTop: "40px" }}>
@@ -62,42 +71,111 @@ const OnHoldHistory = ({ onVerify, searchTerm }) => {
   }
 
   return (
-    <div>
-      {filteredItems.map((item) => (
+    <>
+      <div
+        style={{
+          flex: '1 1 auto',
+          minHeight: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-start',
+          overflowY: 'auto',
+          paddingRight: '8px',
+          marginRight: '-8px',
+          scrollbarWidth: 'none'
+        }}
+      >
         <div
-          key={item.id}
-          className="moderator-history-item"
           style={{
-            minHeight: 100,
-            marginBottom: 24,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
+            paddingRight: '8px',
+            marginRight: '-8px'
           }}
         >
-          <div
-            className="moderator-history-appointment-info"
-            style={{ flex: 1 }}
-          >
+          {paginatedItems.map((item) => (
             <div
-              className="moderator-history-appointment-name moderator-history-name"
-              style={{ fontSize: "1.25em", color: "#424A57" }}
+              key={item.id}
+              className="moderator-history-item"
+              style={{
+                minHeight: 100,
+                marginBottom: 24,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
             >
-              {item.name}
+              <div
+                className="moderator-history-appointment-info"
+                style={{ flex: 1 }}
+              >
+                <div
+                  className="moderator-history-appointment-name moderator-history-name"
+                  style={{ fontSize: "1.25em", color: "#424A57" }}
+                >
+                  {item.name}
+                </div>
+              </div>
+              {/* Action button - moved to right */}
+              <div style={{ display: "flex", gap: "12px", marginLeft: "18px" }}>
+                <button
+                  className="moderator-history-see-more-btn verify"
+                  onClick={() => handleVerify(item)}
+                >
+                  Verify
+                </button>
+              </div>
             </div>
-          </div>
-          {/* Action button - moved to right */}
-          <div style={{ display: "flex", gap: "12px", marginLeft: "18px" }}>
-            <button
-              className="moderator-history-see-more-btn verify"
-              onClick={() => handleVerify(item)}
-            >
-              Verify
-            </button>
-          </div>
+          ))}
         </div>
-      ))}
-    </div>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '12px', gap: '10px' }}>
+        <button
+          onClick={() => setPage(prev => Math.max(prev - 1, 1))}
+          disabled={page === 1}
+          style={{
+            padding: '6px 14px',
+            borderRadius: '8px',
+            border: 'none',
+            background: '#f0f0f0',
+            color: '#7f8c8d',
+            cursor: page === 1 ? 'not-allowed' : 'pointer',
+            fontWeight: 500,
+            boxShadow: '4px 4px 8px #e0e0e0, -4px -4px 8px #fff'
+          }}
+        >
+          Prev
+        </button>
+        <span style={{
+          fontWeight: 500,
+          fontSize: '15px',
+          color: '#7f8c8d',
+          background: '#f0f0f0',
+          borderRadius: '8px',
+          padding: '6px 14px',
+          border: 'none',
+          display: 'flex',
+          alignItems: 'center',
+          boxShadow: '4px 4px 8px #e0e0e0, -4px -4px 8px #fff'
+        }}>
+          Page {page} of {totalPages}
+        </span>
+        <button
+          onClick={() => setPage(prev => Math.min(prev + 1, totalPages))}
+          disabled={page === totalPages}
+          style={{
+            padding: '6px 14px',
+            borderRadius: '8px',
+            border: 'none',
+            background: '#f0f0f0',
+            color: '#7f8c8d',
+            cursor: page === totalPages ? 'not-allowed' : 'pointer',
+            fontWeight: 500,
+            boxShadow: '4px 4px 8px #e0e0e0, -4px -4px 8px #fff'
+          }}
+        >
+          Next
+        </button>
+      </div>
+    </>
   );
 };
 

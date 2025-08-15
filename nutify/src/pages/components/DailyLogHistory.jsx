@@ -1,5 +1,5 @@
 // Daily log history list UI
-import React from "react";
+import React, { useState } from "react";
 
 // Format date for header (now includes year)
 const formatDateHeader = (dateStr) => {
@@ -101,11 +101,15 @@ const dailyLogHistoryItems = [
   },
 ];
 
+const ITEMS_PER_PAGE = 10;
+
 const DailyLogHistory = ({
   historyItems = dailyLogHistoryItems,
   onViewDetails,
   searchTerm,
 }) => {
+  const [page, setPage] = useState(1);
+
   const filteredItems = historyItems.filter(
     (item) =>
       item.status === "dailylog" &&
@@ -134,72 +138,144 @@ const DailyLogHistory = ({
       );
   });
 
+  // Pagination logic
+  const totalPages = Math.max(1, Math.ceil(flatItems.length / ITEMS_PER_PAGE));
+  const paginatedItems = flatItems.slice(
+    (page - 1) * ITEMS_PER_PAGE,
+    page * ITEMS_PER_PAGE
+  );
+
+  const handlePrev = () => setPage(prev => Math.max(prev - 1, 1));
+  const handleNext = () => setPage(prev => Math.min(prev + 1, totalPages));
+
   return (
-    <div className="moderator-history-card-list">
-      {flatItems.map((entry, idx) =>
-        entry.type === "header" ? (
-          <div
-            key={"header-" + entry.date}
-            style={{
-              fontWeight: "900",
-              fontSize: "1.4em",
-              margin: "1px 0 8px 0", // changed: marginTop is now 1px
-            }}
-          >
-            {formatDateHeader(entry.date)}
-          </div>
-        ) : (
-          <div
-            key={entry.id}
-            className="moderator-history-item"
-            data-status={entry.status}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
+    <>
+      <div
+        className="moderator-history-card-list"
+        style={{
+          flex: '1 1 auto',
+          minHeight: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-start',
+          overflowY: 'auto',
+          paddingRight: '8px',
+          marginRight: '-8px'
+        }}
+      >
+        {paginatedItems.map((entry, idx) =>
+          entry.type === "header" ? (
             <div
-              className="moderator-history-appointment-info"
-              style={{ flex: 1 }}
+              key={"header-" + entry.date}
+              style={{
+                fontWeight: "900",
+                fontSize: "1.4em",
+                margin: "1px 0 8px 0", // changed: marginTop is now 1px
+              }}
+            >
+              {formatDateHeader(entry.date)}
+            </div>
+          ) : (
+            <div
+              key={entry.id}
+              className="moderator-history-item"
+              data-status={entry.status}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
             >
               <div
-                className="moderator-history-appointment-name moderator-history-name"
-                style={{ fontSize: "1.25em" }} // slightly bigger student name
+                className="moderator-history-appointment-info"
+                style={{ flex: 1 }}
               >
-                {entry.studentName}
+                <div
+                  className="moderator-history-appointment-name moderator-history-name"
+                  style={{ fontSize: "1.25em" }} // slightly bigger student name
+                >
+                  {entry.studentName}
+                </div>
+                <div
+                  className="moderator-history-appointment-details moderator-history-details"
+                  style={{ fontSize: "1.08em", color: "#424A57" }} // slightly bigger faculty
+                >
+                  Faculty: {entry.name}
+                </div>
+                <div
+                  className="moderator-history-appointment-time"
+                  style={{ fontSize: "1.08em", color: "#424A57" }} // slightly bigger time
+                >
+                  Date: {formatDateTime(entry.time)}
+                </div>
+                <div
+                  className="moderator-history-appointment-details moderator-history-details"
+                  style={{ fontSize: "1.08em", color: "#424A57" }} // slightly bigger reason
+                >
+                  Reason: {entry.reason}
+                </div>
               </div>
-              <div
-                className="moderator-history-appointment-details moderator-history-details"
-                style={{ fontSize: "1.08em", color: "#424A57" }} // slightly bigger faculty
-              >
-                Faculty: {entry.name}
-              </div>
-              <div
-                className="moderator-history-appointment-time"
-                style={{ fontSize: "1.08em", color: "#424A57" }} // slightly bigger time
-              >
-                Date: {formatDateTime(entry.time)}
-              </div>
-              <div
-                className="moderator-history-appointment-details moderator-history-details"
-                style={{ fontSize: "1.08em", color: "#424A57" }} // slightly bigger reason
-              >
-                Reason: {entry.reason}
+              <div style={{ display: "flex", gap: "10px", marginLeft: "18px" }}>
+                <button
+                  className="moderator-home-see-more-btn gray details small-btn-text"
+                  onClick={() => onViewDetails(entry)}
+                >
+                  View Details
+                </button>
               </div>
             </div>
-            <div style={{ display: "flex", gap: "10px", marginLeft: "18px" }}>
-              <button
-                className="moderator-home-see-more-btn gray details small-btn-text"
-                onClick={() => onViewDetails(entry)}
-              >
-                View Details
-              </button>
-            </div>
-          </div>
-        )
-      )}
-    </div>
+          )
+        )}
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '12px', gap: '10px' }}>
+        <button
+          onClick={handlePrev}
+          disabled={page === 1}
+          style={{
+            padding: '6px 14px',
+            borderRadius: '8px',
+            border: 'none',
+            background: '#f0f0f0',
+            color: '#7f8c8d',
+            cursor: page === 1 ? 'not-allowed' : 'pointer',
+            fontWeight: 500,
+            boxShadow: '4px 4px 8px #e0e0e0, -4px -4px 8px #fff'
+          }}
+        >
+          Prev
+        </button>
+        <span style={{
+          fontWeight: 500,
+          fontSize: '15px',
+          color: '#7f8c8d',
+          background: '#f0f0f0',
+          borderRadius: '8px',
+          padding: '6px 14px',
+          border: 'none',
+          display: 'flex',
+          alignItems: 'center',
+          boxShadow: '4px 4px 8px #e0e0e0, -4px -4px 8px #fff'
+        }}>
+          Page {page} of {totalPages}
+        </span>
+        <button
+          onClick={handleNext}
+          disabled={page === totalPages}
+          style={{
+            padding: '6px 14px',
+            borderRadius: '8px',
+            border: 'none',
+            background: '#f0f0f0',
+            color: '#7f8c8d',
+            cursor: page === totalPages ? 'not-allowed' : 'pointer',
+            fontWeight: 500,
+            boxShadow: '4px 4px 8px #e0e0e0, -4px -4px 8px #fff'
+          }}
+        >
+          Next
+        </button>
+      </div>
+    </>
   );
 };
 

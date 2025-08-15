@@ -55,8 +55,12 @@
     -20px -20px 40px rgba(255, 255, 255, 0.8);
   transition: all 0.3s ease;
   width: 100%; /* ensure card fills container width */
+  height: 780px;     /* fixed height */
+  display: flex;
+  flex-direction: column;
 }
 
+/* Faculty section: neumorphic style */
 .moderator-home-faculty-section {
   padding: 25px 20px 25px 25px;
 }
@@ -83,14 +87,6 @@
   display: flex;
   flex-direction: column;
   gap: 15px;
-}
-
-/* Faculty list: remove scrollable panel and fixed height */
-.moderator-home-faculty-list {
-  /* height: 810px !important;
-  overflow-y: scroll;
-  padding-right: 8px;
-  margin-right: -8px; */
 }
 
 /* Remove custom scrollbar for faculty list */
@@ -179,6 +175,33 @@
   font-family: "Helvetica", sans-serif;
   font-size: 13px;
   color: #95a5a6;
+}
+
+/* Slightly increase card info font size (smaller than before) */
+.moderator-home-appointment-item .moderator-home-appointment-info {
+  font-size: 1.03em;
+}
+
+.moderator-home-appointment-item .moderator-home-appointment-name {
+  font-size: 1.08em;
+}
+
+.moderator-home-appointment-item .moderator-home-appointment-details,
+.moderator-home-appointment-item .moderator-home-appointment-time {
+  font-size: 1.04em;
+}
+
+/* Slightly increase faculty info font size in faculty list */
+.moderator-home-faculty-item .moderator-home-faculty-info {
+  font-size: 1.03em;
+}
+
+.moderator-home-faculty-item .moderator-home-faculty-name {
+  font-size: 1.08em;
+}
+
+.moderator-home-faculty-item .moderator-home-faculty-department {
+  font-size: 1.04em;
 }
 
 /* Faculty status: online/offline indicator */
@@ -319,6 +342,9 @@
   gap: 1px;
   justify-content: flex-start;
   align-items: center;
+  flex: 1 1 auto;
+  min-height: 0; /* allow flex scroll */
+  overflow-y: auto;
 }
 
 /* Remove custom scrollbar for queue */
@@ -379,12 +405,28 @@
   overflow: hidden;
 }
 
-.moderator-home-notify-btn:active {
-  box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.1),
-    inset -5px -5px 10px rgba(255, 255, 255, 0.8),
-    0 0 20px rgba(127, 140, 141, 0.1);
-  color: #5a6c7d;
-  transition: all 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+/* Make buttons bigger */
+.moderator-home-see-more-btn,
+.moderator-home-notify-btn {
+  font-size: 1em !important;
+  padding: 10px 0 !important;
+  min-height: 38px;
+}
+
+/* Neumorphic yellow for Notify Appointees */
+.moderator-home-notify-btn.verify {
+  background: #ffd36b !important;
+  color: #7a5c00 !important;
+  box-shadow: 8px 8px 15px rgba(44, 62, 80, 0.13),
+    -8px -8px 15px rgba(255, 255, 255, 0.0);
+  font-weight: 700 !important;
+}
+.moderator-home-notify-btn.verify:active {
+  box-shadow: inset 10px 10px 22px rgba(44, 62, 80, 0.22),
+    inset -10px -10px 22px rgba(255, 255, 255, 0.0);
+  background: #ffd36b !important;
+  filter: none;
+  transition: box-shadow 0.2s, background 0.2s;
 }
 
 /* Input group: icon + input field layout */
@@ -702,4 +744,50 @@ select.login-input option {
 
 .Schedule-Button:active {
   box-shadow: inset 15px 15px 30px #35408e, inset -15px -15px 30px #3b469c;
+}
+
+/* Gray and yellow button styles */
+.moderator-home-see-more-btn.gray,
+.moderator-home-see-more-btn.details {
+  background: #d4d4d4 !important;
+  color: #2c3e50 !important;
+  box-shadow: 8px 8px 15px rgba(44, 62, 80, 0.13),
+    -8px -8px 15px rgba(255, 255, 255, 0.0);
+  font-weight: 700 !important;
+}
+.moderator-home-see-more-btn.gray:active,
+.moderator-home-see-more-btn.details:active {
+  box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.1),
+    inset -5px -5px 10px rgba(255, 255, 255, 0.8),
+    0 0 20px rgba(127, 140, 141, 0.1);
+  color: #5a6c7d;
+  transition: all 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.moderator-home-notify-btn.verify {
+  background: #ffd36b !important;
+  color: #7a5c00 !important;
+  box-shadow: 8px 8px 15px rgba(44, 62, 80, 0.13),
+    -8px -8px 15px rgba(255, 255, 255, 0.0);
+  font-weight: 700 !important;
+}
+.moderator-home-notify-btn.verify:active {
+  box-shadow: inset 10px 10px 22px rgba(44, 62, 80, 0.22),
+    inset -10px -10px 22px rgba(255, 255, 255, 0.0);
+  background: #ffd36b !important;
+  filter: none;
+  transition: box-shadow 0.2s, background 0.2s;
+}
+
+/* Custom scrollbar styles for queue and faculty lists */
+.moderator-home-queue-list,
+.moderator-home-faculty-list {
+  scrollbar-width: none;
+}
+
+.moderator-home-queue-list::-webkit-scrollbar,
+.moderator-home-faculty-list::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  background: transparent;
 }
