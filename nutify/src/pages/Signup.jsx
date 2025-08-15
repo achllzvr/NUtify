@@ -5,6 +5,7 @@ import idIcon from '../assets/icons/credit-card.svg';
 import lockIcon from '../assets/icons/lock.svg';
 import eyeIcon from '../assets/icons/eye.svg';
 import eyeOffIcon from '../assets/icons/eye-off.svg';
+import mailIcon from '../assets/icons/mail.svg';
 
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -12,7 +13,7 @@ const Signup = () => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    username: '',
+    email: '',
     idNumber: '',
     password: '',
     confirmPassword: ''
@@ -41,7 +42,6 @@ const Signup = () => {
       alert('Passwords do not match!');
       return;
     }
-    // For demo purposes, redirect to login
     navigate('/login');
   };
 
@@ -82,13 +82,13 @@ const Signup = () => {
             </div>
 
             <div className="input-group">
-              <img src={userIcon} alt="Username" className="input-icon" />
+              <img src={mailIcon} alt="Email" className="input-icon" />
               <input
-                type="text"
+                type="email"
                 className="login-input"
-                placeholder="Username"
-                name="username"
-                value={formData.username}
+                placeholder="Email"
+                name="email"
+                value={formData.email}
                 onChange={handleInputChange}
                 required
               />

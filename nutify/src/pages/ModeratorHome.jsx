@@ -424,9 +424,20 @@ const ModeratorHome = () => {
               <button
                 className="Schedule-Button"
                 style={{
-                  background: (facultySelected && studentName && reason) ? undefined : '#d3d3d3',
-                  color: (facultySelected && studentName && reason) ? '#fff' : '#888',
-                  cursor: (facultySelected && studentName && reason) ? 'pointer' : 'not-allowed'
+                  background: 'linear-gradient(145deg, #3c489f, #323c86)',
+                  boxShadow: (facultySelected && studentName && reason)
+                    ? 'inset 15px 15px 30px #35408e, inset -15px -15px 30px #3b469c'
+                    : '6px 6px 12px rgba(53, 64, 142, 0.2), -6px -6px 12px rgba(255, 255, 255, 0.8)',
+                  color: 'white',
+                  fontSize: '18px',
+                  fontWeight: 600,
+                  borderRadius: '30px',
+                  padding: '10px 0',
+                  width: '100%',
+                  transition: 'all 0.3s ease-in-out',
+                  fontFamily: '"Helvetica", sans-serif',
+                  cursor: (facultySelected && studentName && reason) ? 'pointer' : 'not-allowed',
+                  opacity: (facultySelected && studentName && reason) ? 1 : 0.7
                 }}
                 disabled={!(facultySelected && studentName && reason)}
                 onClick={handleSchedule}

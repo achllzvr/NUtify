@@ -28,7 +28,7 @@ const formatDateMMDDYYYY = (dateStr) => {
 const ModeratorHistory = () => {
   const [activeFilter, setActiveFilter] = useState("dailylog");
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchInput, setSearchInput] = useState(""); // add controlled input state
+  const [searchInput, setSearchInput] = useState("");
   const [selectedItem, setSelectedItem] = useState(null);
   const [verifyAlertVisible, setVerifyAlertVisible] = useState(false);
   const [verifyAlertTransition, setVerifyAlertTransition] = useState(false);

@@ -119,6 +119,7 @@
 .moderator-history-item {
   display: flex;
   align-items: center;
+  justify-content: space-between; /* Add this for horizontal layout */
   padding: 24px 15px;
   margin: 0 2px 24px 2px;
   background: #f0f0f0;
@@ -127,6 +128,17 @@
     inset -8px -8px 15px rgba(255, 255, 255, 0.8);
   transition: all 0.3s ease;
   min-height: 140px;
+}
+
+/* Ensure button container aligns right */
+.moderator-history-item > div:last-child,
+.moderator-history-appointment-item > div:last-child {
+  display: flex;
+  align-items: center;
+  margin-left: 18px;
+  gap: 10px;
+  flex-shrink: 0; /* Prevent shrinking */
+  min-width: 200px; /* Ensure enough space for both buttons */
 }
 
 /* Avatar for history cards */
@@ -153,6 +165,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  padding: 0 12px; /* Added padding for inner card info */
 }
 
 /* Name/title in card */
@@ -185,13 +198,14 @@
 }
 
 /* See more button for pagination */
-.moderator-history-see-more-btn {
+.moderator-history-see-more-btn,
+.moderator-home-see-more-btn {
   background: #f0f0f0;
-  width: 13%;
+  width: 13em; 
   margin-top: 5px;
   border: none;
   border-radius: 15px;
-  padding: 5px 12px;
+  padding: 5px 18px;
   font-size: 14px;
   color: #7f8c8d;
   cursor: pointer;
@@ -204,14 +218,22 @@
   transform: translateY(0);
   position: relative;
   overflow: hidden;
+  white-space: nowrap; 
 }
 
 .moderator-history-see-more-btn:active {
-  box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.1),
-    inset -5px -5px 10px rgba(255, 255, 255, 0.8),
-    0 0 20px rgba(127, 140, 141, 0.1);
-  color: #5a6c7d;
-  transition: all 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+   box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.1),
+      inset -5px -5px 10px rgba(255, 255, 255, 0.8);
+}
+/* Button container: prevent shrinking and overflow */
+.moderator-history-item > div:last-child,
+.moderator-history-appointment-item > div:last-child {
+  display: flex;
+  align-items: center;
+  margin-left: 18px;
+  gap: 10px;
+  flex-shrink: 0; /* Prevent shrinking */
+  min-width: 200px; /* Ensure enough space for both buttons */
 }
 
 /* Custom scrollbar for card list */
@@ -467,10 +489,15 @@
   .moderator-history-content-container { padding: 0 10px; }
   .moderator-history-filter-tabs { display: none; }
   .moderator-history-see-more-btn {
-    width: 15%;
-    padding: 4px 8px;
+    width: auto; /* Changed from 15% to auto */
+    min-width: 90px;
+    padding: 4px 14px; /* Increased horizontal padding */
     font-size: 12px;
     border-radius: 10px;
+  }
+  .moderator-history-item > div:last-child,
+  .moderator-history-appointment-item > div:last-child {
+    min-width: 180px;
   }
   .moderator-history-filter-mobile-btn:active {
     box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.1),
@@ -541,6 +568,13 @@
     gap: 10px;
     min-height: 100px;
     padding: 18px 10px;
+  }
+  .moderator-history-item > div:last-child,
+  .moderator-history-appointment-item > div:last-child {
+    margin-left: 0;
+    margin-top: 10px;
+    width: 100%;
+    justify-content: flex-start;
   }
   .moderator-history-appointment-avatar {
     align-self: center;

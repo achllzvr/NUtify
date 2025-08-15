@@ -1,5 +1,5 @@
 // Request history list UI
-import React from "react";
+import React, { useState } from "react";
 
 // Format date as MM/DD/YYYY
 const formatDateMMDDYYYY = (dateStr) => {
@@ -56,7 +56,11 @@ export const requestHistoryItems = [
   },
 ];
 
+const REQUESTS_PER_PAGE = 10;
+
 const RequestHistory = ({ onViewDetails, searchTerm }) => {
+  const [page, setPage] = useState(1);
+
   // Filter by search
   const filteredRequests = requestHistoryItems.filter(
     (item) =>
@@ -69,17 +73,31 @@ const RequestHistory = ({ onViewDetails, searchTerm }) => {
         item.reason.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
+  const totalPages = Math.max(1, Math.ceil(filteredRequests.length / REQUESTS_PER_PAGE));
+  const paginatedRequests = filteredRequests.slice(
+    (page - 1) * REQUESTS_PER_PAGE,
+    page * REQUESTS_PER_PAGE
+  );
+
+  const handlePrev = () => setPage((prev) => Math.max(prev - 1, 1));
+  const handleNext = () => setPage((prev) => Math.min(prev + 1, totalPages));
+
   return (
     <div className="moderator-history-card-list">
-      {filteredRequests.map((item) => (
+      {paginatedRequests.map((item) => (
         <div
           key={item.id}
           className="moderator-history-item"
           data-status="pending"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
         >
-          <div className="moderator-history-appointment-info">
+          <div className="moderator-history-appointment-info" style={{ flex: 1 }}>
             <div className="moderator-history-appointment-name moderator-history-name">
-              Name: {item.name}
+              {item.name}
             </div>
             <div
               className="moderator-history-appointment-details moderator-history-details"
@@ -99,18 +117,62 @@ const RequestHistory = ({ onViewDetails, searchTerm }) => {
             <div className="moderator-history-appointment-details moderator-history-details">
               Reason: {item.reason}
             </div>
-            {/* Details button */}
-            <div style={{ display: "flex", gap: "10px", marginTop: "6px" }}>
-              <button
-                className="moderator-home-see-more-btn small-btn-text"
-                onClick={() => onViewDetails(item)}
-              >
-                View Details
-              </button>
-            </div>
+          </div>
+          <div style={{ display: "flex", gap: "10px", marginLeft: "18px" }}>
+            <button
+              className="moderator-home-see-more-btn small-btn-text"
+              onClick={() => onViewDetails(item)}
+            >
+              View Details
+            </button>
           </div>
         </div>
       ))}
+      <div style={{ display: "flex", justifyContent: "center", marginTop: "12px", gap: "10px" }}>
+        <button
+          onClick={handlePrev}
+          disabled={page === 1}
+          style={{
+            padding: "6px 14px",
+            borderRadius: "8px",
+            border: "none",
+            background: "#f0f0f0",
+            color: "#7f8c8d",
+            cursor: page === 1 ? "not-allowed" : "pointer",
+            fontWeight: 500
+          }}
+        >
+          Prev
+        </button>
+        <span style={{
+          fontWeight: 500,
+          fontSize: "15px",
+          color: "#7f8c8d",
+          background: "#f0f0f0",
+          borderRadius: "8px",
+          padding: "6px 14px",
+          border: "none",
+          display: "flex",
+          alignItems: "center"
+        }}>
+          Page {page} of {totalPages}
+        </span>
+        <button
+          onClick={handleNext}
+          disabled={page === totalPages}
+          style={{
+            padding: "6px 14px",
+            borderRadius: "8px",
+            border: "none",
+            background: "#f0f0f0",
+            color: "#7f8c8d",
+            cursor: page === totalPages ? "not-allowed" : "pointer",
+            fontWeight: 500
+          }}
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 };

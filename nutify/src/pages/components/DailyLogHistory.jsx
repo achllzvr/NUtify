@@ -1,5 +1,5 @@
 // Daily log history list UI
-import React from "react";
+import React, { useState } from "react";
 
 // Format date for header
 const formatDateHeader = (dateStr) => {
@@ -92,12 +92,15 @@ const dailyLogHistoryItems = [
   },
 ];
 
+const DAILYLOG_PER_PAGE = 10;
+
 const DailyLogHistory = ({
   historyItems = dailyLogHistoryItems,
   onViewDetails,
   searchTerm,
 }) => {
-  // Filter by search
+  const [page, setPage] = useState(1);
+
   const filteredItems = historyItems.filter(
     (item) =>
       item.status === "dailylog" &&
@@ -110,64 +113,139 @@ const DailyLogHistory = ({
           item.reason.toLowerCase().includes(searchTerm.toLowerCase())))
   );
 
-  // Group by date
   const groups = getDailyLogGroups(filteredItems).filter(
     (group) =>
       Array.isArray(group.items) &&
       group.items.some((item) => item.studentName && item.name && item.reason)
   );
 
+  const flatItems = [];
+  groups.forEach((group) => {
+    flatItems.push({ type: "header", date: group.date });
+    group.items
+      .filter((item) => item.studentName && item.name && item.reason)
+      .forEach((item) =>
+        flatItems.push({ type: "item", ...item, groupDate: group.date })
+      );
+  });
+
+  const totalPages = Math.max(1, Math.ceil(flatItems.length / DAILYLOG_PER_PAGE));
+  const paginatedFlatItems = flatItems.slice(
+    (page - 1) * DAILYLOG_PER_PAGE,
+    page * DAILYLOG_PER_PAGE
+  );
+
+  const handlePrev = () => setPage((prev) => Math.max(prev - 1, 1));
+  const handleNext = () => setPage((prev) => Math.min(prev + 1, totalPages));
+
   return (
     <div className="moderator-history-card-list">
-      {groups.map((group) => (
-        <React.Fragment key={group.date}>
+      {paginatedFlatItems.map((entry, idx) =>
+        entry.type === "header" ? (
           <div
+            key={"header-" + entry.date}
             style={{
-              fontWeight: "bold",
-              fontSize: "1.1em",
-              margin: "-.9em 0 8px 0",
+              fontWeight: "900",
+              fontSize: "1.4em",
+              margin: "-.7em 0 8px 0",
             }}
           >
-            {formatDateHeader(group.date)}
+            {formatDateHeader(entry.date)}
           </div>
-          {group.items
-            .filter((item) => item.studentName && item.name && item.reason)
-            .map((item) => (
-              <div
-                key={item.id}
-                className="moderator-history-item"
-                data-status={item.status}
-              >
-                <div className="moderator-history-appointment-info">
-                  <div className="moderator-history-appointment-name moderator-history-name">
-                    Name: {item.studentName}
-                  </div>
-                  <div className="moderator-history-appointment-details moderator-history-details">
-                    Faculty: {item.name}
-                  </div>
-                  <div className="moderator-history-appointment-time">
-                    Date • Time: {formatDateHeader(group.date)} •{" "}
-                    {item.time.split(" ")[1] || item.time.split(" - ")[1]}
-                  </div>
-                  <div className="moderator-history-appointment-details moderator-history-details">
-                    Reason: {item.reason}
-                  </div>
-                  {/* Details button */}
-                  <div
-                    style={{ display: "flex", gap: "10px", marginTop: "6px" }}
-                  >
-                    <button
-                      className="moderator-home-see-more-btn small-btn-text"
-                      onClick={() => onViewDetails(item)}
-                    >
-                      View Details
-                    </button>
-                  </div>
-                </div>
+        ) : (
+          <div
+            key={entry.id}
+            className="moderator-history-item"
+            data-status={entry.status}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <div
+              className="moderator-history-appointment-info"
+              style={{ flex: 1 }}
+            >
+              <div className="moderator-history-appointment-name moderator-history-name">
+                {entry.studentName}
               </div>
-            ))}
-        </React.Fragment>
-      ))}
+              <div className="moderator-history-appointment-details moderator-history-details">
+                Faculty: {entry.name}
+              </div>
+              <div className="moderator-history-appointment-time">
+                Date • Time: {formatDateHeader(entry.groupDate)} •{" "}
+                {entry.time.split(" ")[1] || entry.time.split(" - ")[1]}
+              </div>
+              <div className="moderator-history-appointment-details moderator-history-details">
+                Reason: {entry.reason}
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: "10px", marginLeft: "18px" }}>
+              <button
+                className="moderator-home-see-more-btn small-btn-text"
+                onClick={() => onViewDetails(entry)}
+              >
+                View Details
+              </button>
+            </div>
+          </div>
+        )
+      )}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          marginTop: "12px",
+          gap: "10px",
+        }}
+      >
+        <button
+          onClick={handlePrev}
+          disabled={page === 1}
+          style={{
+            padding: "6px 14px",
+            borderRadius: "8px",
+            border: "none",
+            background: "#f0f0f0",
+            color: "#7f8c8d",
+            cursor: page === 1 ? "not-allowed" : "pointer",
+            fontWeight: 500,
+          }}
+        >
+          Prev
+        </button>
+        <span
+          style={{
+            fontWeight: 500,
+            fontSize: "15px",
+            color: "#7f8c8d",
+            background: "#f0f0f0",
+            borderRadius: "8px",
+            padding: "6px 14px",
+            border: "none",
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          Page {page} of {totalPages}
+        </span>
+        <button
+          onClick={handleNext}
+          disabled={page === totalPages}
+          style={{
+            padding: "6px 14px",
+            borderRadius: "8px",
+            border: "none",
+            background: "#f0f0f0",
+            color: "#7f8c8d",
+            cursor: page === totalPages ? "not-allowed" : "pointer",
+            fontWeight: 500,
+          }}
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 };

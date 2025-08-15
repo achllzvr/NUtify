@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import jeiPastranaAvatar from '../assets/images/avatars/1c9a4dd0bbd964e3eecbd40caf3b7e37.jpg';
 import ireneBalmes from '../assets/images/avatars/c33237da3438494d1abc67166196484e.jpg';
 import carloTorres from '../assets/images/avatars/8940e8ea369def14e82f05a5fee994b9.jpg';
@@ -21,12 +21,25 @@ const upcomingAppointments = [
   
 ];
 
+const QUEUE_PER_PAGE = 5;
+
 const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, truncateReason }) => {
+  const [page, setPage] = useState(1);
+
   const filteredQueue = upcomingAppointments.filter(a =>
     a.name.toLowerCase().includes(mainSearch.toLowerCase()) ||
     a.studentName.toLowerCase().includes(mainSearch.toLowerCase()) ||
     a.department.toLowerCase().includes(mainSearch.toLowerCase())
   );
+
+  const totalPages = Math.max(1, Math.ceil(filteredQueue.length / QUEUE_PER_PAGE));
+  const paginatedQueue = filteredQueue.slice(
+    (page - 1) * QUEUE_PER_PAGE,
+    page * QUEUE_PER_PAGE
+  );
+
+  const handlePrev = () => setPage(prev => Math.max(prev - 1, 1));
+  const handleNext = () => setPage(prev => Math.min(prev + 1, totalPages));
 
   return (
     <div className="moderator-home-appointment-section" id="moderator-home-upcomingAppointments">
@@ -34,39 +47,105 @@ const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, truncateR
         <h2>Current Queue</h2>
       </div>
       <div className="moderator-home-queue-list">
-        {filteredQueue.map(appointment => (
-          <div key={appointment.id} className="moderator-home-appointment-item">
-            <div className="moderator-home-appointment-avatar">
-              <img src={appointment.avatar} alt={appointment.name} className="moderator-home-avatar-img" />
+        {paginatedQueue.map(appointment => (
+          <div
+            key={appointment.id}
+            className="moderator-home-appointment-item"
+            style={{
+              padding: '18px 22px', // add padding
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+              <div className="moderator-home-appointment-avatar">
+                <img src={appointment.avatar} alt={appointment.name} className="moderator-home-avatar-img" />
+              </div>
+              <div className="moderator-home-appointment-info" style={{ flex: 1 }}>
+                <div className="moderator-home-appointment-name">{appointment.name}</div>
+                <div className="moderator-home-appointment-details">
+                  Student: {appointment.studentName}
+                </div>
+                <div className="moderator-home-appointment-time">
+                  {appointment.time}
+                </div>
+                <div className="moderator-home-appointment-details" style={{ marginTop: '2px', marginBottom: '8px' }}>
+                  Reason: {truncateReason(appointment.reason)}
+                </div>
+              </div>
             </div>
-            <div className="moderator-home-appointment-info" style={{ flex: 1 }}>
-              <div className="moderator-home-appointment-name">{appointment.name}</div>
-              <div className="moderator-home-appointment-details">
-                Student: {appointment.studentName}
-              </div>
-              <div className="moderator-home-appointment-time">
-                {appointment.time}
-              </div>
-              <div className="moderator-home-appointment-details" style={{ marginTop: '2px', marginBottom: '8px' }}>
-                Reason: {truncateReason(appointment.reason)}
-              </div>
-              <div style={{ display: 'flex', gap: '10px', marginTop: '6px' }}>
-                <button
-                  className="moderator-home-see-more-btn small-btn-text"
-                  onClick={() => onViewDetails(appointment)}
-                >
-                  View Details
-                </button>
-                <button
-                  className="moderator-home-notify-btn small-btn-text"
-                  onClick={() => onNotifyAppointees(appointment)}
-                >
-                  Notify Appointees
-                </button>
-              </div>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px',
+                alignItems: 'flex-end',
+                minWidth: '140px'
+              }}
+            >
+              <button
+                className="moderator-home-see-more-btn small-btn-text"
+                style={{ width: '130px', fontSize: '12px', padding: '8px 15px' }}
+                onClick={() => onViewDetails(appointment)}
+              >
+                View Details
+              </button>
+              <button
+                className="moderator-home-notify-btn small-btn-text"
+                style={{ width: '130px', fontSize: '12px', padding: '8px 15px' }}
+                onClick={() => onNotifyAppointees(appointment)}
+              >
+                Notify Appointees
+              </button>
             </div>
           </div>
         ))}
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '12px', gap: '10px' }}>
+        <button
+          onClick={handlePrev}
+          disabled={page === 1}
+          style={{
+            padding: '6px 14px',
+            borderRadius: '8px',
+            border: 'none',
+            background: '#f0f0f0',
+            color: '#7f8c8d',
+            cursor: page === 1 ? 'not-allowed' : 'pointer',
+            fontWeight: 500
+          }}
+        >
+          Prev
+        </button>
+        <span style={{
+          fontWeight: 500,
+          fontSize: '15px',
+          color: '#7f8c8d',
+          background: '#f0f0f0',
+          borderRadius: '8px',
+          padding: '6px 14px',
+          border: 'none',
+          display: 'flex',
+          alignItems: 'center'
+        }}>
+          Page {page} of {totalPages}
+        </span>
+        <button
+          onClick={handleNext}
+          disabled={page === totalPages}
+          style={{
+            padding: '6px 14px',
+            borderRadius: '8px',
+            border: 'none',
+            background: '#f0f0f0',
+            color: '#7f8c8d',
+            cursor: page === totalPages ? 'not-allowed' : 'pointer',
+            fontWeight: 500
+          }}
+        >
+          Next
+        </button>
       </div>
     </div>
   );

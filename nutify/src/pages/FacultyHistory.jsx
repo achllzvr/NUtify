@@ -135,6 +135,16 @@ const FacultyHistory = () => {
     return matchesFilter && matchesSearch;
   });
 
+  const ITEMS_PER_PAGE = 10;
+  const [page, setPage] = useState(1);
+  const totalPages = Math.max(1, Math.ceil(filteredItems.length / ITEMS_PER_PAGE));
+  const paginatedItems = filteredItems.slice(
+    (page - 1) * ITEMS_PER_PAGE,
+    page * ITEMS_PER_PAGE
+  );
+  const handlePrev = () => setPage(prev => Math.max(prev - 1, 1));
+  const handleNext = () => setPage(prev => Math.min(prev + 1, totalPages));
+
   const handleFilterChange = (filter) => {
     setActiveFilter(filter);
   };
@@ -206,7 +216,7 @@ const FacultyHistory = () => {
               </button>
 
               <div className="faculty-history-card-list">
-                {filteredItems.map(item => (
+                {paginatedItems.map(item => (
                   <div key={item.id} className="faculty-history-item" data-status={item.status}>
                     <div className="faculty-history-appointment-avatar">
                       <img src={item.avatar} alt={item.name} className="faculty-history-avatar-img" />
@@ -230,6 +240,51 @@ const FacultyHistory = () => {
                     </div>
                   </div>
                 ))}
+                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '12px', gap: '10px' }}>
+                  <button
+                    onClick={handlePrev}
+                    disabled={page === 1}
+                    style={{
+                      padding: '6px 14px',
+                      borderRadius: '8px',
+                      border: 'none',
+                      background: '#f0f0f0',
+                      color: '#7f8c8d',
+                      cursor: page === 1 ? 'not-allowed' : 'pointer',
+                      fontWeight: 500
+                    }}
+                  >
+                    Prev
+                  </button>
+                  <span style={{
+                    fontWeight: 500,
+                    fontSize: '15px',
+                    color: '#7f8c8d',
+                    background: '#f0f0f0',
+                    borderRadius: '8px',
+                    padding: '6px 14px',
+                    border: 'none',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}>
+                    Page {page} of {totalPages}
+                  </span>
+                  <button
+                    onClick={handleNext}
+                    disabled={page === totalPages}
+                    style={{
+                      padding: '6px 14px',
+                      borderRadius: '8px',
+                      border: 'none',
+                      background: '#f0f0f0',
+                      color: '#7f8c8d',
+                      cursor: page === totalPages ? 'not-allowed' : 'pointer',
+                      fontWeight: 500
+                    }}
+                  >
+                    Next
+                  </button>
+                </div>
               </div>
             </div>
           </div>

@@ -74,7 +74,7 @@
 
 /* Faculty list: scrollable panel */
 .moderator-home-faculty-list {
-  height: 790px !important;
+  height: 810px !important;
   overflow-y: scroll;
   padding-right: 8px;
   margin-right: -8px;

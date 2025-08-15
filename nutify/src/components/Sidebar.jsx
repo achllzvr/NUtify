@@ -4,7 +4,7 @@ import logo from '../assets/images/NUtifywhite.png';
 import chevronLeftIcon from '../assets/icons/chevron-left.svg';
 import menuIcon from '../assets/icons/menu.svg';
 import homeIcon from '../assets/icons/home.svg';
-import mailIcon from '../assets/icons/mail.svg';
+import inboxIcon from '../assets/icons/inbox.svg';
 import settingsIcon from '../assets/icons/settings.svg';
 
 const getInitialSidebarState = () => {
@@ -138,7 +138,7 @@ const Sidebar = ({ userType, userName, userRole, userAvatar }) => {
             className={getSidebarIconClass(`/${userType}/history`)}
             onClick={() => handleNavigation(`/${userType}/history`)}
           >
-            <img src={mailIcon} alt={userType === 'moderator' ? 'Inbox' : 'History'} className="icon" />
+            <img src={inboxIcon} alt={userType === 'moderator' ? 'Inbox' : 'History'} className="icon" />
             <span className="nav-text">
               {userType === 'moderator' ? 'Inbox' : 'History'}
             </span>
