@@ -167,14 +167,14 @@
 .moderator-home-faculty-department {
   font-family: "Helvetica", sans-serif;
   font-size: 14px;
-  color: #7f8c8d;
+  color: #424A57; /* changed from #7f8c8d */
   margin-bottom: 2px;
 }
 
 .moderator-home-appointment-time {
   font-family: "Helvetica", sans-serif;
   font-size: 13px;
-  color: #95a5a6;
+  color: #424A57; /* changed from #95a5a6 */
 }
 
 /* Slightly increase card info font size (smaller than before) */
@@ -189,6 +189,7 @@
 .moderator-home-appointment-item .moderator-home-appointment-details,
 .moderator-home-appointment-item .moderator-home-appointment-time {
   font-size: 1.04em;
+  color: #424A57; /* ensure override for appointment details/time color */
 }
 
 /* Slightly increase faculty info font size in faculty list */
@@ -202,6 +203,7 @@
 
 .moderator-home-faculty-item .moderator-home-faculty-department {
   font-size: 1.04em;
+  color: #424A57; /* ensure override for department color */
 }
 
 /* Faculty status: online/offline indicator */
