@@ -286,6 +286,7 @@ body {
 
 /* Text input color */
 input[type="text"],
+input[type="password"],
 textarea,
 .login-select {
   color: #1c1d1e;
