@@ -30,7 +30,6 @@
 .moderator-history-filter-tabs {
   display: flex;
   gap: 0;
-  margin-bottom: 25px;
   justify-content: flex-start;
   flex-wrap: wrap;
   background: transparent;
@@ -82,22 +81,53 @@
 }
 
 /* Active tab indicator width/position per status */
-.moderator-history-filter-tabs[data-active="pending"]::after { width: 14.28%; left: 14.28%; }
-.moderator-history-filter-tabs[data-active="accepted"]::after { width: 14.28%; left: 28.56%; }
-.moderator-history-filter-tabs[data-active="completed"]::after { width: 14.28%; left: 42.84%; }
-.moderator-history-filter-tabs[data-active="missed"]::after { width: 14.28%; left: 57.12%; }
-.moderator-history-filter-tabs[data-active="cancelled"]::after { width: 14.28%; left: 71.4%; }
-.moderator-history-filter-tabs[data-active="declined"]::after { width: 14.28%; left: 85.68%; }
-.moderator-history-filter-tabs[data-active="dailylog"]::after { width: 25%; left: 0; }
-.moderator-history-filter-tabs[data-active="request"]::after { width: 25%; left: 25%; }
-.moderator-history-filter-tabs[data-active="approval"]::after { width: 25%; left: 50%; }
-.moderator-history-filter-tabs[data-active="onhold"]::after { width: 25%; left: 75%; }
+.moderator-history-filter-tabs[data-active="pending"]::after {
+  width: 14.28%;
+  left: 14.28%;
+}
+.moderator-history-filter-tabs[data-active="accepted"]::after {
+  width: 14.28%;
+  left: 28.56%;
+}
+.moderator-history-filter-tabs[data-active="completed"]::after {
+  width: 14.28%;
+  left: 42.84%;
+}
+.moderator-history-filter-tabs[data-active="missed"]::after {
+  width: 14.28%;
+  left: 57.12%;
+}
+.moderator-history-filter-tabs[data-active="cancelled"]::after {
+  width: 14.28%;
+  left: 71.4%;
+}
+.moderator-history-filter-tabs[data-active="declined"]::after {
+  width: 14.28%;
+  left: 85.68%;
+}
+.moderator-history-filter-tabs[data-active="dailylog"]::after {
+  width: 25%;
+  left: 0;
+}
+.moderator-history-filter-tabs[data-active="request"]::after {
+  width: 25%;
+  left: 25%;
+}
+.moderator-history-filter-tabs[data-active="approval"]::after {
+  width: 25%;
+  left: 50%;
+}
+.moderator-history-filter-tabs[data-active="onhold"]::after {
+  width: 25%;
+  left: 75%;
+}
 
 /* History card section */
 .moderator-history-section {
   background: #f0f0f0;
   border-radius: 20px;
-  padding: 25px;
+  padding: 15px 25px 25px 25px;
+
   box-shadow: 20px 20px 40px rgba(0, 0, 0, 0.1),
     -20px -20px 40px rgba(255, 255, 255, 0.8);
   transition: all 0.3s ease;
@@ -202,13 +232,13 @@
 .moderator-history-see-more-btn,
 .moderator-home-see-more-btn {
   background: #f0f0f0;
-  width: 13em; 
+  width: 260px; /* Even wider */
   margin-top: 5px;
   border: none;
   border-radius: 15px;
-  padding: 5px 18px;
-  font-size: 14px;
-  color: #7f8c8d;
+  padding: 10px 0; /* Reduced vertical padding */
+  font-size: 20px;
+  color: #35408e;
   cursor: pointer;
   box-shadow: 8px 8px 15px rgba(0, 0, 0, 0.1),
     -8px -8px 15px rgba(255, 255, 255, 0.8);
@@ -216,25 +246,89 @@
     box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), color 0.2s ease-out,
     transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   font-family: "Helvetica", sans-serif;
+  font-weight: 700;
   transform: translateY(0);
   position: relative;
   overflow: hidden;
-  white-space: nowrap; 
+  white-space: nowrap;
+  text-align: center;
+  display: inline-block;
 }
 
-.moderator-history-see-more-btn:active {
-   box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.1),
-      inset -5px -5px 10px rgba(255, 255, 255, 0.8);
+.moderator-history-see-more-btn:active,
+.moderator-home-see-more-btn:active {
+  box-shadow: inset 8px 8px 15px rgba(0, 0, 0, 0.13),
+    inset -8px -8px 15px rgba(255, 255, 255, 0.8);
+  filter: brightness(0.97);
+  transition: box-shadow 0.2s, filter 0.2s;
 }
-/* Button container: prevent shrinking and overflow */
-.moderator-history-item > div:last-child,
-.moderator-history-appointment-item > div:last-child {
-  display: flex;
-  align-items: center;
-  margin-left: 18px;
-  gap: 10px;
-  flex-shrink: 0; /* Prevent shrinking */
-  min-width: 200px; /* Ensure enough space for both buttons */
+
+/* History buttons: Hold & View Details (gray) */
+.moderator-history-see-more-btn.gray,
+.moderator-history-see-more-btn.hold,
+.moderator-history-see-more-btn.details {
+  background: #d4d4d4 !important;
+  color: #2c3e50 !important;
+  box-shadow: 8px 8px 15px rgba(44, 62, 80, 0.13),
+    -8px -8px 15px rgba(255, 255, 255, 0);
+}
+.moderator-history-see-more-btn.gray:active,
+.moderator-history-see-more-btn.hold:active,
+.moderator-history-see-more-btn.details:active {
+  box-shadow: inset 10px 10px 22px rgba(44, 62, 80, 0.22),
+    inset -10px -10px 22px rgba(255, 255, 255, 0);
+  background: #d4d4d4 !important;
+  filter: none;
+  transition: box-shadow 0.2s, background 0.2s;
+}
+
+/* Home buttons: Hold & View Details (gray) */
+.moderator-home-see-more-btn.gray,
+.moderator-home-see-more-btn.hold,
+.moderator-home-see_more-btn.details {
+  background: #d4d4d4 !important;
+  color: #2c3e50 !important;
+  box-shadow: 8px 8px 15px rgba(44, 62, 80, 0.13),
+    -8px -8px 15px rgba(255, 255, 255, 0);
+}
+.moderator-home-see-more-btn.gray:active,
+.moderator-home-see-more-btn.hold:active,
+.moderator-home-see-more-btn.details:active {
+  box-shadow: inset 10px 10px 22px rgba(44, 62, 80, 0.22),
+    inset -10px -10px 22px rgba(255, 255, 255, 0);
+  background: #d4d4d4 !important;
+  filter: none;
+  transition: box-shadow 0.2s, background 0.2s;
+}
+
+/* History buttons: Verify (yellow) */
+.moderator-history-see-more-btn.verify {
+  background: #ffd36b !important;
+  color: #7a5c00 !important;
+  box-shadow: 8px 8px 15px rgba(44, 62, 80, 0.13),
+    -8px -8px 15px rgba(255, 255, 255, 0);
+}
+.moderator-history-see-more-btn.verify:active {
+  box-shadow: inset 10px 10px 22px rgba(44, 62, 80, 0.22),
+    inset -10px -10px 22px rgba(255, 255, 255, 0);
+  background: #ffd36b !important;
+  filter: none;
+  transition: box-shadow 0.2s, background 0.2s;
+}
+
+/* Home buttons: Verify (yellow) */
+.moderator-home-see-more-btn.verify {
+  background: #ffd36b !important;
+  color: #7a5c00 !important;
+  box-shadow: 8px 8px 15px rgba(44, 62, 80, 0.13),
+    -8px -8px 15px rgba(255, 255, 255, 0);
+}
+.moderator-home-see-more-btn.verify:active {
+  box-shadow: inset 10px 10px 22px rgba(44, 62, 80, 0.22),
+    inset -10px -10px 22px rgba(255, 255, 255, 0);
+  background: #ffd36b !important;
+  filter: none;
+  transition: box-shadow 0.2s, background 0.2s;
 }
 
 /* Custom scrollbar for card list */
@@ -300,7 +394,8 @@
     hue-rotate(200deg) brightness(95%) contrast(90%);
 }
 
-.moderator-history-filter-option.selected .moderator-history-filter-option-icon {
+.moderator-history-filter-option.selected
+  .moderator-history-filter-option-icon {
   filter: brightness(0) saturate(100%) invert(28%) sepia(80%) saturate(1000%)
     hue-rotate(215deg) brightness(95%) contrast(90%);
 }
@@ -354,16 +449,46 @@
 }
 
 /* Status badge colors per state */
-.moderator-history-status-pending { background: #ffd36b; color: #7a5c00; }
-.moderator-history-status-missed { background: #ff7a7a; color: #fff; }
-.moderator-history-status-completed { background: #4caf50; color: #fff; }
-.moderator-history-status-cancelled { background: #ff7a7a; color: #fff; }
-.moderator-history-status-declined { background: #ff7a7a; color: #fff; }
-.moderator-history-status-accepted { background: #4caf50; color: #fff; }
-.moderator-history-status-dailylog { background: #4caf50; color: #fff; }
-.moderator-history-status-request { background: #ffd36b; color: #7a5c00; }
-.moderator-history-status-approval { background: #4caf50; color: #fff; }
-.moderator-history-status-onhold { background: #ff7a7a; color: #fff; }
+.moderator-history-status-pending {
+  background: #ffd36b;
+  color: #7a5c00;
+}
+.moderator-history-status-missed {
+  background: #ff7a7a;
+  color: #fff;
+}
+.moderator-history-status-completed {
+  background: #4caf50;
+  color: #fff;
+}
+.moderator-history-status-cancelled {
+  background: #ff7a7a;
+  color: #fff;
+}
+.moderator-history-status-declined {
+  background: #ff7a7a;
+  color: #fff;
+}
+.moderator-history-status-accepted {
+  background: #4caf50;
+  color: #fff;
+}
+.moderator-history-status-dailylog {
+  background: #4caf50;
+  color: #fff;
+}
+.moderator-history-status-request {
+  background: #ffd36b;
+  color: #7a5c00;
+}
+.moderator-history-status-approval {
+  background: #4caf50;
+  color: #fff;
+}
+.moderator-history-status-onhold {
+  background: #ff7a7a;
+  color: #fff;
+}
 
 .moderator-history-filter-mobile-btn {
   display: none;
@@ -410,7 +535,8 @@
   font-weight: 600;
   text-align: center;
   margin-bottom: 10px;
-  box-shadow: 6px 6px 12px rgba(53, 64, 142, 0.1), -6px -6px 12px rgba(255, 255, 255, 0.8);
+  box-shadow: 6px 6px 12px rgba(53, 64, 142, 0.1),
+    -6px -6px 12px rgba(255, 255, 255, 0.8);
 }
 
 /* Modal status colors per state */
@@ -487,18 +613,23 @@
     width: 100%;
     max-width: none;
   }
-  .moderator-history-content-container { padding: 0 10px; max-width: 100%; }
-  .moderator-history-filter-tabs { display: none; }
+  .moderator-history-content-container {
+    padding: 0 10px;
+    max-width: 100%;
+  }
+  .moderator-history-filter-tabs {
+    display: none;
+  }
   .moderator-history-see-more-btn {
-    width: auto; /* Changed from 15% to auto */
-    min-width: 90px;
-    padding: 4px 14px; /* Increased horizontal padding */
-    font-size: 12px;
-    border-radius: 10px;
+    width: 210px; /* Wider for mobile */
+    min-width: 210px;
+    padding: 8px 0; /* Reduced vertical padding for mobile */
+    font-size: 18px;
+    border-radius: 12px;
   }
   .moderator-history-item > div:last-child,
   .moderator-history-appointment-item > div:last-child {
-    min-width: 180px;
+    min-width: 280px;
   }
   .moderator-history-filter-mobile-btn:active {
     box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.1),
@@ -529,15 +660,22 @@
     margin-top: 150px;
   }
   .moderator-history-see-more-btn {
-    padding: 8px 0;
-    font-size: 14px;
-    border-radius: 16px;
-    width: 100%;
+    padding: 8px 0; /* Reduced vertical padding for tablet */
+    font-size: 16px;
+    border-radius: 14px;
+    width: 100%; /* Keep full width for tablet */
     display: block;
     text-align: center;
     margin-top: 10px;
   }
-  .moderator-history-status { display: none !important; }
+  .moderator-history-item > div:last-child,
+  .moderator-history-appointment-item > div:last-child {
+    min-width: 100%;
+    gap: 12px;
+  }
+  .moderator-history-status {
+    display: none !important;
+  }
   .moderator-history-status-mobile {
     display: block !important;
     width: 100%;
@@ -550,16 +688,46 @@
       -6px -6px 12px rgba(255, 255, 255, 0.8);
     padding: 4px 0;
   }
-  .moderator-history-status-pending.moderator-history-status-mobile { background: #ffd36b; color: #7a5c00; }
-  .moderator-history-status-missed.moderator-history-status-mobile { background: #ff7a7a; color: #fff; }
-  .moderator-history-status-completed.moderator-history-status-mobile { background: #4caf50; color: #fff; }
-  .moderator-history-status-cancelled.moderator-history-status-mobile { background: #ff7a7a; color: #fff; }
-  .moderator-history-status-declined.moderator-history-status-mobile { background: #ff7a7a; color: #fff; }
-  .moderator-history-status-accepted.moderator-history-status-mobile { background: #4caf50; color: #fff; }
-  .moderator-history-status-dailylog.moderator-history-status-mobile { background: #4caf50; color: #fff; }
-  .moderator-history-status-request.moderator-history-status-mobile { background: #ffd36b; color: #7a5c00; }
-  .moderator-history-status-approval.moderator-history-status-mobile { background: #4caf50; color: #fff; }
-  .moderator-history-status-onhold.moderator-history-status-mobile { background: #ff7a7a; color: #fff; }
+  .moderator-history-status-pending.moderator-history-status-mobile {
+    background: #ffd36b;
+    color: #7a5c00;
+  }
+  .moderator-history-status-missed.moderator-history-status-mobile {
+    background: #ff7a7a;
+    color: #fff;
+  }
+  .moderator-history-status-completed.moderator-history-status-mobile {
+    background: #4caf50;
+    color: #fff;
+  }
+  .moderator-history-status-cancelled.moderator-history-status-mobile {
+    background: #ff7a7a;
+    color: #fff;
+  }
+  .moderator-history-status-declined.moderator-history-status-mobile {
+    background: #ff7a7a;
+    color: #fff;
+  }
+  .moderator-history-status-accepted.moderator-history-status-mobile {
+    background: #4caf50;
+    color: #fff;
+  }
+  .moderator-history-status-dailylog.moderator-history-status-mobile {
+    background: #4caf50;
+    color: #fff;
+  }
+  .moderator-history-status-request.moderator-history-status-mobile {
+    background: #ffd36b;
+    color: #7a5c00;
+  }
+  .moderator-history-status-approval.moderator-history-status-mobile {
+    background: #4caf50;
+    color: #fff;
+  }
+  .moderator-history-status-onhold.moderator-history-status-mobile {
+    background: #ff7a7a;
+    color: #fff;
+  }
 }
 
 @media (max-width: 576px) {
@@ -584,19 +752,29 @@
     width: 40px;
     height: 40px;
   }
-  .moderator-history-avatar-img { width: 100%; height: 100%; }
+  .moderator-history-avatar-img {
+    width: 100%;
+    height: 100%;
+  }
   .moderator-history-appointment-info {
     text-align: center;
     align-self: stretch;
   }
   .moderator-history-see-more-btn {
-    padding: 5px 10px;
-    font-size: 11px;
+    padding: 6px 0; /* Reduced vertical padding for small screens */
+    font-size: 15px;
     border-radius: 10px;
+    width: 100%; /* Keep full width for small screens */
   }
-  .moderator-history-details-modal-content { border-radius: 12px; }
-  .moderator-history-details-modal-title { font-size: 1.3rem; }
-  .moderator-history-details-modal-body { gap: 12px; }
+  .moderator-history-details-modal-content {
+    border-radius: 12px;
+  }
+  .moderator-history-details-modal-title {
+    font-size: 1.3rem;
+  }
+  .moderator-history-details-modal-body {
+    gap: 12px;
+  }
   .moderator-history-section {
     min-height: 760px;
     height: 350px;
@@ -608,4 +786,3 @@
     flex: 1;
   }
 }
-

@@ -1,12 +1,21 @@
 // Daily log history list UI
-import React, { useState } from "react";
+import React from "react";
 
-// Format date for header
+// Format date for header (now includes year)
 const formatDateHeader = (dateStr) => {
   const d = new Date(dateStr);
   return isNaN(d.getTime())
     ? dateStr
-    : d.toLocaleString("en-US", { month: "long", day: "numeric" });
+    : d.toLocaleString("en-US", { month: "long", day: "numeric", year: "numeric" });
+};
+
+// Format date and time for item row
+const formatDateTime = (dateStr) => {
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
+  const datePart = d.toLocaleString("en-US", { month: "long", day: "numeric", year: "numeric" });
+  const timePart = d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
+  return `${datePart} • ${timePart}`;
 };
 
 // Group dailylog items by date
@@ -92,15 +101,11 @@ const dailyLogHistoryItems = [
   },
 ];
 
-const DAILYLOG_PER_PAGE = 10;
-
 const DailyLogHistory = ({
   historyItems = dailyLogHistoryItems,
   onViewDetails,
   searchTerm,
 }) => {
-  const [page, setPage] = useState(1);
-
   const filteredItems = historyItems.filter(
     (item) =>
       item.status === "dailylog" &&
@@ -129,25 +134,16 @@ const DailyLogHistory = ({
       );
   });
 
-  const totalPages = Math.max(1, Math.ceil(flatItems.length / DAILYLOG_PER_PAGE));
-  const paginatedFlatItems = flatItems.slice(
-    (page - 1) * DAILYLOG_PER_PAGE,
-    page * DAILYLOG_PER_PAGE
-  );
-
-  const handlePrev = () => setPage((prev) => Math.max(prev - 1, 1));
-  const handleNext = () => setPage((prev) => Math.min(prev + 1, totalPages));
-
   return (
     <div className="moderator-history-card-list">
-      {paginatedFlatItems.map((entry, idx) =>
+      {flatItems.map((entry, idx) =>
         entry.type === "header" ? (
           <div
             key={"header-" + entry.date}
             style={{
               fontWeight: "900",
               fontSize: "1.4em",
-              margin: "-.7em 0 8px 0",
+              margin: "1px 0 8px 0", // changed: marginTop is now 1px
             }}
           >
             {formatDateHeader(entry.date)}
@@ -167,23 +163,34 @@ const DailyLogHistory = ({
               className="moderator-history-appointment-info"
               style={{ flex: 1 }}
             >
-              <div className="moderator-history-appointment-name moderator-history-name">
+              <div
+                className="moderator-history-appointment-name moderator-history-name"
+                style={{ fontSize: "1.25em" }} // slightly bigger student name
+              >
                 {entry.studentName}
               </div>
-              <div className="moderator-history-appointment-details moderator-history-details">
+              <div
+                className="moderator-history-appointment-details moderator-history-details"
+                style={{ fontSize: "1.08em", color: "#424A57" }} // slightly bigger faculty
+              >
                 Faculty: {entry.name}
               </div>
-              <div className="moderator-history-appointment-time">
-                Date • Time: {formatDateHeader(entry.groupDate)} •{" "}
-                {entry.time.split(" ")[1] || entry.time.split(" - ")[1]}
+              <div
+                className="moderator-history-appointment-time"
+                style={{ fontSize: "1.08em", color: "#424A57" }} // slightly bigger time
+              >
+                Date: {formatDateTime(entry.time)}
               </div>
-              <div className="moderator-history-appointment-details moderator-history-details">
+              <div
+                className="moderator-history-appointment-details moderator-history-details"
+                style={{ fontSize: "1.08em", color: "#424A57" }} // slightly bigger reason
+              >
                 Reason: {entry.reason}
               </div>
             </div>
             <div style={{ display: "flex", gap: "10px", marginLeft: "18px" }}>
               <button
-                className="moderator-home-see-more-btn small-btn-text"
+                className="moderator-home-see-more-btn gray details small-btn-text"
                 onClick={() => onViewDetails(entry)}
               >
                 View Details
@@ -192,60 +199,6 @@ const DailyLogHistory = ({
           </div>
         )
       )}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          marginTop: "12px",
-          gap: "10px",
-        }}
-      >
-        <button
-          onClick={handlePrev}
-          disabled={page === 1}
-          style={{
-            padding: "6px 14px",
-            borderRadius: "8px",
-            border: "none",
-            background: "#f0f0f0",
-            color: "#7f8c8d",
-            cursor: page === 1 ? "not-allowed" : "pointer",
-            fontWeight: 500,
-          }}
-        >
-          Prev
-        </button>
-        <span
-          style={{
-            fontWeight: 500,
-            fontSize: "15px",
-            color: "#7f8c8d",
-            background: "#f0f0f0",
-            borderRadius: "8px",
-            padding: "6px 14px",
-            border: "none",
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
-          Page {page} of {totalPages}
-        </span>
-        <button
-          onClick={handleNext}
-          disabled={page === totalPages}
-          style={{
-            padding: "6px 14px",
-            borderRadius: "8px",
-            border: "none",
-            background: "#f0f0f0",
-            color: "#7f8c8d",
-            cursor: page === totalPages ? "not-allowed" : "pointer",
-            fontWeight: 500,
-          }}
-        >
-          Next
-        </button>
-      </div>
     </div>
   );
 };

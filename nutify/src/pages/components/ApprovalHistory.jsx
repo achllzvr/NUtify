@@ -24,10 +24,7 @@ const initialApprovalItems = [
   },
   { id: 5, name: "Anna Santos", type: "Student", details: "" },
   {
-    id: 6,
-    name: "Prof. Maria Lopez",
-    type: "Professor",
-    details: "Faculty - SACE",
+    id: 6, name: "Prof. Maria Lopez", type: "Professor", details: "Faculty - SACE",
   },
   { id: 7, name: "James Lim", type: "Student", details: "" },
   {
@@ -38,11 +35,8 @@ const initialApprovalItems = [
   },
 ];
 
-const APPROVALS_PER_PAGE = 10;
-
 const ApprovalHistory = ({ onVerify, searchTerm }) => {
   const [approvalItems, setApprovalItems] = useState(initialApprovalItems);
-  const [page, setPage] = useState(1);
 
   // Remove item
   const handleHold = (id) => {
@@ -63,15 +57,6 @@ const ApprovalHistory = ({ onVerify, searchTerm }) => {
       item.details.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const totalPages = Math.max(1, Math.ceil(filteredItems.length / APPROVALS_PER_PAGE));
-  const paginatedItems = filteredItems.slice(
-    (page - 1) * APPROVALS_PER_PAGE,
-    page * APPROVALS_PER_PAGE
-  );
-
-  const handlePrev = () => setPage((prev) => Math.max(prev - 1, 1));
-  const handleNext = () => setPage((prev) => Math.min(prev + 1, totalPages));
-
   if (filteredItems.length === 0) {
     return (
       <div style={{ textAlign: "center", color: "#888", marginTop: "40px" }}>
@@ -82,7 +67,7 @@ const ApprovalHistory = ({ onVerify, searchTerm }) => {
 
   return (
     <div>
-      {paginatedItems.map((item) => (
+      {filteredItems.map((item) => (
         <div
           key={item.id}
           className="moderator-history-item"
@@ -98,20 +83,23 @@ const ApprovalHistory = ({ onVerify, searchTerm }) => {
             className="moderator-history-appointment-info"
             style={{ flex: 1 }}
           >
-            <div className="moderator-history-appointment-name moderator-history-name">
+            <div
+              className="moderator-history-appointment-name moderator-history-name"
+              style={{ fontSize: "1.25em", color: "#424A57" }} // slightly bigger name
+            >
               {item.name}
             </div>
           </div>
           {/* Action buttons - moved to right */}
           <div style={{ display: "flex", gap: "12px", marginLeft: "18px" }}>
             <button
-              className="moderator-history-see-more-btn"
+              className="moderator-history-see-more-btn gray hold"
               onClick={() => handleHold(item.id)}
             >
               Hold
             </button>
             <button
-              className="moderator-history-see-more-btn"
+              className="moderator-history-see-more-btn verify"
               onClick={() => handleVerify(item)}
             >
               Verify
@@ -119,51 +107,6 @@ const ApprovalHistory = ({ onVerify, searchTerm }) => {
           </div>
         </div>
       ))}
-      <div style={{ display: "flex", justifyContent: "center", marginTop: "12px", gap: "10px" }}>
-        <button
-          onClick={handlePrev}
-          disabled={page === 1}
-          style={{
-            padding: "6px 14px",
-            borderRadius: "8px",
-            border: "none",
-            background: "#f0f0f0",
-            color: "#7f8c8d",
-            cursor: page === 1 ? "not-allowed" : "pointer",
-            fontWeight: 500
-          }}
-        >
-          Prev
-        </button>
-        <span style={{
-          fontWeight: 500,
-          fontSize: "15px",
-          color: "#7f8c8d",
-          background: "#f0f0f0",
-          borderRadius: "8px",
-          padding: "6px 14px",
-          border: "none",
-          display: "flex",
-          alignItems: "center"
-        }}>
-          Page {page} of {totalPages}
-        </span>
-        <button
-          onClick={handleNext}
-          disabled={page === totalPages}
-          style={{
-            padding: "6px 14px",
-            borderRadius: "8px",
-            border: "none",
-            background: "#f0f0f0",
-            color: "#7f8c8d",
-            cursor: page === totalPages ? "not-allowed" : "pointer",
-            fontWeight: 500
-          }}
-        >
-          Next
-        </button>
-      </div>
     </div>
   );
 };
