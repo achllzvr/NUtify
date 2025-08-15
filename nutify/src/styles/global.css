@@ -284,6 +284,13 @@ body {
   pointer-events: none;
 }
 
+/* Text input color */
+input[type="text"],
+textarea,
+.login-select {
+  color: #1c1d1e;
+}
+
 /* Responsive Design for Auth Pages */
 @media (max-width: 768px) {
   .login-card {
