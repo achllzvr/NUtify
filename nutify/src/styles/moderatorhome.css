@@ -793,3 +793,9 @@ select.login-input option {
   width: 0;
   background: transparent;
 }
+
+/* Neumorphic vertical icon bar for queue card */
+.moderator-home-queue-icon-bar {
+  box-shadow: inset 8px 8px 15px rgba(0,0,0,0.10), inset -8px -8px 15px rgba(255,255,255,0.08);
+  /* No border-right, no white border */
+}

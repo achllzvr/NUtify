@@ -27,6 +27,17 @@ import bobbyBuendia from '../assets/images/avatars/237d3876ef98d5364ed1326813f4e
 import checkIcon from '../assets/icons/check.svg';
 import CurrentQueue from '../components/CurrentQueue';
 import FacultyList from '../components/FacultyList';
+import messageCircleIcon from '../assets/icons/message-circle.svg';
+import calendarIcon from '../assets/icons/calendar.svg';
+import folderIcon from '../assets/icons/folder.svg';
+import archiveIcon from '../assets/icons/archive.svg';
+
+const REASON_OPTIONS = ['Consultation', 'Meeting', 'Project', 'Other'];
+function mapReason(reason) {
+  if (!reason) return 'Other';
+  const found = REASON_OPTIONS.find(opt => reason.trim().toLowerCase().startsWith(opt.toLowerCase()));
+  return found || 'Other';
+}
 
 const truncateReason = (reason, maxLength = 40) => {
   if (!reason) return '';
@@ -596,7 +607,7 @@ const ModeratorHome = () => {
                   <strong>Time:</strong> {detailsModalAppointment.time.split('•')[1]?.trim()}
                 </div>
                 <div style={{ fontSize: '16px', marginBottom: '10px' }}>
-                  <strong>Reason:</strong> {detailsModalAppointment.reason}
+                  <strong>Reason:</strong> {mapReason(detailsModalAppointment.reason)}
                 </div>
               </div>
               <div className="modal-footer" style={{ borderTop: 'none' }}></div>
