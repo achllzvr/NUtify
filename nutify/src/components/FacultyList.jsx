@@ -28,7 +28,7 @@ const facultyList = [
 ];
 
 // Pagination constants
-const FACULTY_PER_PAGE = 11;
+const FACULTY_PER_PAGE = 9;
 
 const FacultyList = ({ mainSearch, facultyStatusFilter, setFacultyStatusFilter }) => {
   const [page, setPage] = useState(1);

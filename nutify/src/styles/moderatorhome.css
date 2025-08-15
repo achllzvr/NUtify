@@ -1,9 +1,9 @@
 /* Content Container: Main content area layout */
 .moderator-home-main-content {
   margin-left: 80px;
-  margin-top: 80px;
+  margin-top: 100px;
   min-height: calc(100vh - 80px);
-  padding: 20px;
+  padding: 10px;
   transition: margin-left 0.3s ease;
   display: flex;
   justify-content: center;
@@ -12,17 +12,22 @@
 
 /* Content container: holds left and right columns */
 .moderator-home-content-container {
-  display: flex;
-  gap: 30px;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: auto 1fr;
+  grid-gap: 30px;
   max-width: 1200px;
   margin: 0;
   padding: 0;
   width: 100%;
+  grid-template-areas:
+    "left right"
+    "bottom bottom";
 }
 
 /* Left column: appointment/faculty sections */
 .moderator-home-left-column {
-  flex: 1;
+  grid-area: left;
   display: flex;
   flex-direction: column;
   gap: 30px;
@@ -30,7 +35,14 @@
 
 /* Right column: queue/list panel */
 .moderator-home-right-column {
-  flex: 0 0 350px;
+  grid-area: right;
+  flex: none;
+}
+
+/* Appointment section: bottom card spans both columns */
+.moderator-home-appointment-section {
+  grid-area: bottom;
+  margin-top: 0;
 }
 
 /* Appointment and faculty sections: card layout */
@@ -72,29 +84,18 @@
   gap: 15px;
 }
 
-/* Faculty list: scrollable panel */
+/* Faculty list: remove scrollable panel and fixed height */
 .moderator-home-faculty-list {
-  height: 810px !important;
+  /* height: 810px !important;
   overflow-y: scroll;
   padding-right: 8px;
-  margin-right: -8px;
+  margin-right: -8px; */
 }
 
-/* Custom scrollbar for faculty list */
-.moderator-home-faculty-list::-webkit-scrollbar {
-  width: 6px;
-}
-
-.moderator-home-faculty-list::-webkit-scrollbar-track {
-  background: rgba(240, 240, 240, 0.5);
-  border-radius: 3px;
-}
-
-.moderator-home-faculty-list::-webkit-scrollbar-thumb {
-  background: rgba(53, 64, 142, 0.4);
-  border-radius: 3px;
-}
-
+/* Remove custom scrollbar for faculty list */
+.moderator-home-faculty-list::-webkit-scrollbar,
+.moderator-home-faculty-list::-webkit-scrollbar-track,
+.moderator-home-faculty-list::-webkit-scrollbar-thumb,
 .moderator-home-faculty-list::-webkit-scrollbar-button {
   display: none;
   height: 0;
@@ -306,12 +307,12 @@
   background: #2a3273;
 }
 
-/* Queue list: scrollable area for appointments */
+/* Queue list: remove scrollable area for appointments */
 .moderator-home-queue-list {
-  height: 350px;
+  /* height: 350px;
   overflow-y: auto;
   padding-right: 8px;
-  margin-right: -15px;
+  margin-right: -15px; */
   display: flex;
   flex-direction: column;
   gap: 15px;
@@ -319,27 +320,10 @@
   align-items: center;
 }
 
-/* Center appointment cards in queue */
-.moderator-home-queue-list .moderator-home-appointment-item {
-  width: 100%;
-  margin: 0 auto;
-}
-
-/* Custom scrollbar for queue */
-.moderator-home-queue-list::-webkit-scrollbar {
-  width: 6px;
-}
-
-.moderator-home-queue-list::-webkit-scrollbar-track {
-  background: rgba(240, 240, 240, 0.5);
-  border-radius: 3px;
-}
-
-.moderator-home-queue-list::-webkit-scrollbar-thumb {
-  background: rgba(53, 64, 142, 0.4);
-  border-radius: 3px;
-}
-
+/* Remove custom scrollbar for queue */
+.moderator-home-queue-list::-webkit-scrollbar,
+.moderator-home-queue-list::-webkit-scrollbar-track,
+.moderator-home-queue-list::-webkit-scrollbar-thumb,
 .moderator-home-queue-list::-webkit-scrollbar-button {
   display: none;
   height: 0;
@@ -432,6 +416,7 @@
   outline: none;
   transition: all 0.3s ease;
   font-family: "Helvetica", sans-serif;
+  color: #aeaeae;
 }
 
 .login-input::placeholder {
@@ -489,7 +474,7 @@
   background: #f0f0f0;
   box-shadow: 8px 8px 15px rgba(0, 0, 0, 0.09),
     -8px -8px 15px rgba(255, 255, 255, 0.8);
-  color: #7F8C8D;
+  color: #1c1d1e;
   outline: none;
   transition: box-shadow 0.2s;
   min-width: 120px;
@@ -518,6 +503,12 @@
   color: #7F8C8D;
   outline: none;
   border: none;
+}
+
+/* Ensure dropdown options also use #1c1d1e color */
+.moderator-home-faculty-filter-dropdown option,
+select.login-input option {
+  color: #1c1d1e;
 }
 
 /* Responsive Design: inputs/buttons */
@@ -553,12 +544,16 @@
 /* Responsive Design: layout for screens */
 @media (max-width: 1024px) {
   .moderator-home-content-container {
+    display: flex;
     flex-direction: column;
     gap: 20px;
   }
 
-  .moderator-home-right-column {
-    flex: none;
+  .moderator-home-left-column,
+  .moderator-home-right-column,
+  .moderator-home-appointment-section {
+    width: 100%;
+    grid-area: unset;
   }
 }
 
@@ -617,4 +612,27 @@
     flex: 1;
     margin-right: 10px;
   }
+}
+
+.moderator-home-left-column > .moderator-home-appointment-section {
+  /* Increase height for the outer card */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Make queue list fill the parent card */
+.moderator-home-queue-list {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 35px;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+/* Ensure appointment items adapt to width */
+.moderator-home-appointment-item {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
