@@ -12,7 +12,7 @@
 
 /* Content container: centers left column */
 .moderator-history-content-container {
-  max-width: 1200px;
+  max-width: 1400px; /* increased for more screen usage */
   margin: 0 auto;
   padding: 0;
   width: 100%;
@@ -104,6 +104,7 @@
   height: 780px;
   display: flex;
   flex-direction: column;
+  width: 100%; /* ensure card fills container width */
 }
 
 /* Card list: scrollable container for history items */
@@ -486,7 +487,7 @@
     width: 100%;
     max-width: none;
   }
-  .moderator-history-content-container { padding: 0 10px; }
+  .moderator-history-content-container { padding: 0 10px; max-width: 100%; }
   .moderator-history-filter-tabs { display: none; }
   .moderator-history-see-more-btn {
     width: auto; /* Changed from 15% to auto */
@@ -511,7 +512,8 @@
   }
   .moderator-history-section {
     padding: 20px;
-    min-height: 1200px;
+    min-width: 0;
+    width: 100%; /* ensure card fills container width */
     display: flex;
     flex-direction: column;
   }

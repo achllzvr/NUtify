@@ -52,6 +52,7 @@ const ModeratorHome = () => {
   const [requestAlertVisible, setRequestAlertVisible] = useState(false);
   const [requestAlertTransition, setRequestAlertTransition] = useState(false);
   const [facultyStatusFilter, setFacultyStatusFilter] = useState('all');
+  const [showRequestModal, setShowRequestModal] = useState(false);
 
   const handleFacultyClick = (faculty) => {
     setSelectedFaculty(faculty);
@@ -312,208 +313,241 @@ const ModeratorHome = () => {
               setFacultyStatusFilter={setFacultyStatusFilter}
             />
           </div>
-
-          <div className="moderator-home-appointment-section">
-            <div className="moderator-home-section-header">
-              <h2>Create On-the-spot Request</h2>
-            </div>
-            <div style={{ fontWeight: 500, marginBottom: '6px' }}>Select Faculty</div>
-            <div className="input-group" style={{ marginBottom: '18px', position: 'relative' }}>
-              <img src={searchIcon} alt="Search" className="input-icon" style={{ left: 18, width: 22, height: 22 }} />
-              <input
-                type="text"
-                className="login-input"
-                placeholder="Search Faculty"
-                value={facultySearch}
-                onChange={e => {
-                  setFacultySearch(e.target.value);
-                  setFacultySelected('');
-                }}
-                style={{ paddingLeft: '55px', borderRadius: '15px' }}
-              />
-              {facultySearch && !facultySelected && (
-                <div style={{
-                  position: 'absolute',
-                  top: '110%',
-                  left: 0,
-                  right: 0,
-                  background: '#fff',
-                  borderRadius: '10px',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.09)',
-                  zIndex: 10,
-                  maxHeight: '180px',
-                  overflowY: 'auto'
-                }}>
-                  {filteredFaculty.length === 0 && (
-                    <div style={{ padding: '10px 18px', color: '#888' }}>No faculty found</div>
-                  )}
-                  {filteredFaculty.map(f => (
-                    <div
-                      key={f.id}
-                      style={{
-                        padding: '10px 18px',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '10px'
-                      }}
-                      onClick={() => {
-                        setFacultySelected(f.name);
-                        setFacultySearch(f.name);
-                      }}
-                    >
-                      <img src={f.avatar} alt={f.name} style={{ width: 28, height: 28, borderRadius: '50%' }} />
-                      <span>{f.name}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div style={{ fontWeight: 500, marginBottom: '6px' }}>Select Student</div>
-            <div className="input-group" style={{ marginBottom: '18px', position: 'relative' }}>
-              <img src={searchIcon} alt="Search" className="input-icon" style={{ left: 18, width: 22, height: 22 }} />
-              <input
-                type="text"
-                className="login-input"
-                placeholder="Search Student"
-                value={studentSearch}
-                onChange={e => {
-                  setStudentSearch(e.target.value);
-                  setStudentName('');
-                }}
-                style={{ paddingLeft: '55px', borderRadius: '15px' }}
-              />
-              {studentSearch && !studentName && (
-                <div style={{
-                  position: 'absolute',
-                  top: '110%',
-                  left: 0,
-                  right: 0,
-                  background: '#fff',
-                  borderRadius: '10px',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.09)',
-                  zIndex: 10,
-                  maxHeight: '180px',
-                  overflowY: 'auto'
-                }}>
-                  {filteredStudents.length === 0 && (
-                    <div style={{ padding: '10px 18px', color: '#888' }}>No student found</div>
-                  )}
-                  {filteredStudents.map(s => (
-                    <div
-                      key={s.name}
-                      style={{
-                        padding: '10px 18px',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '10px'
-                      }}
-                      onClick={() => {
-                        setStudentName(s.name);
-                        setStudentSearch(s.name);
-                      }}
-                    >
-                      <img src={s.avatar} alt={s.name} style={{ width: 28, height: 28, borderRadius: '50%' }} />
-                      <span>{s.name}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div style={{ fontWeight: 500, marginBottom: '6px' }}>Reason</div>
-            <div style={{ marginBottom: '18px' }}>
-              <select
-                className="moderator-home-faculty-filter-dropdown"
-                value={reasonType}
-                onChange={e => {
-                  setReasonType(e.target.value);
-                  if (e.target.value !== 'Other') setReason('');
-                }}
-                style={{
-                  borderRadius: '15px',
-                  padding: '8px 18px',
-                  fontSize: '15px',
-                  fontFamily: '"Helvetica", Arial, sans-serif',
-                  border: 'none',
-                  background: '#f0f0f0',
-                  boxShadow: '8px 8px 15px rgba(0, 0, 0, 0.09), -8px -8px 15px rgba(255, 255, 255, 0.8)',
-                  outline: 'none',
-                  minWidth: '120px',
-                  width: '100%',
-                  appearance: 'none',
-                  backgroundImage:
-                    "url(\"data:image/svg+xml;utf8,<svg fill='%237F8C8D' height='18' viewBox='0 0 24 24' width='18' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>\")",
-                  backgroundRepeat: 'no-repeat',
-                  backgroundPosition: 'right 14px center',
-                  backgroundSize: '18px 18px'
-                }}
-              >
-                {reasonOptions.map(opt => (
-                  <option key={opt} value={opt}>{opt}</option>
-                ))}
-              </select>
-              {reasonType === 'Other' && (
-                <input
-                  type="text"
-                  className="login-input"
-                  placeholder="Enter Reason"
-                  value={reason}
-                  onChange={e => setReason(e.target.value)}
-                  style={{
-                    borderRadius: '10px',
-                    marginTop: '10px',
-                    paddingLeft: '25px'
-                  }}
-                />
-              )}
-            </div>
-            <button
-              className="Schedule-Button"
-              style={{
-                background: 'linear-gradient(145deg, #3c489f, #323c86)',
-                boxShadow: (
-                  facultySelected &&
-                  studentName &&
-                  ((reasonType !== 'Other' && reasonType) || (reasonType === 'Other' && reason))
-                )
-                  ? 'inset 15px 15px 30px #35408e, inset -15px -15px 30px #3b469c'
-                  : '6px 6px 12px rgba(53, 64, 142, 0.2), -6px -6px 12px rgba(255, 255, 255, 0.8)',
-                color: 'white',
-                fontSize: '18px',
-                fontWeight: 600,
-                borderRadius: '30px',
-                padding: '10px 0',
-                width: '100%',
-                transition: 'all 0.3s ease-in-out',
-                fontFamily: '"Helvetica", sans-serif',
-                cursor: (
-                  facultySelected &&
-                  studentName &&
-                  ((reasonType !== 'Other' && reasonType) || (reasonType === 'Other' && reason))
-                ) ? 'pointer' : 'not-allowed',
-                opacity: (
-                  facultySelected &&
-                  studentName &&
-                  ((reasonType !== 'Other' && reasonType) || (reasonType === 'Other' && reason))
-                ) ? 1 : 0.7
-              }}
-              disabled={
-                !(
-                  facultySelected &&
-                  studentName &&
-                  ((reasonType !== 'Other' && reasonType) || (reasonType === 'Other' && reason))
-                )
-              }
-              onClick={handleSchedule}
-            >
-              Schedule
-            </button>
-          </div>
         </div>
       </div>
+
+      {/* Fixed Button */}
+      <button
+        className="fixed-create-request-btn"
+        style={{
+          position: 'fixed',
+          bottom: '32px',
+          right: '32px',
+          zIndex: 2000,
+          background: 'linear-gradient(145deg, #3c489f, #323c86)',
+          color: 'white',
+          fontWeight: 700,
+          fontSize: '17px',
+          borderRadius: '50px',
+          padding: '16px 32px',
+          boxShadow: '0 4px 24px rgba(44,62,80,0.13)',
+          border: 'none',
+          cursor: 'pointer',
+          fontFamily: '"Montserrat", sans-serif',
+          transition: 'all 0.2s',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px', // Ensure gap is present for inline style fallback
+        }}
+        onClick={() => setShowRequestModal(true)}
+      >
+        <span style={{ fontSize: '22px', fontWeight: 900, marginRight: '6px' }}>+</span>
+        <span>Create Request</span>
+      </button>
+
+      {/* Modal for Create On-the-spot Request */}
+      {showRequestModal && (
+        <>
+          <div className="modal fade show" style={{ display: 'block', zIndex: 3000 }}>
+            <div className="modal-dialog modal-dialog-centered">
+              <div className="modal-content" style={{ borderRadius: '20px', padding: '0' }}>
+                <div className="modal-header" style={{ borderBottom: 'none', position: 'relative' }}>
+                  <h5 className="modal-title" style={{ fontWeight: 700 }}>
+                    Create On-the-spot Request
+                  </h5>
+                  <span
+                    style={{
+                      position: 'absolute',
+                      right: '18px',
+                      top: '18px',
+                      fontSize: '22px',
+                      cursor: 'pointer',
+                      color: '#888'
+                    }}
+                    onClick={() => setShowRequestModal(false)}
+                    aria-label="Close"
+                    title="Close"
+                  >
+                    &#10005;
+                  </span>
+                </div>
+                <div className="modal-body" style={{ padding: '0 25px 25px 25px' }}>
+                  <div style={{ fontWeight: 500, marginBottom: '6px' }}>Select Faculty</div>
+                  <div className="input-group" style={{ marginBottom: '18px', position: 'relative' }}>
+                    <img src={searchIcon} alt="Search" className="input-icon" style={{ left: 18, width: 22, height: 22 }} />
+                    <input
+                      type="text"
+                      className="login-input"
+                      placeholder="Search Faculty"
+                      value={facultySearch}
+                      onChange={e => {
+                        setFacultySearch(e.target.value);
+                        setFacultySelected('');
+                      }}
+                      style={{ paddingLeft: '55px', borderRadius: '15px' }}
+                    />
+                    {facultySearch && !facultySelected && (
+                      <div style={{
+                        position: 'absolute',
+                        top: '110%',
+                        left: 0,
+                        right: 0,
+                        background: '#fff',
+                        borderRadius: '10px',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.09)',
+                        zIndex: 10,
+                        maxHeight: '180px',
+                        overflowY: 'auto'
+                      }}>
+                        {filteredFaculty.length === 0 && (
+                          <div style={{ padding: '10px 18px', color: '#888' }}>No faculty found</div>
+                        )}
+                        {filteredFaculty.map(f => (
+                          <div
+                            key={f.id}
+                            style={{
+                              padding: '10px 18px',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '10px'
+                            }}
+                            onClick={() => {
+                              setFacultySelected(f.name);
+                              setFacultySearch(f.name);
+                            }}
+                          >
+                            <img src={f.avatar} alt={f.name} style={{ width: 28, height: 28, borderRadius: '50%' }} />
+                            <span>{f.name}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div style={{ fontWeight: 500, marginBottom: '6px' }}>Select Student</div>
+                  <div className="input-group" style={{ marginBottom: '18px', position: 'relative' }}>
+                    <img src={searchIcon} alt="Search" className="input-icon" style={{ left: 18, width: 22, height: 22 }} />
+                    <input
+                      type="text"
+                      className="login-input"
+                      placeholder="Search Student"
+                      value={studentSearch}
+                      onChange={e => {
+                        setStudentSearch(e.target.value);
+                        setStudentName('');
+                      }}
+                      style={{ paddingLeft: '55px', borderRadius: '15px' }}
+                    />
+                    {studentSearch && !studentName && (
+                      <div style={{
+                        position: 'absolute',
+                        top: '110%',
+                        left: 0,
+                        right: 0,
+                        background: '#fff',
+                        borderRadius: '10px',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.09)',
+                        zIndex: 10,
+                        maxHeight: '180px',
+                        overflowY: 'auto'
+                      }}>
+                        {filteredStudents.length === 0 && (
+                          <div style={{ padding: '10px 18px', color: '#888' }}>No student found</div>
+                        )}
+                        {filteredStudents.map(s => (
+                          <div
+                            key={s.name}
+                            style={{
+                              padding: '10px 18px',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '10px'
+                            }}
+                            onClick={() => {
+                              setStudentName(s.name);
+                              setStudentSearch(s.name);
+                            }}
+                          >
+                            <img src={s.avatar} alt={s.name} style={{ width: 28, height: 28, borderRadius: '50%' }} />
+                            <span>{s.name}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div style={{ fontWeight: 500, marginBottom: '6px' }}>Reason</div>
+                  <div style={{ marginBottom: '18px' }}>
+                    <select
+                      className="moderator-home-faculty-filter-dropdown"
+                      value={reasonType}
+                      onChange={e => {
+                        setReasonType(e.target.value);
+                        if (e.target.value !== 'Other') setReason('');
+                      }}
+                      style={{
+                        borderRadius: '15px',
+                        padding: '8px 18px',
+                        fontSize: '15px',
+                        fontFamily: '"Helvetica", Arial, sans-serif',
+                        border: 'none',
+                        background: '#f0f0f0',
+                        boxShadow: '8px 8px 15px rgba(0, 0, 0, 0.09), -8px -8px 15px rgba(255, 255, 255, 0.8)',
+                        outline: 'none',
+                        minWidth: '120px',
+                        width: '100%',
+                        appearance: 'none',
+                        backgroundImage:
+                          "url(\"data:image/svg+xml;utf8,<svg fill='%237F8C8D' height='18' viewBox='0 0 24 24' width='18' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>\")",
+                        backgroundRepeat: 'no-repeat',
+                        backgroundPosition: 'right 14px center',
+                        backgroundSize: '18px 18px'
+                      }}
+                    >
+                      {reasonOptions.map(opt => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                    </select>
+                    {reasonType === 'Other' && (
+                      <input
+                        type="text"
+                        className="login-input"
+                        placeholder="Enter Reason"
+                        value={reason}
+                        onChange={e => setReason(e.target.value)}
+                        style={{
+                          borderRadius: '10px',
+                          marginTop: '10px',
+                          paddingLeft: '25px'
+                        }}
+                      />
+                    )}
+                  </div>
+                  <button
+                    className="Schedule-Button"
+                    disabled={
+                      !(
+                        facultySelected &&
+                        studentName &&
+                        ((reasonType !== 'Other' && reasonType) || (reasonType === 'Other' && reason))
+                      )
+                    }
+                    onClick={() => {
+                      handleSchedule();
+                      setShowRequestModal(false);
+                    }}
+                  >
+                    Schedule
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="modal-backdrop fade show" style={{ zIndex: 2999 }}></div>
+        </>
+      )}
 
       {detailsModalAppointment && (
         <div className="modal fade show" style={{ display: 'block' }}>

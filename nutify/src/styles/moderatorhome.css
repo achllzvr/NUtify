@@ -16,7 +16,7 @@
   grid-template-columns: 2fr 1fr;
   grid-template-rows: auto 1fr;
   grid-gap: 30px;
-  max-width: 1200px;
+  max-width: 1400px; /* increased for more screen usage */
   margin: 0;
   padding: 0;
   width: 100%;
@@ -54,6 +54,7 @@
   box-shadow: 20px 20px 40px rgba(0, 0, 0, 0.1),
     -20px -20px 40px rgba(255, 255, 255, 0.8);
   transition: all 0.3s ease;
+  width: 100%; /* ensure card fills container width */
 }
 
 .moderator-home-faculty-section {
@@ -569,7 +570,7 @@ select.login-input option {
 
   .moderator-home-appointment-section,
   .moderator-home-faculty-section {
-    width: 20em;
+    width: 100%; /* was 20em, now fill parent */
   }
 
   .moderator-home-content-container {
@@ -596,7 +597,7 @@ select.login-input option {
 
   .moderator-home-left-column {
     width: 100%;
-    max-width: 400px;
+    max-width: 700px; /* increased from 500px for larger card */
     align-items: center;
   }
 
@@ -635,4 +636,70 @@ select.login-input option {
   width: 100%;
   min-width: 0;
   box-sizing: border-box;
+}
+
+/* Fixed create request button */
+.fixed-create-request-btn {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  z-index: 2000;
+  background: linear-gradient(145deg, #3c489f, #323c86);
+  color: white;
+  font-weight: 700;
+  font-size: 18px;
+  border-radius: 50px;
+  padding: 10px 0;
+  box-shadow: 0 4px 24px rgba(44,62,80,0.13);
+  border: none;
+  cursor: pointer;
+  font-family: "Montserrat", sans-serif;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Add gap between + and text */
+}
+
+.fixed-create-request-btn:active {
+  box-shadow: inset 15px 15px 30px #35408e, inset -15px -15px 30px #3b469c;
+}
+
+@media (max-width: 768px) {
+  .fixed-create-request-btn {
+    right: 16px;
+    bottom: 16px;
+    padding: 12px 22px;
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .fixed-create-request-btn {
+    right: 8px;
+    bottom: 8px;
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+}
+
+/* Schedule button */
+.Schedule-Button {
+  background: #3c489f;
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 30px;
+  padding: 10px 0;
+  width: 100%;
+  box-shadow: 0 8px 24px 0 rgba(44, 62, 80, 0.18);
+  border: none;
+  text-align: center;
+  font-family: "Montserrat", Arial, Helvetica, sans-serif;
+  letter-spacing: 0.5px;
+  transition: box-shadow 0.2s, background 0.2s;
+  display: block;
+}
+
+.Schedule-Button:active {
+  box-shadow: inset 15px 15px 30px #35408e, inset -15px -15px 30px #3b469c;
 }
