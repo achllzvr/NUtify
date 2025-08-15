@@ -38,6 +38,10 @@ function mapReason(reason) {
   const found = REASON_OPTIONS.find(opt => reason.trim().toLowerCase().startsWith(opt.toLowerCase()));
   return found || 'Other';
 }
+const getReasonText = (reason) =>
+  mapReason(reason) === 'Other'
+    ? 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam euismod, nunc ut laoreet.'
+    : mapReason(reason);
 
 const truncateReason = (reason, maxLength = 40) => {
   if (!reason) return '';
@@ -607,7 +611,7 @@ const ModeratorHome = () => {
                   <strong>Time:</strong> {detailsModalAppointment.time.split('•')[1]?.trim()}
                 </div>
                 <div style={{ fontSize: '16px', marginBottom: '10px' }}>
-                  <strong>Reason:</strong> {mapReason(detailsModalAppointment.reason)}
+                  <strong>Reason:</strong> {getReasonText(detailsModalAppointment.reason)}
                 </div>
               </div>
               <div className="modal-footer" style={{ borderTop: 'none' }}></div>

@@ -57,6 +57,17 @@ const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, truncateR
   const handlePrev = () => setPage(prev => Math.max(prev - 1, 1));
   const handleNext = () => setPage(prev => Math.min(prev + 1, totalPages));
 
+  const formatDateWithYear = (dateStr) => {
+    // Accepts formats like "June 15 • 09:00 - 10:00"
+    if (!dateStr) return '';
+    const [datePart, timePart] = dateStr.split('•').map(s => s.trim());
+    // Try to parse the date part and add current year if missing
+    let d = new Date(datePart + ' ' + new Date().getFullYear());
+    if (isNaN(d.getTime())) return dateStr;
+    const formattedDate = d.toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    return `${formattedDate}${timePart ? ' • ' + timePart : ''}`;
+  };
+
   return (
     <div
       className="moderator-home-appointment-section"
@@ -86,6 +97,15 @@ const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, truncateR
         {paginatedQueue.map(appointment => {
           const reasonLabel = mapReason(appointment.reason);
           const { icon, bg } = reasonIconMap[reasonLabel];
+          // Show lorem ipsum if reason is Other
+          const fullReasonText =
+            reasonLabel === 'Other'
+              ? 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam euismod, nunc ut laoreet.'
+              : reasonLabel;
+          // Limit to 6 words for card
+          const words = fullReasonText.split(' ');
+          const shortReasonText =
+            words.length > 6 ? words.slice(0, 6).join(' ') + '...' : fullReasonText;
           return (
             <div
               key={appointment.id}
@@ -111,7 +131,7 @@ const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, truncateR
                   justifyContent: 'center',
                   boxShadow: 'inset 8px 8px 15px rgba(0,0,0,0.10), inset -8px -8px 15px rgba(255,255,255,0.08)',
                   backgroundClip: 'padding-box',
-                  marginRight: '-5px' // overlap any white line/gap
+                  marginRight: '-5px'
                 }}
               >
                 <img src={icon} alt={reasonLabel} style={{ width: 20, height: 20, filter: 'brightness(0) invert(1)' }} />
@@ -127,7 +147,6 @@ const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, truncateR
                     justifyContent: 'space-between',
                     borderTopLeftRadius: 0,
                     borderBottomLeftRadius: 0,
-                    // No margin or border on left
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
@@ -140,10 +159,10 @@ const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, truncateR
                         Student: {appointment.studentName}
                       </div>
                       <div className="moderator-home-appointment-time">
-                        {appointment.time}
+                        Date: {formatDateWithYear(appointment.time)}
                       </div>
                       <div className="moderator-home-appointment-details" style={{ marginTop: '2px', marginBottom: '8px' }}>
-                        Reason: {reasonLabel}
+                        Reason: {shortReasonText}
                       </div>
                     </div>
                   </div>
@@ -159,7 +178,7 @@ const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, truncateR
                     <button
                       className="moderator-home-see-more-btn gray details small-btn-text"
                       style={{ width: '130px', fontSize: '12px', padding: '8px 15px' }}
-                      onClick={() => onViewDetails({ ...appointment, reason: reasonLabel })}
+                      onClick={() => onViewDetails({ ...appointment, reason: fullReasonText })}
                     >
                       View Details
                     </button>

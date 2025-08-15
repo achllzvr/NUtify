@@ -89,16 +89,6 @@
   gap: 15px;
 }
 
-/* Remove custom scrollbar for faculty list */
-.moderator-home-faculty-list::-webkit-scrollbar,
-.moderator-home-faculty-list::-webkit-scrollbar-track,
-.moderator-home-faculty-list::-webkit-scrollbar-thumb,
-.moderator-home-faculty-list::-webkit-scrollbar-button {
-  display: none;
-  height: 0;
-  width: 0;
-}
-
 /* Appointment/faculty items: card style */
 .moderator-home-appointment-item,
 .moderator-home-faculty-item {
@@ -347,16 +337,6 @@
   flex: 1 1 auto;
   min-height: 0; /* allow flex scroll */
   overflow-y: auto;
-}
-
-/* Remove custom scrollbar for queue */
-.moderator-home-queue-list::-webkit-scrollbar,
-.moderator-home-queue-list::-webkit-scrollbar-track,
-.moderator-home-queue-list::-webkit-scrollbar-thumb,
-.moderator-home-queue-list::-webkit-scrollbar-button {
-  display: none;
-  height: 0;
-  width: 0;
 }
 
 /* See more button: shows more items */
@@ -784,14 +764,26 @@ select.login-input option {
 /* Custom scrollbar styles for queue and faculty lists */
 .moderator-home-queue-list,
 .moderator-home-faculty-list {
-  scrollbar-width: none;
+  scrollbar-width: thin;
+  scrollbar-color: #5a6c7d #e8e8f0; /* bluish gray thumb, lighter track */
 }
 
 .moderator-home-queue-list::-webkit-scrollbar,
 .moderator-home-faculty-list::-webkit-scrollbar {
-  display: none;
-  width: 0;
-  background: transparent;
+  width: 8px;
+  background: #e8e8f0; /* lighter track */
+}
+
+.moderator-home-queue-list::-webkit-scrollbar-thumb,
+.moderator-home-faculty-list::-webkit-scrollbar-thumb {
+  background: #5a6c7d; /* bluish gray thumb */
+  border-radius: 4px;
+}
+
+.moderator-home-queue-list::-webkit-scrollbar-track,
+.moderator-home-faculty-list::-webkit-scrollbar-track {
+  background: #e8e8f0; /* lighter track */
+  border-radius: 4px;
 }
 
 /* Neumorphic vertical icon bar for queue card */

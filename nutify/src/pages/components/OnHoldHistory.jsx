@@ -73,6 +73,7 @@ const OnHoldHistory = ({ onVerify, searchTerm }) => {
   return (
     <>
       <div
+        className="moderator-history-card-list"
         style={{
           flex: '1 1 auto',
           minHeight: 0,
@@ -81,51 +82,43 @@ const OnHoldHistory = ({ onVerify, searchTerm }) => {
           justifyContent: 'flex-start',
           overflowY: 'auto',
           paddingRight: '8px',
-          marginRight: '-8px',
-          scrollbarWidth: 'none'
+          marginRight: '-8px'
         }}
       >
-        <div
-          style={{
-            paddingRight: '8px',
-            marginRight: '-8px'
-          }}
-        >
-          {paginatedItems.map((item) => (
+        {paginatedItems.map((item) => (
+          <div
+            key={item.id}
+            className="moderator-history-item"
+            style={{
+              minHeight: 100,
+              marginBottom: 24,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
             <div
-              key={item.id}
-              className="moderator-history-item"
-              style={{
-                minHeight: 100,
-                marginBottom: 24,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
+              className="moderator-history-appointment-info"
+              style={{ flex: 1 }}
             >
               <div
-                className="moderator-history-appointment-info"
-                style={{ flex: 1 }}
+                className="moderator-history-appointment-name moderator-history-name"
+                style={{ fontSize: "1.25em", color: "#424A57" }}
               >
-                <div
-                  className="moderator-history-appointment-name moderator-history-name"
-                  style={{ fontSize: "1.25em", color: "#424A57" }}
-                >
-                  {item.name}
-                </div>
-              </div>
-              {/* Action button - moved to right */}
-              <div style={{ display: "flex", gap: "12px", marginLeft: "18px" }}>
-                <button
-                  className="moderator-history-see-more-btn verify"
-                  onClick={() => handleVerify(item)}
-                >
-                  Verify
-                </button>
+                {item.name}
               </div>
             </div>
-          ))}
-        </div>
+            {/* Action button - moved to right */}
+            <div style={{ display: "flex", gap: "12px", marginLeft: "18px" }}>
+              <button
+                className="moderator-history-see-more-btn verify"
+                onClick={() => handleVerify(item)}
+              >
+                Verify
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
       <div style={{ display: 'flex', justifyContent: 'center', marginTop: '12px', gap: '10px' }}>
         <button
