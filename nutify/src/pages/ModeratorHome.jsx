@@ -164,6 +164,18 @@ const ModeratorHome = () => {
     }
   }, [detailsModalAppointment]);
 
+  useEffect(() => {
+    if (showRequestModal) {
+      const handleEsc = (event) => {
+        if (event.key === "Escape") {
+          setShowRequestModal(false);
+        }
+      };
+      window.addEventListener("keydown", handleEsc);
+      return () => window.removeEventListener("keydown", handleEsc);
+    }
+  }, [showRequestModal]);
+
   const reasonOptions = [
     'Consultation',
     'Meeting',

@@ -1,7 +1,7 @@
 /* Content Container: Main content area layout */
 .moderator-home-main-content {
   margin-left: 80px;
-  margin-top: 100px;
+  margin-top: 98px;
   min-height: calc(100vh - 80px);
   padding: 10px;
   transition: margin-left 0.3s ease;
@@ -316,7 +316,7 @@
   margin-right: -15px; */
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 1px;
   justify-content: flex-start;
   align-items: center;
 }
@@ -626,7 +626,7 @@ select.login-input option {
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  gap: 35px;
+  gap: 20px;
   justify-content: flex-start;
   align-items: center;
 }
