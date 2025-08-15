@@ -163,67 +163,73 @@ const DailyLogHistory = ({
           marginRight: '-8px'
         }}
       >
-        {paginatedItems.map((entry, idx) =>
-          entry.type === "header" ? (
-            <div
-              key={"header-" + entry.date}
-              style={{
-                fontWeight: "900",
-                fontSize: "1.4em",
-                margin: "1px 0 8px 0", // changed: marginTop is now 1px
-              }}
-            >
-              {formatDateHeader(entry.date)}
-            </div>
-          ) : (
-            <div
-              key={entry.id}
-              className="moderator-history-item"
-              data-status={entry.status}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
+        {paginatedItems.length === 0 ? (
+          <div style={{ textAlign: 'center', color: '#888', marginTop: '40px', fontSize: '1.2em', fontWeight: 500 }}>
+            No logs yet.
+          </div>
+        ) : (
+          paginatedItems.map((entry, idx) =>
+            entry.type === "header" ? (
               <div
-                className="moderator-history-appointment-info"
-                style={{ flex: 1 }}
+                key={"header-" + entry.date}
+                style={{
+                  fontWeight: "900",
+                  fontSize: "1.4em",
+                  margin: "1px 0 8px 0", // changed: marginTop is now 1px
+                }}
+              >
+                {formatDateHeader(entry.date)}
+              </div>
+            ) : (
+              <div
+                key={entry.id}
+                className="moderator-history-item"
+                data-status={entry.status}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
               >
                 <div
-                  className="moderator-history-appointment-name moderator-history-name"
-                  style={{ fontSize: "1.25em" }} // slightly bigger student name
+                  className="moderator-history-appointment-info"
+                  style={{ flex: 1 }}
                 >
-                  {entry.studentName}
+                  <div
+                    className="moderator-history-appointment-name moderator-history-name"
+                    style={{ fontSize: "1.25em" }} // slightly bigger student name
+                  >
+                    {entry.studentName}
+                  </div>
+                  <div
+                    className="moderator-history-appointment-details moderator-history-details"
+                    style={{ fontSize: "1.08em", color: "#424A57" }} // slightly bigger faculty
+                  >
+                    Faculty: {entry.name}
+                  </div>
+                  <div
+                    className="moderator-history-appointment-time"
+                    style={{ fontSize: "1.08em", color: "#424A57" }} // slightly bigger time
+                  >
+                    Date: {formatDateTime(entry.time)}
+                  </div>
+                  <div
+                    className="moderator-history-appointment-details moderator-history-details"
+                    style={{ fontSize: "1.08em", color: "#424A57" }} // slightly bigger reason
+                  >
+                    Reason: {entry.reason}
+                  </div>
                 </div>
-                <div
-                  className="moderator-history-appointment-details moderator-history-details"
-                  style={{ fontSize: "1.08em", color: "#424A57" }} // slightly bigger faculty
-                >
-                  Faculty: {entry.name}
-                </div>
-                <div
-                  className="moderator-history-appointment-time"
-                  style={{ fontSize: "1.08em", color: "#424A57" }} // slightly bigger time
-                >
-                  Date: {formatDateTime(entry.time)}
-                </div>
-                <div
-                  className="moderator-history-appointment-details moderator-history-details"
-                  style={{ fontSize: "1.08em", color: "#424A57" }} // slightly bigger reason
-                >
-                  Reason: {entry.reason}
+                <div style={{ display: "flex", gap: "10px", marginLeft: "18px" }}>
+                  <button
+                    className="moderator-home-see-more-btn gray details small-btn-text"
+                    onClick={() => onViewDetails(entry)}
+                  >
+                    View Details
+                  </button>
                 </div>
               </div>
-              <div style={{ display: "flex", gap: "10px", marginLeft: "18px" }}>
-                <button
-                  className="moderator-home-see-more-btn gray details small-btn-text"
-                  onClick={() => onViewDetails(entry)}
-                >
-                  View Details
-                </button>
-              </div>
-            </div>
+            )
           )
         )}
       </div>

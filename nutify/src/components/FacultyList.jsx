@@ -82,21 +82,27 @@ const FacultyList = ({ mainSearch, facultyStatusFilter, setFacultyStatusFilter }
           marginRight: '-8px'
         }}
       >
-        {paginatedFaculty.map(faculty => (
-          <div
-            key={faculty.id}
-            className="moderator-home-faculty-item"
-          >
-            <div className="moderator-home-faculty-avatar">
-              <img src={faculty.avatar} alt={faculty.name} className="moderator-home-avatar-img" />
-            </div>
-            <div className="moderator-home-faculty-info">
-              <div className="moderator-home-faculty-name">{faculty.name}</div>
-              <div className="moderator-home-faculty-department">{faculty.department}</div>
-            </div>
-            <div className={`moderator-home-faculty-status ${faculty.status}`}></div>
+        {paginatedFaculty.length === 0 ? (
+          <div style={{ textAlign: 'center', color: '#888', marginTop: '40px', fontSize: '1.2em', fontWeight: 500 }}>
+            No faculty users found.
           </div>
-        ))}
+        ) : (
+          paginatedFaculty.map(faculty => (
+            <div
+              key={faculty.id}
+              className="moderator-home-faculty-item"
+            >
+              <div className="moderator-home-faculty-avatar">
+                <img src={faculty.avatar} alt={faculty.name} className="moderator-home-avatar-img" />
+              </div>
+              <div className="moderator-home-faculty-info">
+                <div className="moderator-home-faculty-name">{faculty.name}</div>
+                <div className="moderator-home-faculty-department">{faculty.department}</div>
+              </div>
+              <div className={`moderator-home-faculty-status ${faculty.status}`}></div>
+            </div>
+          ))
+        )}
       </div>
       <div style={{ display: 'flex', justifyContent: 'center', marginTop: '12px', gap: '10px' }}>
         <button

@@ -64,8 +64,8 @@ const OnHoldHistory = ({ onVerify, searchTerm }) => {
 
   if (filteredItems.length === 0) {
     return (
-      <div style={{ textAlign: "center", color: "#888", marginTop: "40px" }}>
-        No on hold items.
+      <div style={{ textAlign: "center", color: "#888", marginTop: "40px", fontSize: '1.2em', fontWeight: 500 }}>
+        Nothing on hold.
       </div>
     );
   }

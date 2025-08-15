@@ -94,107 +94,113 @@ const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, truncateR
           marginRight: '-8px'
         }}
       >
-        {paginatedQueue.map(appointment => {
-          const reasonLabel = mapReason(appointment.reason);
-          const { icon, bg } = reasonIconMap[reasonLabel];
-          // Show lorem ipsum if reason is Other
-          const fullReasonText =
-            reasonLabel === 'Other'
-              ? 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam euismod, nunc ut laoreet.'
-              : reasonLabel;
-          // Limit to 6 words for card
-          const words = fullReasonText.split(' ');
-          const shortReasonText =
-            words.length > 6 ? words.slice(0, 6).join(' ') + '...' : fullReasonText;
-          return (
-            <div
-              key={appointment.id}
-              style={{
-                display: 'flex',
-                alignItems: 'stretch',
-                width: '100%',
-                minWidth: 0,
-                boxSizing: 'border-box'
-              }}
-            >
-              {/* container2: vertical icon bar */}
+        {paginatedQueue.length === 0 ? (
+          <div style={{ textAlign: 'center', color: '#888', marginTop: '40px', fontSize: '1.2em', fontWeight: 500 }}>
+            No queue for today.
+          </div>
+        ) : (
+          paginatedQueue.map(appointment => {
+            const reasonLabel = mapReason(appointment.reason);
+            const { icon, bg } = reasonIconMap[reasonLabel];
+            // Show lorem ipsum if reason is Other
+            const fullReasonText =
+              reasonLabel === 'Other'
+                ? 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam euismod, nunc ut laoreet.'
+                : reasonLabel;
+            // Limit to 6 words for card
+            const words = fullReasonText.split(' ');
+            const shortReasonText =
+              words.length > 6 ? words.slice(0, 6).join(' ') + '...' : fullReasonText;
+            return (
               <div
+                key={appointment.id}
                 style={{
-                  width: '60px',
-                  minWidth: '60px',
-                  height: '100%',
-                  background: bg,
-                  borderTopLeftRadius: '15px',
-                  borderBottomLeftRadius: '15px',
                   display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: 'inset 8px 8px 15px rgba(0,0,0,0.10), inset -8px -8px 15px rgba(255,255,255,0.08)',
-                  backgroundClip: 'padding-box',
-                  marginRight: '-5px'
+                  alignItems: 'stretch',
+                  width: '100%',
+                  minWidth: 0,
+                  boxSizing: 'border-box'
                 }}
               >
-                <img src={icon} alt={reasonLabel} style={{ width: 20, height: 20, filter: 'brightness(0) invert(1)' }} />
-              </div>
-              {/* container3: card content */}
-              <div style={{ flex: 1 }}>
+                {/* container2: vertical icon bar */}
                 <div
-                  className="moderator-home-appointment-item"
                   style={{
-                    padding: '18px 22px',
+                    width: '60px',
+                    minWidth: '60px',
+                    height: '100%',
+                    background: bg,
+                    borderTopLeftRadius: '15px',
+                    borderBottomLeftRadius: '15px',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'space-between',
-                    borderTopLeftRadius: 0,
-                    borderBottomLeftRadius: 0,
+                    justifyContent: 'center',
+                    boxShadow: 'inset 8px 8px 15px rgba(0,0,0,0.10), inset -8px -8px 15px rgba(255,255,255,0.08)',
+                    backgroundClip: 'padding-box',
+                    marginRight: '-5px'
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
-                    <div className="moderator-home-appointment-avatar">
-                      <img src={appointment.avatar} alt={appointment.name} className="moderator-home-avatar-img" />
-                    </div>
-                    <div className="moderator-home-appointment-info" style={{ flex: 1 }}>
-                      <div className="moderator-home-appointment-name">{appointment.name}</div>
-                      <div className="moderator-home-appointment-details">
-                        Student: {appointment.studentName}
-                      </div>
-                      <div className="moderator-home-appointment-time">
-                        Date: {formatDateWithYear(appointment.time)}
-                      </div>
-                      <div className="moderator-home-appointment-details" style={{ marginTop: '2px', marginBottom: '8px' }}>
-                        Reason: {shortReasonText}
-                      </div>
-                    </div>
-                  </div>
+                  <img src={icon} alt={reasonLabel} style={{ width: 20, height: 20, filter: 'brightness(0) invert(1)' }} />
+                </div>
+                {/* container3: card content */}
+                <div style={{ flex: 1 }}>
                   <div
+                    className="moderator-home-appointment-item"
                     style={{
+                      padding: '18px 22px',
                       display: 'flex',
-                      flexDirection: 'column',
-                      gap: '10px',
-                      alignItems: 'flex-end',
-                      minWidth: '140px'
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      borderTopLeftRadius: 0,
+                      borderBottomLeftRadius: 0,
                     }}
                   >
-                    <button
-                      className="moderator-home-see-more-btn gray details small-btn-text"
-                      style={{ width: '130px', fontSize: '12px', padding: '8px 15px' }}
-                      onClick={() => onViewDetails({ ...appointment, reason: fullReasonText })}
+                    <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+                      <div className="moderator-home-appointment-avatar">
+                        <img src={appointment.avatar} alt={appointment.name} className="moderator-home-avatar-img" />
+                      </div>
+                      <div className="moderator-home-appointment-info" style={{ flex: 1 }}>
+                        <div className="moderator-home-appointment-name">{appointment.name}</div>
+                        <div className="moderator-home-appointment-details">
+                          Student: {appointment.studentName}
+                        </div>
+                        <div className="moderator-home-appointment-time">
+                          Date: {formatDateWithYear(appointment.time)}
+                        </div>
+                        <div className="moderator-home-appointment-details" style={{ marginTop: '2px', marginBottom: '8px' }}>
+                          Reason: {shortReasonText}
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '10px',
+                        alignItems: 'flex-end',
+                        minWidth: '140px'
+                      }}
                     >
-                      View Details
-                    </button>
-                    <button
-                      className="moderator-home-notify-btn verify small-btn-text"
-                      style={{ width: '130px', fontSize: '12px', padding: '8px 15px' }}
-                      onClick={() => onNotifyAppointees(appointment)}
-                    >
-                      <span style={{ display: 'block', lineHeight: '1.2' }}>Notify<br />Appointees</span>
-                    </button>
+                      <button
+                        className="moderator-home-see-more-btn gray details small-btn-text"
+                        style={{ width: '130px', fontSize: '12px', padding: '8px 15px' }}
+                        onClick={() => onViewDetails({ ...appointment, reason: fullReasonText })}
+                      >
+                        View Details
+                      </button>
+                      <button
+                        className="moderator-home-notify-btn verify small-btn-text"
+                        style={{ width: '130px', fontSize: '12px', padding: '8px 15px' }}
+                        onClick={() => onNotifyAppointees(appointment)}
+                      >
+                        <span style={{ display: 'block', lineHeight: '1.2' }}>Notify<br />Appointees</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })
+        )}
       </div>
       <div style={{ display: 'flex', justifyContent: 'center', marginTop: '12px', gap: '10px' }}>
         <button

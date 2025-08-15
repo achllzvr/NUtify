@@ -97,62 +97,68 @@ const RequestHistory = ({ onViewDetails, searchTerm }) => {
           marginRight: '-8px'
         }}
       >
-        {paginatedRequests.map((item) => (
-          <div
-            key={item.id}
-            className="moderator-history-item"
-            data-status="pending"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <div className="moderator-history-appointment-info" style={{ flex: 1 }}>
-              <div
-                className="moderator-history-appointment-name moderator-history-name"
-                style={{ fontSize: "1.25em" }} // slightly bigger name
-              >
-                {item.name}
-              </div>
-              <div
-                className="moderator-history-appointment-details moderator-history-details"
-                style={{ fontSize: "1.08em", color: "#424A57" }} // slightly bigger student
-              >
-                Student: {item.studentName}
-              </div>
-              <div
-                className="moderator-history-appointment-details moderator-history-details"
-                style={{ fontSize: "1.08em", color: "#424A57" }} // slightly bigger status
-              >
-                Status: Pending
-              </div>
-              <div
-                className="moderator-history-appointment-time"
-                style={{ fontSize: "1.08em", color: "#424A57" }} // slightly bigger time
-              >
-                Timestamp: {formatDateMMDDYYYY(item.time)} •{" "}
-                {item.time.split(" ")[1] ||
-                  item.time.split(" - ")[1] ||
-                  "00:00 am"}
-              </div>
-              <div
-                className="moderator-history-appointment-details moderator-history-details"
-                style={{ fontSize: "1.08em", color: "#424A57" }} // slightly bigger reason
-              >
-                Reason: {item.reason}
-              </div>
-            </div>
-            <div style={{ display: "flex", gap: "10px", marginLeft: "18px" }}>
-              <button
-                className="moderator-history-see-more-btn gray details"
-                onClick={() => onViewDetails(item)}
-              >
-                View Details
-              </button>
-            </div>
+        {paginatedRequests.length === 0 ? (
+          <div style={{ textAlign: 'center', color: '#888', marginTop: '40px', fontSize: '1.2em', fontWeight: 500 }}>
+            No requests for today.
           </div>
-        ))}
+        ) : (
+          paginatedRequests.map((item) => (
+            <div
+              key={item.id}
+              className="moderator-history-item"
+              data-status="pending"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <div className="moderator-history-appointment-info" style={{ flex: 1 }}>
+                <div
+                  className="moderator-history-appointment-name moderator-history-name"
+                  style={{ fontSize: "1.25em" }} // slightly bigger name
+                >
+                  {item.name}
+                </div>
+                <div
+                  className="moderator-history-appointment-details moderator-history-details"
+                  style={{ fontSize: "1.08em", color: "#424A57" }} // slightly bigger student
+                >
+                  Student: {item.studentName}
+                </div>
+                <div
+                  className="moderator-history-appointment-details moderator-history-details"
+                  style={{ fontSize: "1.08em", color: "#424A57" }} // slightly bigger status
+                >
+                  Status: Pending
+                </div>
+                <div
+                  className="moderator-history-appointment-time"
+                  style={{ fontSize: "1.08em", color: "#424A57" }} // slightly bigger time
+                >
+                  Timestamp: {formatDateMMDDYYYY(item.time)} •{" "}
+                  {item.time.split(" ")[1] ||
+                    item.time.split(" - ")[1] ||
+                    "00:00 am"}
+                </div>
+                <div
+                  className="moderator-history-appointment-details moderator-history-details"
+                  style={{ fontSize: "1.08em", color: "#424A57" }} // slightly bigger reason
+                >
+                  Reason: {item.reason}
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: "10px", marginLeft: "18px" }}>
+                <button
+                  className="moderator-history-see-more-btn gray details"
+                  onClick={() => onViewDetails(item)}
+                >
+                  View Details
+                </button>
+              </div>
+            </div>
+          ))
+        )}
       </div>
       <div style={{ display: 'flex', justifyContent: 'center', marginTop: '12px', gap: '10px' }}>
         <button

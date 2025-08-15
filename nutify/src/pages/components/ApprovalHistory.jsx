@@ -68,7 +68,7 @@ const ApprovalHistory = ({ onVerify, searchTerm }) => {
 
   if (filteredItems.length === 0) {
     return (
-      <div style={{ textAlign: "center", color: "#888", marginTop: "40px" }}>
+      <div style={{ textAlign: "center", color: "#888", marginTop: "40px", fontSize: '1.2em', fontWeight: 500 }}>
         No approvals pending.
       </div>
     );
