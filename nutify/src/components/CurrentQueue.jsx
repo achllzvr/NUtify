@@ -11,6 +11,10 @@ import messageCircleIcon from '../assets/icons/message-circle.svg';
 import calendarIcon from '../assets/icons/calendar.svg';
 import folderIcon from '../assets/icons/folder.svg';
 import archiveIcon from '../assets/icons/archive.svg';
+import jaysonGuia from '../assets/images/avatars/d447a9fd5010652f6c0911fbe9c662c6.jpg';
+import bobbyBuendia from '../assets/images/avatars/237d3876ef98d5364ed1326813f4ed5b.jpg';
+import pennyLumbera from '../assets/images/avatars/237d3876ef98d5364ed1326813f4ed5b.jpg';
+import larryFronda from '../assets/images/avatars/237d3876ef98d5364ed1326813f4ed5b.jpg';
 
 const REASON_OPTIONS = ['Consultation', 'Meeting', 'Project', 'Other'];
 const reasonIconMap = {
@@ -25,16 +29,115 @@ function mapReason(reason) {
   return found || 'Other';
 }
 
+const facultyList = [
+  { id: 1, name: 'Jayson Guia', department: 'Faculty - SACE', avatar: jaysonGuia },
+  { id: 2, name: 'Jei Pastrana', department: 'Faculty - SACE', avatar: jeiPastranaAvatar },
+  { id: 3, name: 'Irene Balmes', department: 'Faculty - SACE', avatar: ireneBalmes },
+  { id: 4, name: 'Carlo Torres', department: 'Faculty - SACE', avatar: carloTorres },
+  { id: 5, name: 'Archie Menisis', department: 'Faculty - SACE', avatar: archieMenisis },
+  { id: 6, name: 'Michael Joseph Aramil', department: 'Faculty - SACE', avatar: michaelAramil },
+  { id: 7, name: 'Erwin De Castro', department: 'Faculty - SACE', avatar: erwinDeCastro },
+  { id: 8, name: 'Joel Enriquez', department: 'Faculty - SACE', avatar: joelEnriquez },
+  { id: 9, name: 'Bernie Fabito', department: 'Faculty - SACE', avatar: bernieFabito },
+  { id: 10, name: 'Bobby Buendia', department: 'Faculty - SAHS', avatar: bobbyBuendia },
+  { id: 11, name: 'Penny Lumbera', department: 'Faculty - SAHS', avatar: pennyLumbera },
+  { id: 12, name: 'Larry Fronda', department: 'Faculty - SAHS', avatar: larryFronda }
+];
+
+const studentNames = [
+  "Kier Kriztopher",
+  "Achilles Vonn",
+  "Sophia Marie",
+  "Beatriz Gail",
+  "Prinz Noel",
+  "Mark Matthew",
+  "Nicole Aermione",
+  "Mike Roan",
+  "Romeo Paolo"
+];
+
 const upcomingAppointments = [
-  { id: 1, name: 'Jei Pastrana', studentName: 'Beatriz Solis', department: 'Faculty - SACE', time: 'June 15 • 09:00 - 10:00', avatar: jeiPastranaAvatar, reason: mapReason('Consultation') },
-  { id: 2, name: 'Irene Balmes', studentName: 'John Clarenz Dimazana', department: 'Faculty - SACE', time: 'June 14 • 09:00 - 10:00', avatar: ireneBalmes, reason: mapReason('Meeting') },
-  { id: 3, name: 'Jei Pastrana', studentName: 'Kriztopher Kier Estioco', department: 'Faculty - SACE', time: 'June 15 • 09:00 - 10:00', avatar: jeiPastranaAvatar, reason: mapReason('Project') },
-  { id: 4, name: 'Carlo Torres', studentName: 'Niel Cerezo', department: 'Faculty - SACE', time: 'June 16 • 10:00 - 11:00', avatar: carloTorres, reason: mapReason('Other') },
-  { id: 5, name: 'Archie Menisis', studentName: 'Ella Ramos', department: 'Faculty - SACE', time: 'June 17 • 11:00 - 12:00', avatar: archieMenisis, reason: mapReason('Consultation') },
-  { id: 6, name: 'Michael Joseph Aramil', studentName: 'Francis Lee', department: 'Faculty - SACE', time: 'June 18 • 12:00 - 01:00', avatar: michaelAramil, reason: mapReason('Other') },
-  { id: 7, name: 'Erwin De Castro', studentName: 'Grace Uy', department: 'Faculty - SACE', time: 'June 19 • 01:00 - 02:00', avatar: erwinDeCastro, reason: mapReason('Meeting') },
-  { id: 8, name: 'Joel Enriquez', studentName: 'Henry Sy', department: 'Faculty - SACE', time: 'June 20 • 02:00 - 03:00', avatar: joelEnriquez, reason: mapReason('Consultation') },
-  { id: 9, name: 'Bernie Fabito', studentName: 'Ivy Dela Cruz', department: 'Faculty - SACE', time: 'June 21 • 03:00 - 04:00', avatar: bernieFabito, reason: mapReason('Other') }
+  {
+    id: 1,
+    name: facultyList[0].name,
+    studentName: studentNames[0],
+    department: facultyList[0].department,
+    time: 'July 29, 2025 • 09:00 - 10:00',
+    avatar: facultyList[0].avatar,
+    reason: mapReason('Consultation')
+  },
+  {
+    id: 2,
+    name: facultyList[1].name,
+    studentName: studentNames[1],
+    department: facultyList[1].department,
+    time: 'July 29, 2025 • 10:00 - 11:00',
+    avatar: facultyList[1].avatar,
+    reason: mapReason('Meeting')
+  },
+  {
+    id: 3,
+    name: facultyList[2].name,
+    studentName: studentNames[2],
+    department: facultyList[2].department,
+    time: 'July 29, 2025 • 11:00 - 12:00',
+    avatar: facultyList[2].avatar,
+    reason: mapReason('Project')
+  },
+  {
+    id: 4,
+    name: facultyList[3].name,
+    studentName: studentNames[3],
+    department: facultyList[3].department,
+    time: 'July 29, 2025 • 13:00 - 14:00',
+    avatar: facultyList[3].avatar,
+    reason: mapReason('Other')
+  },
+  {
+    id: 5,
+    name: facultyList[4].name,
+    studentName: studentNames[4],
+    department: facultyList[4].department,
+    time: 'July 29, 2025 • 14:00 - 15:00',
+    avatar: facultyList[4].avatar,
+    reason: mapReason('Consultation')
+  },
+  {
+    id: 6,
+    name: facultyList[5].name,
+    studentName: studentNames[5],
+    department: facultyList[5].department,
+    time: 'July 29, 2025 • 15:00 - 16:00',
+    avatar: facultyList[5].avatar,
+    reason: mapReason('Other')
+  },
+  {
+    id: 7,
+    name: facultyList[6].name,
+    studentName: studentNames[6],
+    department: facultyList[6].department,
+    time: 'July 29, 2025 • 16:00 - 17:00',
+    avatar: facultyList[6].avatar,
+    reason: mapReason('Meeting')
+  },
+  {
+    id: 8,
+    name: facultyList[7].name,
+    studentName: studentNames[7],
+    department: facultyList[7].department,
+    time: 'July 29, 2025 • 17:00 - 18:00',
+    avatar: facultyList[7].avatar,
+    reason: mapReason('Consultation')
+  },
+  {
+    id: 9,
+    name: facultyList[8].name,
+    studentName: studentNames[8],
+    department: facultyList[8].department,
+    time: 'July 29, 2025 • 18:00 - 19:00',
+    avatar: facultyList[8].avatar,
+    reason: mapReason('Other')
+  }
 ];
 
 const QUEUE_PER_PAGE = 10;
@@ -58,11 +161,10 @@ const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, truncateR
   const handleNext = () => setPage(prev => Math.min(prev + 1, totalPages));
 
   const formatDateWithYear = (dateStr) => {
-    // Accepts formats like "June 15 • 09:00 - 10:00"
+    // Accepts formats like "July 29 2025 • 09:00 - 10:00"
     if (!dateStr) return '';
     const [datePart, timePart] = dateStr.split('•').map(s => s.trim());
-    // Try to parse the date part and add current year if missing
-    let d = new Date(datePart + ' ' + new Date().getFullYear());
+    let d = new Date(datePart);
     if (isNaN(d.getTime())) return dateStr;
     const formattedDate = d.toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
     return `${formattedDate}${timePart ? ' • ' + timePart : ''}`;

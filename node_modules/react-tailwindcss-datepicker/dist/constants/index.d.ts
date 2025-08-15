@@ -1,0 +1,16 @@
+import { ColorKeys, Colors, DateLookingType, WeekStringType } from "../types";
+export declare const COLORS: readonly ["blue", "orange", "yellow", "red", "purple", "amber", "lime", "green", "emerald", "teal", "cyan", "sky", "indigo", "violet", "purple", "fuchsia", "pink", "rose"];
+export declare const DEFAULT_COLOR: ColorKeys;
+export declare const DEFAULT_SEPARATOR = "~";
+export declare const LANGUAGE = "en";
+export declare const DATE_FORMAT = "YYYY-MM-DD";
+export declare const START_WEEK: WeekStringType;
+export declare const DATE_LOOKING_OPTIONS: readonly ["forward", "backward", "middle"];
+export declare const DEFAULT_DATE_LOOKING: DateLookingType;
+export declare const DAYS: readonly [0, 1, 2, 3, 4, 5, 6];
+export declare const MONTHS: number[];
+export declare const BG_COLOR: Colors;
+export declare const TEXT_COLOR: Colors;
+export declare const BORDER_COLOR: Colors;
+export declare const RING_COLOR: Colors;
+export declare const BUTTON_COLOR: Colors;
