@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 import './styles/global.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 // Custom hook for page titles
 import usePageTitle from './hooks/usePageTitle';
