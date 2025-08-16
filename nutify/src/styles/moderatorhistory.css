@@ -3,7 +3,7 @@
   margin-left: 80px;
   margin-top: 88px;
   min-height: calc(100vh - 88px);
-  padding: 20px;
+  padding: 10px; /* match moderatorhome */
   transition: margin-left 0.3s ease;
   display: flex;
   justify-content: center;
@@ -12,9 +12,9 @@
 
 /* Content container: centers left column */
 .moderator-history-content-container {
-  max-width: 1400px; /* increased for more screen usage */
-  margin: 0 auto;
-  padding: 0;
+  max-width: 1400px;
+  margin: 0; /* remove auto margin */
+  padding: 0; /* match moderatorhome */
   width: 100%;
 }
 
@@ -641,8 +641,10 @@
     max-width: none;
   }
   .moderator-history-content-container {
-    padding: 0 10px;
+    margin-top: 10.5px!important;
+    padding: 0; /* match moderatorhome */
     max-width: 100%;
+    margin: 0; /* remove auto margin */
   }
   .moderator-history-filter-tabs {
     display: none;
@@ -763,65 +765,67 @@
   }
 }
 
-@media (max-width: 576px) {
-  .moderator-history-appointment-item,
-  .moderator-history-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-    min-height: 100px;
-    padding: 18px 10px;
+/* Responsive history card layout for <=768px */
+@media (max-width: 768px) {
+  .moderator-history-section {
+    border-radius: 14px !important;
+    width: 100% !important; /* ensure full width like moderatorhome */
+    height: auto !important;
+
+  }
+  .moderator-history-card-list {
+    padding: 0 !important;
+    margin-right: 0 !important;
+    gap: 12px !important;
+  }
+  .moderator-history-item,
+  .moderator-history-appointment-item {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    padding: 14px 10px !important;
+    border-radius: 10px !important;
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 0 !important;
+    gap: 8px !important;
+  }
+  .moderator-history-appointment-avatar {
+    margin-right: 0 !important;
+    margin-bottom: 8px !important;
+    width: 40px !important;
+    height: 40px !important;
+    align-self: center !important;
+  }
+  .moderator-history-avatar-img {
+    width: 100% !important;
+    height: 100% !important;
+    font-size: 14px !important;
+  }
+  .moderator-history-appointment-info {
+    align-items: center !important;
+    text-align: center !important;
+    font-size: 1em !important;
   }
   .moderator-history-item > div:last-child,
   .moderator-history-appointment-item > div:last-child {
-    margin-left: 0;
-    margin-top: 10px;
-    width: 100%;
-    justify-content: flex-start;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-top: 10px !important;
+    justify-content: flex-start !important;
   }
-  .moderator-history-appointment-avatar {
-    align-self: center;
-    margin-right: 0;
-    width: 40px;
-    height: 40px;
-  }
-  .moderator-history-avatar-img {
-    width: 100%;
-    height: 100%;
-  }
-  .moderator-history-appointment-info {
-    text-align: center;
-    align-self: stretch;
-  }
-  .moderator-history-see-more-btn {
-    padding: 6px 0; /* Reduced vertical padding for small screens */
-    font-size: 15px;
-    border-radius: 10px;
-    width: 100%; /* Keep full width for small screens */
-  }
-  .moderator-history-details-modal-content {
-    border-radius: 12px;
-  }
-  .moderator-history-details-modal-title {
-    font-size: 1.3rem;
-  }
-  .moderator-history-details-modal-body {
-    gap: 12px;
-  }
-  .moderator-history-section {
-    min-height: 760px;
-    height: 350px;
-    display: flex;
-    flex-direction: column;
-  }
-  .moderator-history-card-list {
-    flex: 1 1 auto;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    overflow-y: auto;
-    /* Remove max-height */
+  .moderator-history-see-more-btn,
+  .moderator-home-see-more-btn {
+    width: 100% !important;
+    min-width: 0 !important;
+    font-size: 15px !important;
+    padding: 12px 0 !important;
+    margin: 0 !important;
+    border-radius: 12px !important;
+    display: block !important;
   }
 }
 
