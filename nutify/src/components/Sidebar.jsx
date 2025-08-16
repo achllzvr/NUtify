@@ -68,8 +68,10 @@ const Sidebar = ({ userType, userName, userRole, userAvatar }) => {
 
   const handleAvatarClick = (e) => {
     e.stopPropagation();
-    toggleSidebar();
-    setShowSettingsDropdown((prev) => !prev);
+    if (!isExpanded) {
+      toggleSidebar();
+      setShowSettingsDropdown(true);
+    }
   };
 
   useEffect(() => {
