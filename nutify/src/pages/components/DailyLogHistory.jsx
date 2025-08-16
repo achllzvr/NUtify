@@ -126,6 +126,14 @@ const dailyLogHistoryItems = [
 
 const ITEMS_PER_PAGE = 10;
 
+// Helper to truncate reason to max 6 words
+const truncateReason = (reason) => {
+  if (!reason) return "";
+  const words = reason.split(" ");
+  if (words.length <= 6) return reason;
+  return words.slice(0, 6).join(" ") + "...";
+};
+
 const DailyLogHistory = ({
   historyItems = dailyLogHistoryItems,
   onViewDetails,
@@ -296,7 +304,7 @@ const DailyLogHistory = ({
                     className="moderator-history-appointment-details moderator-history-details"
                     style={{ fontSize: "1.08em", color: "#424A57" }}
                   >
-                    Reason: {entry.reason}
+                    Reason: {truncateReason(entry.reason)}
                   </div>
                 </div>
                 <div style={{ display: "flex", gap: "10px", marginLeft: "18px" }}>

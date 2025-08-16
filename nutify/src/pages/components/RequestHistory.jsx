@@ -104,6 +104,14 @@ const RequestHistory = ({ onViewDetails, searchTerm }) => {
   const handlePrev = () => setPage(prev => Math.max(prev - 1, 1));
   const handleNext = () => setPage(prev => Math.min(prev + 1, totalPages));
 
+  // Helper to truncate reason to max 6 words
+  const truncateReason = (reason) => {
+    if (!reason) return "";
+    const words = reason.split(" ");
+    if (words.length <= 6) return reason;
+    return words.slice(0, 6).join(" ") + "...";
+  };
+
   return (
     <>
       <div
@@ -167,7 +175,7 @@ const RequestHistory = ({ onViewDetails, searchTerm }) => {
                   className="moderator-history-appointment-details moderator-history-details"
                   style={{ fontSize: "1.08em", color: "#424A57" }} // slightly bigger reason
                 >
-                  Reason: {item.reason}
+                  Reason: {truncateReason(item.reason)}
                 </div>
               </div>
               <div style={{ display: "flex", gap: "10px", marginLeft: "18px" }}>

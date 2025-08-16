@@ -172,7 +172,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between; /* Add this for horizontal layout */
-  padding: 24px 15px;
+  padding: 82px 32px 82px 32px; /* increased top and horizontal padding */
   margin: 0 2px 24px 2px;
   background: #f0f0f0;
   border-radius: 15px;

@@ -3,7 +3,7 @@ import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import '../styles/dashboard.css';
 import '../styles/moderatorhome.css';
-import '../styles/moderatorhome-responsive.css';
+
 
 import johnDoeAvatar from '../assets/images/avatars/1c9a4dd0bbd964e3eecbd40caf3b7e37.jpg';
 import jeiPastranaAvatar from '../assets/images/avatars/1c9a4dd0bbd964e3eecbd40caf3b7e37.jpg';
