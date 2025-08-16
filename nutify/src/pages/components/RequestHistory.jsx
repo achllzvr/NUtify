@@ -1,31 +1,36 @@
 // Request history list UI
 import React, { useState } from "react";
 
-// Format date as MM/DD/YYYY
-const formatDateMMDDYYYY = (dateStr) => {
+// Format date as "Month Day, Year • hh:mm am/pm"
+const formatDateWithTime = (dateStr) => {
   // Accepts "July 29, 2025 09:00"
-  const [datePart, timePart] = dateStr.split(' ');
-  let d = new Date(datePart.replace(',', '') + ' ' + timePart);
-  return isNaN(d.getTime())
-    ? dateStr
-    : `${d.toLocaleString("en-US", { month: "long", day: "numeric", year: "numeric" })}`;
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
+  const datePart = d.toLocaleString("en-US", { month: "long", day: "numeric", year: "numeric" });
+  let hours = d.getHours();
+  let minutes = d.getMinutes();
+  let ampm = hours >= 12 ? "pm" : "am";
+  hours = hours % 12;
+  hours = hours === 0 ? 12 : hours;
+  const timePart = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")} ${ampm}`;
+  return `${datePart} • ${timePart}`;
 };
 
 const facultyList = [
-  { id: 1, name: 'Jayson Guia', avatar: null },
-  { id: 2, name: 'Jei Pastrana', avatar: null },
-  { id: 3, name: 'Irene Balmes', avatar: null },
-  { id: 4, name: 'Carlo Torres', avatar: null },
-  { id: 5, name: 'Archie Menisis', avatar: null },
-  { id: 6, name: 'Michael Joseph Aramil', avatar: null }
+  { id: 1, name: 'Prof. Alex Carter', avatar: null },
+  { id: 2, name: 'Prof. Sam Rivers', avatar: null },
+  { id: 3, name: 'Prof. Morgan Lee', avatar: null },
+  { id: 4, name: 'Prof. Charlie Lane', avatar: null },
+  { id: 5, name: 'Prof. Taylor Brooks', avatar: null },
+  { id: 6, name: 'Prof. Avery West', avatar: null }
 ];
 
 const studentNames = [
-  "Kier Kriztopher",
-  "Achilles Vonn",
-  "Sophia Marie",
-  "Beatriz Gail",
-  "Prinz Noel"
+  "Stud. Jordan Smith",
+  "Stud. Morgan Fox",
+  "Stud. Taylor Brooks",
+  "Stud. Avery West",
+  "Stud. Charlie Lane"
 ];
 
 // Example request items
@@ -36,7 +41,7 @@ export const requestHistoryItems = [
     studentName: studentNames[0],
     status: "pending",
     time: "July 29, 2025 09:00",
-    reason: "Request for thesis consultation",
+    reason: "Consultation",
   },
   {
     id: 102,
@@ -44,7 +49,7 @@ export const requestHistoryItems = [
     studentName: studentNames[1],
     status: "pending",
     time: "July 29, 2025 10:00",
-    reason: "Request for grade review",
+    reason: "Meeting",
   },
   {
     id: 103,
@@ -52,7 +57,7 @@ export const requestHistoryItems = [
     studentName: studentNames[2],
     status: "pending",
     time: "July 29, 2025 11:00",
-    reason: "Request for project feedback",
+    reason: "Project",
   },
   {
     id: 104,
@@ -60,7 +65,7 @@ export const requestHistoryItems = [
     studentName: studentNames[3],
     status: "pending",
     time: "July 29, 2025 13:00",
-    reason: "Request for consultation slot",
+    reason: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor.",
   },
   {
     id: 105,
@@ -68,7 +73,7 @@ export const requestHistoryItems = [
     studentName: studentNames[4],
     status: "pending",
     time: "July 29, 2025 14:00",
-    reason: "Request for extension on assignment",
+    reason: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor.",
   },
 ];
 
@@ -160,10 +165,7 @@ const RequestHistory = ({ onViewDetails, searchTerm }) => {
                   className="moderator-history-appointment-time"
                   style={{ fontSize: "1.08em", color: "#424A57" }} // slightly bigger time
                 >
-                  Timestamp: {formatDateMMDDYYYY(item.time)} •{" "}
-                  {item.time.split(" ")[1] ||
-                    item.time.split(" - ")[1] ||
-                    "00:00 am"}
+                  Timestamp: {formatDateWithTime(item.time)}
                 </div>
                 <div
                   className="moderator-history-appointment-details moderator-history-details"

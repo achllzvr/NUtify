@@ -1,6 +1,17 @@
 // Daily log history list UI
 import React, { useState } from "react";
 
+// Helper to normalize date string to YYYY-MM-DD
+const normalizeDateKey = (dateStr) => {
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
+  // Pad month and day
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+};
+
 // Format date for header (now includes year)
 const formatDateHeader = (dateStr) => {
   const d = new Date(dateStr);
@@ -18,15 +29,12 @@ const formatDateTime = (dateStr) => {
   return `${datePart} • ${timePart}`;
 };
 
-// Group dailylog items by date
+// Group dailylog items by normalized date
 const getDailyLogGroups = (items) => {
   const groups = {};
   items.forEach((item) => {
     if (item.status === "dailylog") {
-      const dateKey =
-        item.time.includes("-") && item.time.includes(":")
-          ? item.time.split(" ")[0]
-          : item.time.split(" - ")[0];
+      const dateKey = normalizeDateKey(item.time);
       if (!groups[dateKey]) groups[dateKey] = [];
       groups[dateKey].push(item);
     }
@@ -116,6 +124,34 @@ const dailyLogHistoryItems = [
     status: "dailylog",
     reason: "Feedback on assignment",
   },
+  // --- Added July 30 logs ---
+  {
+    id: 7,
+    studentName: studentNames[0],
+    name: facultyList[1].name,
+    details: "Faculty - SACE",
+    time: "July 30, 2025 09:30",
+    status: "dailylog",
+    reason: "Schedule consultation",
+  },
+  {
+    id: 8,
+    studentName: studentNames[2],
+    name: facultyList[2].name,
+    details: "Faculty - SACE",
+    time: "July 30, 2025 10:30",
+    status: "dailylog",
+    reason: "Discuss project updates",
+  },
+  {
+    id: 9,
+    studentName: studentNames[4],
+    name: facultyList[4].name,
+    details: "Faculty - SACE",
+    time: "July 30, 2025 13:00",
+    status: "dailylog",
+    reason: "Request for feedback",
+  },
 ];
 
 const ITEMS_PER_PAGE = 10;
@@ -154,7 +190,7 @@ const DailyLogHistory = ({
         (item.reason &&
           item.reason.toLowerCase().includes(searchTerm.toLowerCase()))) &&
       (!selectedDate ||
-        (item.time.startsWith(selectedDate))) // filter by selected date
+        normalizeDateKey(item.time) === selectedDate) // filter by normalized date
   );
 
   const groups = getDailyLogGroups(filteredItems).filter(
