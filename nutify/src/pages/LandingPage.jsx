@@ -33,10 +33,10 @@ const LandingPage = () => {
                 className="hero-btn primary"
                 onClick={() => navigate('/login')}
               >
-                Login to your NUtify account
+                Admin Dashboard
               </button>
               <button className="hero-btn secondary">
-                Download for Android
+              NUtify for Students and Faculty
               </button>
             </div>
           </div>
