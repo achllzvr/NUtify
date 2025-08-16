@@ -79,7 +79,7 @@ const LandingPage = () => {
           
           <div
             className="hero-image-section"
-            data-aos="fade-left"
+            data-aos={isTablet ? "zoom-in" : "fade-left"}
             data-aos-delay={isTablet ? "0" : "200"}
             data-aos-duration="700"
           >
