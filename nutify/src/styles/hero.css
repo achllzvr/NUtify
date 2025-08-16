@@ -1,0 +1,252 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@700;800;900&display=swap");
+
+.hero-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  max-width: 110em;
+  width: 100%;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-text-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.hero-logo img {
+  height: 60px;
+  width: auto;
+}
+
+.hero-title {
+  margin-bottom: 1rem;
+}
+
+.hero-main-title {
+  font-family: "Inter", "Helvetica Bold", sans-serif;
+  font-weight: 900;
+  font-size: clamp(4rem, 8vw, 6rem);
+  line-height: 0.9;
+  color: #ffffff;
+  margin-bottom: -0.3em;
+  letter-spacing: -0.02em;
+}
+
+.hero-description p {
+  font-family: "Helvetica", sans-serif;
+  font-size: 1.125rem;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  max-width: 900px;
+}
+
+.hero-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.hero-btn {
+  padding: 1rem 1rem;
+  border: none;
+  border-radius: 20px;
+  font-family: "Helvetica", sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  min-width: 390px;
+  text-align: center;
+}
+
+.hero-btn.primary {
+  background: #ffd36b !important;
+  color: #7a5c00 !important;
+  box-shadow: 4px 4px 8px #2a2d45, -4px -4px 8px #50567f;
+}
+
+.hero-btn.primary:active {
+  box-shadow: inset 10px 10px 22px rgba(44, 62, 80, 0.22),
+    inset -10px -10px 22px rgba(255, 255, 255, 0);
+  background: #ffd36b !important;
+  filter: none;
+}
+
+.hero-btn.secondary {
+  color: #424a57;
+  box-shadow: 4px 4px 8px #2a2d45, -4px -4px 8px #50567f;
+}
+
+.hero-btn.secondary:active {
+  background: #e0e0e0;
+  box-shadow: inset 20px 20px 60px #cccccc,
+              inset -20px -20px 60px #fff;
+}
+
+.hero-image-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.device-mockup {
+  position: relative;
+  max-width: 100%;
+  height: auto;
+}
+
+.device-mockup img {
+  margin-top: 5em;
+  width: 100%;
+  height: auto;
+  max-width: 1600px;
+  filter: none;
+}
+
+.top-left-logo {
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  z-index: 10;
+}
+
+.top-left-logo img {
+  height: 48px;
+  width: auto;
+}
+
+@media (max-width: 1024px) {
+  .hero-content {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    text-align: center;
+  }
+
+  .hero-text-section {
+    order: 2;
+    align-items: center;
+  }
+
+  .hero-image-section {
+    order: 1;
+  }
+
+  .hero-main-title {
+    font-size: clamp(2.5rem, 6vw, 3.5rem);
+  }
+
+  .hero-description p {
+    max-width: 600px;
+  }
+
+  .device-mockup img {
+    max-width: 500px;
+    margin-bottom: -5em;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-container {
+    padding: 1rem;
+    min-height: 100vh;
+  }
+
+  .hero-content {
+    gap: 2rem;
+  }
+
+  .hero-logo img {
+    height: 50px;
+  }
+
+  .hero-main-title {
+    font-size: clamp(2rem, 8vw, 3rem);
+  }
+
+  .hero-description p {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .hero-buttons {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .hero-btn {
+    padding: 0.875rem 1.5rem;
+    font-size: 0.9rem;
+    min-width: 250px;
+  }
+
+  .device-mockup img {
+    max-width: 900px;
+  }
+
+  .top-left-logo {
+    top: 1rem;
+    left: 1rem;
+  }
+
+  .top-left-logo img {
+    height: 38px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-container {
+    padding: 0.5rem;
+  }
+
+  .hero-content {
+    gap: 4rem;
+  }
+
+  .hero-logo img {
+    height: 40px;
+  }
+
+  .hero-main-title {
+    font-size: clamp(1.75rem, 10vw, 2.5rem);
+  }
+
+  .hero-description p {
+    font-size: 0.9rem;
+  }
+
+  .hero-btn {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.85rem;
+    min-width: 220px;
+  }
+
+  .device-mockup img {
+    max-width: 600px;
+  }
+
+  .top-left-logo {
+    top: 0.5rem;
+    left: 0.5rem;
+  }
+
+  .top-left-logo img {
+    height: 28px;
+  }
+}

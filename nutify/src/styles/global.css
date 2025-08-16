@@ -1,10 +1,10 @@
-/* Font face definitions */
 @font-face {
   font-family: "Helvetica";
   font-style: normal;
   font-weight: normal;
   src: local("Helvetica"), url("../assets/fonts/Helvetica.woff") format("woff");
 }
+
 @font-face {
   font-family: "Helvetica Oblique";
   font-style: oblique;
@@ -12,6 +12,7 @@
   src: local("Helvetica Oblique"),
     url("../assets/fonts/Helvetica-Oblique.woff") format("woff");
 }
+
 @font-face {
   font-family: "Helvetica Compressed";
   font-style: normal;
@@ -19,6 +20,7 @@
   src: local("Helvetica Compressed"),
     url("../assets/fonts/helvetica-compressed-5871d14b6903a.woff") format("woff");
 }
+
 @font-face {
   font-family: "Helvetica Rounded Bold";
   font-style: normal;
@@ -26,6 +28,7 @@
   src: local("Helvetica Rounded Bold"),
     url("../assets/fonts/helvetica-rounded-bold-5871d05ead8de.woff") format("woff");
 }
+
 @font-face {
   font-family: "Helvetica Bold";
   font-style: normal;
@@ -33,6 +36,7 @@
   src: local("Helvetica Bold"),
     url("../assets/fonts/Helvetica-Bold.woff") format("woff");
 }
+
 @font-face {
   font-family: "Helvetica Bold Oblique";
   font-style: oblique;
@@ -40,6 +44,7 @@
   src: local("Helvetica Bold Oblique"),
     url("../assets/fonts/Helvetica-BoldOblique.woff") format("woff");
 }
+
 @font-face {
   font-family: "Helvetica Light";
   font-style: normal;
@@ -48,7 +53,7 @@
     url("../assets/fonts/helvetica-light-587ebe5a59211.woff") format("woff");
 }
 
-/* Global styles */
+/* Global Styles */
 body {
   font-family: "Helvetica", sans-serif;
   margin: 0;
@@ -61,7 +66,7 @@ body {
   );
 }
 
-/* Auth page background */
+/* Auth Page Styles */
 .auth-body {
   background: #35408e;
   background: linear-gradient(
@@ -73,7 +78,17 @@ body {
   margin: 0;
   padding: 0;
 }
-
+.landing-body {
+  background: #35408e;
+  background: linear-gradient(
+    190deg,
+    rgba(53, 64, 142, 1) 0%,
+    rgba(26, 32, 73, 1) 100%
+  );
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
 /* Login button */
 .login-button {
   position: relative;
@@ -94,6 +109,7 @@ body {
   font-family: "Montserrat", sans-serif;
   overflow: hidden;
 }
+
 .login-button::before {
   content: "";
   position: absolute;
@@ -104,11 +120,10 @@ body {
   transition: opacity 0.25s ease-in-out;
   pointer-events: none;
 }
+
 .login-button:active::before {
   opacity: 1;
 }
-
-/* Login card container */
 .login-container {
   display: flex;
   justify-content: center;
@@ -116,6 +131,7 @@ body {
   min-height: 100vh;
   padding: 20px;
 }
+
 .login-card {
   border-radius: 20px;
   background: linear-gradient(145deg, #ffffff, #d7d7d7);
@@ -123,15 +139,17 @@ body {
   max-width: 510px;
   width: 100%;
 }
+
 .login-title {
   font-size: 54px;
   font-weight: 800;
   color: #000000;
-  margin-bottom: 8px;
+  margin-top:0 ;
   text-align: left;
   font-family: "Montserrat", sans-serif;
   letter-spacing: -1px;
 }
+
 .login-subtitle {
   color: #aeaeae;
   text-align: left;
@@ -140,7 +158,6 @@ body {
   font-weight: 400;
 }
 
-/* Remember me / forgot password / signup links */
 .remember-container {
   display: flex;
   align-items: center;
@@ -148,16 +165,19 @@ body {
   margin-bottom: 35px;
   margin-top: 30px;
 }
+
 .remember-section {
   display: flex;
   align-items: center;
 }
+
 .remember-label {
   color: #aeaeae;
   font-size: 14px;
   cursor: pointer;
   font-weight: 400;
 }
+
 .form-check-input {
   background-color: #f2f2f2 !important;
   border: 1px solid #d3d3d3 !important;
@@ -166,34 +186,39 @@ body {
   height: 18px !important;
   margin-right: 8px !important;
 }
+
 .form-check-input:checked {
   background-color: #323d87 !important;
   border-color: #323d87 !important;
 }
+
 .form-check-input:focus {
   border-color: #323d87 !important;
   box-shadow: none !important;
   outline: none !important;
 }
+
 .form-check-input:focus:not(:checked) {
   border-color: #d3d3d3 !important;
 }
+
 .forgot-password {
   color: #76c7f0;
   font-size: 14px;
   font-weight: 400;
 }
+
 .signup-link {
   text-align: center;
   color: #aeaeae;
   font-size: 14px;
   font-weight: 400;
 }
+
 .signup-link a {
   color: #76c7f0;
 }
 
-/* Password toggle */
 .toggle-password {
   position: absolute;
   right: 25px;
@@ -206,16 +231,17 @@ body {
   cursor: pointer;
 }
 
-/* Dropdown select styles */
 .dropdown-row {
   display: flex;
   gap: 15px;
   margin-bottom: 25px;
 }
+
 .dropdown-group {
   position: relative;
   flex: 1;
 }
+
 .login-select {
   width: 100%;
   padding: 15px 25px 15px 65px;
@@ -233,24 +259,30 @@ body {
   -moz-appearance: none;
   cursor: pointer;
 }
+
 .login-select:focus {
   outline: none !important;
   border: none !important;
 }
+
 .login-select option {
   background: #ffffff;
   color: #333333;
   padding: 10px;
 }
+
 .login-select option:disabled {
   color: #aeaeae;
 }
+
 .login-select:valid {
   color: #333333;
 }
+
 .login-select:invalid {
   color: #aeaeae;
 }
+
 .dropdown-chevron {
   position: absolute;
   right: 25px;
@@ -271,29 +303,34 @@ textarea,
   color: #1c1d1e;
 }
 
-/* Responsive design for auth pages */
+/* Responsive Design for Auth Pages */
 @media (max-width: 768px) {
   .login-card {
     padding: 30px 20px;
     max-width: 100%;
     border-radius: 16px;
   }
+
   .login-title {
     font-size: 40px;
   }
+
   .login-subtitle {
     font-size: 14px;
     margin-bottom: 35px;
   }
+
   .login-select {
     padding: 12px 20px 12px 50px;
     font-size: 15px;
   }
+
   .signup-link,
   .forgot-password,
   .remember-label {
     font-size: 13px;
   }
+
   .dropdown-row {
     flex-direction: column;
     gap: 20px;
@@ -305,32 +342,39 @@ textarea,
     padding: 25px 16px;
     border-radius: 14px;
   }
+
   .login-title {
     font-size: 32px;
   }
+
   .login-subtitle {
     font-size: 13px;
     margin-bottom: 30px;
   }
+
   .login-select {
     padding: 13px 55px 13px 55px;
     font-size: 14px;
   }
+
   .input-icon,
   .toggle-password {
     width: 18px;
     height: 18px;
   }
+
   .input-icon {
     left: 18px;
     top: 50%;
     transform: translateY(-50%);
   }
+
   .toggle-password {
     right: 18px;
     top: 50%;
     transform: translateY(-50%);
   }
+
   .dropdown-chevron {
     width: 16px;
     height: 16px;
@@ -338,28 +382,29 @@ textarea,
     top: 50%;
     transform: translateY(-50%);
   }
+
   .signup-link,
   .forgot-password,
   .remember-label {
     font-size: 12px;
   }
+
   .dropdown-row {
     flex-direction: column;
     gap: 15px;
   }
+
   .form-check-input {
     width: 16px !important;
     height: 16px !important;
     margin-right: 6px !important;
   }
 }
-
-/* Sidebar icon styles */
 .sidebar-icon {
   transition: background 0.3s, transform 0.3s;
 }
 .sidebar-icon.active {
-  background: #2d3748;
+  background: #2d3748; /* example highlight */
   transform: scale(1.05);
 }
 .sidebar-icon.active-animate {

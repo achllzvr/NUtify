@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
+
 import './styles/global.css';
 
 // Custom hook for page titles
@@ -10,10 +10,13 @@ import usePageTitle from './hooks/usePageTitle';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import ForgotPassword from './pages/ForgotPassword';
+import LandingPage from './pages/LandingPage';
 
 // Moderator Pages
 import ModeratorHome from './pages/ModeratorHome';
 import ModeratorHistory from './pages/ModeratorHistory';
+
+
 
 // Component that uses the page title hook
 function AppContent() {
@@ -23,8 +26,8 @@ function AppContent() {
   return (
     <div className="App">
       <Routes>
-        {/* Default route redirects to login */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        {/* Default route shows landing page */}
+        <Route path="/" element={<LandingPage />} />
         
         {/* Auth Routes */}
         <Route path="/login" element={<Login />} />
@@ -34,6 +37,8 @@ function AppContent() {
         {/* Moderator Routes */}
         <Route path="/moderator/home" element={<ModeratorHome />} />
         <Route path="/moderator/history" element={<ModeratorHistory />} />
+
+        
       </Routes>
     </div>
   );
