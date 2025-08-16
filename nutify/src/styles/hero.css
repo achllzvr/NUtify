@@ -1,4 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@700;800;900&display=swap");
+/* Add AOS animation styles */
+@import url("https://unpkg.com/aos@2.3.4/dist/aos.css");
 
 .hero-container {
   min-height: 100vh;
@@ -156,7 +158,12 @@
 
   .device-mockup img {
     max-width: 500px;
-    margin-bottom: -5em;
+    margin-bottom: -2em;
+  }
+
+  .hero-buttons {
+    flex-direction: column;
+    gap: 1rem;
   }
 }
 
@@ -196,6 +203,7 @@
 
   .device-mockup img {
     max-width: 900px;
+    margin-bottom: -4em !important;
   }
 
   .top-left-logo {
