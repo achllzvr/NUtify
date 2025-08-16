@@ -180,6 +180,8 @@ const FacultyHome = () => {
       {showDetailsModal && (
         <div className="modal-backdrop fade show"></div>
       )}
+
+      
     </div>
   );
 };

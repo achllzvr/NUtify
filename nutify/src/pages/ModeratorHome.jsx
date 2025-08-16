@@ -344,61 +344,12 @@ const ModeratorHome = () => {
       </div>
 
       {/* Fixed Button */}
-      <style>
-        {`
-          .fixed-create-request-btn {
-            transition: all 0.2s, box-shadow 0.2s;
-          }
-          .fixed-create-request-btn:hover {
-            transform: scale(1.07);
-            box-shadow: 0 8px 32px rgba(44,62,80,0.18);
-            filter: brightness(1.08);
-          }
-          @media (max-width: 768px) {
-            .fixed-create-request-btn {
-              padding: 10px 18px !important;
-              font-size: 15px !important;
-              border-radius: 50px !important;
-              min-width: 0 !important;
-              width: 48px !important;
-              height: 48px !important;
-              justify-content: center !important;
-            }
-            .fixed-create-request-btn span:last-child {
-              display: none !important;
-            }
-            .fixed-create-request-btn span:first-child {
-              margin-right: 0 !important;
-              font-size: 22px !important;
-            }
-          }
-        `}
-      </style>
       <button
         className="fixed-create-request-btn"
-        style={{
-          position: 'fixed',
-          bottom: '32px',
-          right: '32px',
-          zIndex: 2000,
-          background: 'linear-gradient(145deg, #3c489f, #323c86)',
-          color: 'white',
-          fontWeight: 700,
-          fontSize: '17px',
-          borderRadius: '50px',
-          padding: '16px 32px',
-          boxShadow: '0 4px 24px rgba(44,62,80,0.13)',
-          border: 'none',
-          cursor: 'pointer',
-          fontFamily: '"Montserrat", sans-serif',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
-        }}
         onClick={() => setShowRequestModal(true)}
       >
-        <span style={{ fontSize: '22px', fontWeight: 900, marginRight: '6px' }}>+</span>
-        <span>Create Request</span>
+        <span className="fixed-create-request-btn-plus">+</span>
+        <span className="fixed-create-request-btn-text">Create Request</span>
       </button>
 
       {/* Modal for Create On-the-spot Request */}

@@ -66,6 +66,12 @@ const Sidebar = ({ userType, userName, userRole, userAvatar }) => {
     }
   };
 
+  const handleAvatarClick = (e) => {
+    e.stopPropagation();
+    toggleSidebar();
+    setShowSettingsDropdown((prev) => !prev);
+  };
+
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (
@@ -147,7 +153,7 @@ const Sidebar = ({ userType, userName, userRole, userAvatar }) => {
 
         <div className="sidebar-bottom">
           <div className="user-info">
-            <div className="sidebar-avatar">
+            <div className="sidebar-avatar" onClick={handleAvatarClick}>
               <img src={userAvatar} alt="Avatar" className="avatar" />
             </div>
             <div className="user-details">
