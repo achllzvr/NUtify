@@ -548,24 +548,6 @@ select.login-input option {
   }
 }
 
-@media (max-width: 480px) {
-  .login-input {
-    padding: 13px 55px 13px 55px;
-    font-size: 14px;
-  }
-  .input-icon {
-    left: 18px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 18px;
-    height: 18px;
-  }
-  .login-button {
-    font-size: 15px;
-    padding: 10px;
-  }
-}
-
 /* Responsive Design: layout for screens */
 @media (max-width: 1024px) {
   .moderator-home-content-container {
@@ -583,6 +565,11 @@ select.login-input option {
 }
 
 @media (max-width: 768px) {
+
+  .moderator-home-appointment-section {
+  grid-area: bottom;
+  margin-top: 3.15em !important; /* add margin top to outer card */
+}
   .moderator-home-main-content {
     margin-left: 3.7em;
     margin-top: 110px;
@@ -822,5 +809,58 @@ select.login-input option {
   .fixed-create-request-btn-plus {
     margin-right: 0 !important;
     font-size: 22px !important;
+  }
+}
+
+/* Responsive queue card layout for <=768px */
+@media (max-width: 768px) {
+  .moderator-home-queue-card {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  .moderator-home-queue-icon-bar {
+    margin-left: 2px;
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 60px !important;
+    border-radius: 15px 15px 0 0 !important;
+    margin-right: 0 !important;
+    margin-bottom: -5px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .moderator-home-appointment-item {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    padding: 18px 12px !important;
+    border-radius: 0 0 15px 15px !important;
+  }
+  .moderator-home-appointment-main {
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 12px !important;
+    margin-bottom: 12px !important;
+  }
+  .moderator-home-appointment-avatar {
+    margin-bottom: 0 !important;
+    margin-right: 12px !important;
+    align-self: center !important;
+  }
+  .moderator-home-appointment-actions {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+  .moderator-home-see-more-btn,
+  .moderator-home-notify-btn {
+    width: 100% !important;
+    min-width: 0 !important;
+    font-size: 15px !important;
+    padding: 12px 0 !important;
+    margin: 0 !important;
+    border-radius: 12px !important;
   }
 }

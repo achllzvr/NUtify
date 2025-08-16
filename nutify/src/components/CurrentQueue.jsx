@@ -204,16 +204,19 @@ const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, truncateR
             return (
               <div
                 key={appointment.id}
+                className="moderator-home-queue-card"
                 style={{
                   display: 'flex',
                   alignItems: 'stretch',
                   width: '100%',
                   minWidth: 0,
-                  boxSizing: 'border-box'
+                  boxSizing: 'border-box',
+                  flexDirection: 'row'
                 }}
               >
-                {/* container2: vertical icon bar */}
+                {/* Icon bar: desktop row, mobile top */}
                 <div
+                  className="moderator-home-queue-icon-bar"
                   style={{
                     width: '60px',
                     minWidth: '60px',
@@ -231,7 +234,7 @@ const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, truncateR
                 >
                   <img src={icon} alt={reasonLabel} style={{ width: 20, height: 20, filter: 'brightness(0) invert(1)' }} />
                 </div>
-                {/* container3: card content */}
+                {/* Card content */}
                 <div style={{ flex: 1 }}>
                   <div
                     className="moderator-home-appointment-item"
@@ -242,9 +245,10 @@ const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, truncateR
                       justifyContent: 'space-between',
                       borderTopLeftRadius: 0,
                       borderBottomLeftRadius: 0,
+                      flexDirection: 'row'
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+                    <div className="moderator-home-appointment-main" style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
                       <div className="moderator-home-appointment-avatar">
                         <div
                           className="moderator-home-avatar-img"
@@ -278,6 +282,7 @@ const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, truncateR
                       </div>
                     </div>
                     <div
+                      className="moderator-home-appointment-actions"
                       style={{
                         display: 'flex',
                         flexDirection: 'column',
