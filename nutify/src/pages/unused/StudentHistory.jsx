@@ -4,10 +4,6 @@ import Header from '../../components/Header';
 import '../styles/dashboard.css';
 import '../styles/studenthistory.css';
 
-// Import avatar images
-import johnDoeAvatar from '../assets/images/avatars/1c9a4dd0bbd964e3eecbd40caf3b7e37.jpg';
-import jeiPastranaAvatar from '../assets/images/avatars/1c9a4dd0bbd964e3eecbd40caf3b7e37.jpg';
-import ireneBalmes from '../assets/images/avatars/c33237da3438494d1abc67166196484e.jpg';
 import filterIcon from '../assets/icons/filter.svg';
 
 const StudentHistory = () => {
@@ -25,7 +21,7 @@ const StudentHistory = () => {
       details: 'Faculty - SACE',
       time: 'June 15 - 09:00 am',
       status: 'pending',
-      avatar: jeiPastranaAvatar
+      avatar: null
     },
     {
       id: 2,
@@ -33,7 +29,7 @@ const StudentHistory = () => {
       details: 'Faculty - SACE',
       time: 'June 14 - 09:00 am',
       status: 'accepted',
-      avatar: ireneBalmes
+      avatar: null
     },
     {
       id: 3,
@@ -41,7 +37,7 @@ const StudentHistory = () => {
       details: 'Faculty - SACE',
       time: 'June 13 - 09:00 am',
       status: 'completed',
-      avatar: jeiPastranaAvatar
+      avatar: null
     },
     {
       id: 4,
@@ -49,7 +45,7 @@ const StudentHistory = () => {
       details: 'Faculty - SACE',
       time: 'June 12 - 09:00 am',
       status: 'missed',
-      avatar: ireneBalmes
+      avatar: null
     },
     {
       id: 5,
@@ -57,7 +53,7 @@ const StudentHistory = () => {
       details: 'Faculty - SACE',
       time: 'June 11 - 09:00 am',
       status: 'cancelled',
-      avatar: jeiPastranaAvatar
+      avatar: null
     },
     {
       id: 6,
@@ -65,7 +61,7 @@ const StudentHistory = () => {
       details: 'Faculty - SACE',
       time: 'June 10 - 09:00 am',
       status: 'declined',
-      avatar: ireneBalmes
+      avatar: null
     }
   ];
 
@@ -161,11 +157,11 @@ const StudentHistory = () => {
 
   return (
     <div>
-      <Sidebar 
+      <Sidebar
         userType="student"
         userName="John Doe"
         userRole="Student - SACE"
-        userAvatar={johnDoeAvatar}
+        userAvatar={null}
       />
       
       <Header 
@@ -207,7 +203,23 @@ const StudentHistory = () => {
                 {filteredItems.map(item => (
                   <div key={item.id} className="student-history-item" data-status={item.status}>
                     <div className="student-history-appointment-avatar">
-                      <img src={item.avatar} alt={item.name} className="student-history-avatar-img" />
+                      <div
+                        className="student-history-avatar-img"
+                        style={{
+                          width: '40px',
+                          height: '40px',
+                          borderRadius: '50%',
+                          backgroundColor: '#e0e0e0',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '16px',
+                          fontWeight: 'bold',
+                          color: '#666'
+                        }}
+                      >
+                        {item.name.split(' ').map(n => n[0]).join('').substring(0, 2)}
+                      </div>
                     </div>
                     <div className="student-history-appointment-info">
                       <div className="student-history-appointment-name student-history-name">{item.name}</div>

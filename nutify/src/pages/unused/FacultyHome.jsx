@@ -4,12 +4,7 @@ import Header from '../components/Header';
 import '../styles/dashboard.css';
 import '../styles/facultyhome.css';
 
-// Import avatar images
-import facultyAvatar from '../assets/images/avatars/237d3876ef98d5364ed1326813f4ed5b.jpg';
-import beatrizSolis from '../assets/images/avatars/1c9a4dd0bbd964e3eecbd40caf3b7e37.jpg';
-import johnClarenz from '../assets/images/avatars/c33237da3438494d1abc67166196484e.jpg';
-import kriztopher from '../assets/images/avatars/8940e8ea369def14e82f05a5fee994b9.jpg';
-import nielCerezo from '../assets/images/avatars/237d3876ef98d5364ed1326813f4ed5b.jpg';
+// No avatar imports needed
 
 const FacultyHome = () => {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
@@ -23,7 +18,7 @@ const FacultyHome = () => {
       department: 'Student - SACE',
       time: 'June 15 - 00:00 am',
       status: 'accepted',
-      avatar: beatrizSolis
+      avatar: null
     },
     {
       id: 2,
@@ -31,7 +26,7 @@ const FacultyHome = () => {
       department: 'Student - SACE',
       time: 'June 16 - 10:00 am',
       status: 'accepted',
-      avatar: johnClarenz
+      avatar: null
     },
     {
       id: 3,
@@ -39,7 +34,7 @@ const FacultyHome = () => {
       department: 'Student - SACE',
       time: 'June 18 - 02:00 pm',
       status: 'accepted',
-      avatar: kriztopher
+      avatar: null
     },
     {
       id: 4,
@@ -47,7 +42,7 @@ const FacultyHome = () => {
       department: 'Student - SACE',
       time: 'June 19 - 11:00 am',
       status: 'accepted',
-      avatar: nielCerezo
+      avatar: null
     }
   ];
 
@@ -80,11 +75,11 @@ const FacultyHome = () => {
 
   return (
     <div>
-      <Sidebar 
+      <Sidebar
         userType="faculty"
         userName="Not John Doe"
         userRole="Faculty - SACE"
-        userAvatar={facultyAvatar}
+        userAvatar={null}
       />
       
       <Header 
@@ -109,11 +104,23 @@ const FacultyHome = () => {
                     data-status={appointment.status}
                   >
                     <div className="faculty-home-appointment-avatar">
-                      <img
-                        src={appointment.avatar}
-                        alt={appointment.name}
+                      <div
                         className="faculty-home-avatar-img"
-                      />
+                        style={{
+                          width: '40px',
+                          height: '40px',
+                          borderRadius: '50%',
+                          backgroundColor: '#e0e0e0',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '16px',
+                          fontWeight: 'bold',
+                          color: '#666'
+                        }}
+                      >
+                        {appointment.name.split(' ').map(n => n[0]).join('').substring(0, 2)}
+                      </div>
                     </div>
                     <div className="faculty-home-appointment-info">
                       <div className="faculty-home-appointment-name faculty-home-name">{appointment.name}</div>

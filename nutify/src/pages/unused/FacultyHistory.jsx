@@ -4,12 +4,6 @@ import Header from '../components/Header';
 import '../styles/dashboard.css';
 import '../styles/facultyhistory.css';
 
-// Import avatar images
-import facultyAvatar from '../assets/images/avatars/237d3876ef98d5364ed1326813f4ed5b.jpg';
-import beatrizSolis from '../assets/images/avatars/1c9a4dd0bbd964e3eecbd40caf3b7e37.jpg';
-import johnClarenz from '../assets/images/avatars/c33237da3438494d1abc67166196484e.jpg';
-import kriztopher from '../assets/images/avatars/8940e8ea369def14e82f05a5fee994b9.jpg';
-import nielCerezo from '../assets/images/avatars/237d3876ef98d5364ed1326813f4ed5b.jpg';
 import filterIcon from '../assets/icons/filter.svg';
 
 const FacultyHistory = () => {
@@ -27,7 +21,7 @@ const FacultyHistory = () => {
       details: 'Student - SACE',
       time: 'June 15 - 00:00 am',
       status: 'pending',
-      avatar: beatrizSolis
+      avatar: null
     },
     {
       id: 2,
@@ -35,7 +29,7 @@ const FacultyHistory = () => {
       details: 'Student - SACE',
       time: 'June 16 - 10:00 am',
       status: 'accepted',
-      avatar: johnClarenz
+      avatar: null
     },
     {
       id: 3,
@@ -43,7 +37,7 @@ const FacultyHistory = () => {
       details: 'Student - SACE',
       time: 'June 18 - 02:00 pm',
       status: 'completed',
-      avatar: kriztopher
+      avatar: null
     },
     {
       id: 4,
@@ -51,7 +45,7 @@ const FacultyHistory = () => {
       details: 'Student - SACE',
       time: 'June 19 - 11:00 am',
       status: 'missed',
-      avatar: nielCerezo
+      avatar: null
     },
     {
       id: 5,
@@ -59,7 +53,7 @@ const FacultyHistory = () => {
       details: 'Student - SACE',
       time: 'June 20 - 09:00 am',
       status: 'cancelled',
-      avatar: beatrizSolis
+      avatar: null
     },
     {
       id: 6,
@@ -67,7 +61,7 @@ const FacultyHistory = () => {
       details: 'Student - SACE',
       time: 'June 21 - 02:00 pm',
       status: 'declined',
-      avatar: johnClarenz
+      avatar: null
     }
   ];
 
@@ -173,11 +167,11 @@ const FacultyHistory = () => {
 
   return (
     <div>
-      <Sidebar 
+      <Sidebar
         userType="faculty"
         userName="Not John Doe"
         userRole="Faculty - SACE"
-        userAvatar={facultyAvatar}
+        userAvatar={null}
       />
       
       <Header
@@ -219,7 +213,23 @@ const FacultyHistory = () => {
                 {paginatedItems.map(item => (
                   <div key={item.id} className="faculty-history-item" data-status={item.status}>
                     <div className="faculty-history-appointment-avatar">
-                      <img src={item.avatar} alt={item.name} className="faculty-history-avatar-img" />
+                      <div
+                        className="faculty-history-avatar-img"
+                        style={{
+                          width: '40px',
+                          height: '40px',
+                          borderRadius: '50%',
+                          backgroundColor: '#e0e0e0',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '16px',
+                          fontWeight: 'bold',
+                          color: '#666'
+                        }}
+                      >
+                        {item.name.split(' ').map(n => n[0]).join('').substring(0, 2)}
+                      </div>
                     </div>
                     <div className="faculty-history-appointment-info">
                       <div className="faculty-history-appointment-name faculty-history-name">{item.name}</div>

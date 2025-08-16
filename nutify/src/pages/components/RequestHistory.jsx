@@ -1,11 +1,5 @@
 // Request history list UI
 import React, { useState } from "react";
-import jaysonGuia from '../../components/../assets/images/avatars/d447a9fd5010652f6c0911fbe9c662c6.jpg';
-import jeiPastranaAvatar from '../../components/../assets/images/avatars/1c9a4dd0bbd964e3eecbd40caf3b7e37.jpg';
-import ireneBalmes from '../../components/../assets/images/avatars/c33237da3438494d1abc67166196484e.jpg';
-import carloTorres from '../../components/../assets/images/avatars/8940e8ea369def14e82f05a5fee994b9.jpg';
-import archieMenisis from '../../components/../assets/images/avatars/78529e2ec8eb4a2eb2fb961e04915b0a.jpg';
-import michaelAramil from '../../components/../assets/images/avatars/869f67a992bb6ca4cb657fb9fc634893.jpg';
 
 // Format date as MM/DD/YYYY
 const formatDateMMDDYYYY = (dateStr) => {
@@ -18,12 +12,12 @@ const formatDateMMDDYYYY = (dateStr) => {
 };
 
 const facultyList = [
-  { id: 1, name: 'Jayson Guia', avatar: jaysonGuia },
-  { id: 2, name: 'Jei Pastrana', avatar: jeiPastranaAvatar },
-  { id: 3, name: 'Irene Balmes', avatar: ireneBalmes },
-  { id: 4, name: 'Carlo Torres', avatar: carloTorres },
-  { id: 5, name: 'Archie Menisis', avatar: archieMenisis },
-  { id: 6, name: 'Michael Joseph Aramil', avatar: michaelAramil }
+  { id: 1, name: 'Jayson Guia', avatar: null },
+  { id: 2, name: 'Jei Pastrana', avatar: null },
+  { id: 3, name: 'Irene Balmes', avatar: null },
+  { id: 4, name: 'Carlo Torres', avatar: null },
+  { id: 5, name: 'Archie Menisis', avatar: null },
+  { id: 6, name: 'Michael Joseph Aramil', avatar: null }
 ];
 
 const studentNames = [

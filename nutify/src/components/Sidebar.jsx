@@ -156,7 +156,27 @@ const Sidebar = ({ userType, userName, userRole, userAvatar }) => {
         <div className="sidebar-bottom">
           <div className="user-info">
             <div className="sidebar-avatar" onClick={handleAvatarClick}>
-              <img src={userAvatar} alt="Avatar" className="avatar" />
+              {userAvatar ? (
+                <img src={userAvatar} alt="Avatar" className="avatar" />
+              ) : (
+                <div
+                  className="avatar"
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    backgroundColor: '#e0e0e0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '16px',
+                    fontWeight: 'bold',
+                    color: '#666'
+                  }}
+                >
+                  {userName ? userName.split(' ').map(n => n[0]).join('').substring(0, 2) : 'U'}
+                </div>
+              )}
             </div>
             <div className="user-details">
               <div className="user-name">{userName}</div>

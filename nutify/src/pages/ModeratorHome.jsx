@@ -5,25 +5,8 @@ import '../styles/dashboard.css';
 import '../styles/moderatorhome.css';
 
 
-import johnDoeAvatar from '../assets/images/avatars/1c9a4dd0bbd964e3eecbd40caf3b7e37.jpg';
-import jeiPastranaAvatar from '../assets/images/avatars/1c9a4dd0bbd964e3eecbd40caf3b7e37.jpg';
-import ireneBalmes from '../assets/images/avatars/c33237da3438494d1abc67166196484e.jpg';
-import jaysonGuia from '../assets/images/avatars/d447a9fd5010652f6c0911fbe9c662c6.jpg';
-import carloTorres from '../assets/images/avatars/8940e8ea369def14e82f05a5fee994b9.jpg';
-import archieMenisis from '../assets/images/avatars/78529e2ec8eb4a2eb2fb961e04915b0a.jpg';
-import michaelAramil from '../assets/images/avatars/869f67a992bb6ca4cb657fb9fc634893.jpg';
-import erwinDeCastro from '../assets/images/avatars/92770c61168481c94e1ba43df7615fd8.jpg';
-import joelEnriquez from '../assets/images/avatars/944c5ba154e0489274504f38d01bcfaf.jpg';
-import bernieFabito from '../assets/images/avatars/78529e2ec8eb4a2eb2fb961e04915b0a.jpg';
 import bellIcon from '../assets/icons/bell-solid-full.svg';
 import searchIcon from '../assets/icons/search.svg';
-import facultyAvatar from '../assets/images/avatars/237d3876ef98d5364ed1326813f4ed5b.jpg';
-import beatrizSolis from '../assets/images/avatars/1c9a4dd0bbd964e3eecbd40caf3b7e37.jpg';
-import johnClarenz from '../assets/images/avatars/c33237da3438494d1abc67166196484e.jpg';
-import kriztopher from '../assets/images/avatars/8940e8ea369def14e82f05a5fee994b9.jpg';
-import nielCerezo from '../assets/images/avatars/237d3876ef98d5364ed1326813f4ed5b.jpg';
-import pennyLumbera from '../assets/images/avatars/237d3876ef98d5364ed1326813f4ed5b.jpg';
-import bobbyBuendia from '../assets/images/avatars/237d3876ef98d5364ed1326813f4ed5b.jpg';
 import checkIcon from '../assets/icons/check.svg';
 import CurrentQueue from '../components/CurrentQueue';
 import FacultyList from '../components/FacultyList';
@@ -114,24 +97,24 @@ const ModeratorHome = () => {
   };
 
   const facultyDropdownList = [
-    { id: 1, name: 'Jayson Guia', avatar: jaysonGuia },
-    { id: 2, name: 'Jei Pastrana', avatar: jeiPastranaAvatar },
-    { id: 3, name: 'Irene Balmes', avatar: ireneBalmes },
-    { id: 4, name: 'Carlo Torres', avatar: carloTorres },
-    { id: 5, name: 'Archie Menisis', avatar: archieMenisis },
-    { id: 6, name: 'Michael Joseph Aramil', avatar: michaelAramil },
-    { id: 7, name: 'Erwin De Castro', avatar: erwinDeCastro },
-    { id: 8, name: 'Joel Enriquez', avatar: joelEnriquez },
-    { id: 9, name: 'Bernie Fabito', avatar: bernieFabito },
-    { id: 10, name: 'Bobby Buendia', avatar: bobbyBuendia },
-    { id: 11, name: 'Penny Lumbera', avatar: pennyLumbera }
+    { id: 1, name: 'Jayson Guia', avatar: null },
+    { id: 2, name: 'Jei Pastrana', avatar: null },
+    { id: 3, name: 'Irene Balmes', avatar: null },
+    { id: 4, name: 'Carlo Torres', avatar: null },
+    { id: 5, name: 'Archie Menisis', avatar: null },
+    { id: 6, name: 'Michael Joseph Aramil', avatar: null },
+    { id: 7, name: 'Erwin De Castro', avatar: null },
+    { id: 8, name: 'Joel Enriquez', avatar: null },
+    { id: 9, name: 'Bernie Fabito', avatar: null },
+    { id: 10, name: 'Bobby Buendia', avatar: null },
+    { id: 11, name: 'Penny Lumbera', avatar: null }
   ];
 
   const studentDropdownList = [
-    { name: 'Beatriz Solis', avatar: beatrizSolis },
-    { name: 'John Clarenz Dimazana', avatar: johnClarenz },
-    { name: 'Kriztopher Kier Estioco', avatar: kriztopher },
-    { name: 'Niel Cerezo', avatar: nielCerezo }
+    { name: 'Beatriz Solis', avatar: null },
+    { name: 'John Clarenz Dimazana', avatar: null },
+    { name: 'Kriztopher Kier Estioco', avatar: null },
+    { name: 'Niel Cerezo', avatar: null }
   ];
 
   const filteredFaculty = facultyDropdownList.filter(f =>
@@ -310,7 +293,7 @@ const ModeratorHome = () => {
         userType="moderator"
         userName="John Doe"
         userRole="Moderator"
-        userAvatar={johnDoeAvatar}
+        userAvatar={null}
       />
 
       <Header
@@ -424,7 +407,22 @@ const ModeratorHome = () => {
                               setFacultySearch(f.name);
                             }}
                           >
-                            <img src={f.avatar} alt={f.name} style={{ width: 28, height: 28, borderRadius: '50%' }} />
+                            <div
+                              style={{
+                                width: 28,
+                                height: 28,
+                                borderRadius: '50%',
+                                backgroundColor: '#e0e0e0',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                                color: '#666'
+                              }}
+                            >
+                              {f.name.split(' ').map(n => n[0]).join('').substring(0, 2)}
+                            </div>
                             <span>{f.name}</span>
                           </div>
                         ))}
@@ -477,7 +475,22 @@ const ModeratorHome = () => {
                               setStudentSearch(s.name);
                             }}
                           >
-                            <img src={s.avatar} alt={s.name} style={{ width: 28, height: 28, borderRadius: '50%' }} />
+                            <div
+                              style={{
+                                width: 28,
+                                height: 28,
+                                borderRadius: '50%',
+                                backgroundColor: '#e0e0e0',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                                color: '#666'
+                              }}
+                            >
+                              {s.name.split(' ').map(n => n[0]).join('').substring(0, 2)}
+                            </div>
                             <span>{s.name}</span>
                           </div>
                         ))}

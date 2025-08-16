@@ -11,7 +11,6 @@ import OnHoldHistory from "../pages/components/OnHoldHistory";
 import "../styles/dashboard.css";
 import "../styles/moderatorhistory.css";
 
-import johnDoeAvatar from "../assets/images/avatars/1c9a4dd0bbd964e3eecbd40caf3b7e37.jpg";
 import filterIcon from "../assets/icons/filter.svg";
 import checkIcon from "../assets/icons/check.svg";
 
@@ -174,7 +173,7 @@ const ModeratorHistory = () => {
         userType="moderator"
         userName="John Doe"
         userRole="Moderator"
-        userAvatar={johnDoeAvatar}
+        userAvatar={null}
       />
 
       <Header
