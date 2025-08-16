@@ -78,7 +78,6 @@
 .hero-btn.primary {
   background: #ffd36b !important;
   color: #7a5c00 !important;
-  box-shadow: 4px 4px 8px #2a2d45, -4px -4px 8px #50567f;
 }
 
 .hero-btn.primary:active {
@@ -90,7 +89,6 @@
 
 .hero-btn.secondary {
   color: #424a57;
-  box-shadow: 4px 4px 8px #2a2d45, -4px -4px 8px #50567f;
 }
 
 .hero-btn.secondary:active {
