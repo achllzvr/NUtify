@@ -28,12 +28,8 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // For demo purposes, redirect based on idNumber
-    if (formData.idNumber.toLowerCase().includes("faculty")) {
-      navigate("/faculty/home");
-    } else {
-      navigate("/student/home");
-    }
+    // For demo purposes, redirect to moderator home only
+    navigate("/moderator/home");
   };
 
   return (

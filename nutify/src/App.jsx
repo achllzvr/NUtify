@@ -11,14 +11,6 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import ForgotPassword from './pages/ForgotPassword';
 
-// Student Pages
-import StudentHome from './pages/StudentHome';
-import StudentHistory from './pages/StudentHistory';
-
-// Faculty Pages
-import FacultyHome from './pages/FacultyHome';
-import FacultyHistory from './pages/FacultyHistory';
-
 // Moderator Pages
 import ModeratorHome from './pages/ModeratorHome';
 import ModeratorHistory from './pages/ModeratorHistory';
@@ -38,14 +30,6 @@ function AppContent() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        
-        {/* Student Routes */}
-        <Route path="/student/home" element={<StudentHome />} />
-        <Route path="/student/history" element={<StudentHistory />} />
-        
-        {/* Faculty Routes */}
-        <Route path="/faculty/home" element={<FacultyHome />} />
-        <Route path="/faculty/history" element={<FacultyHistory />} />
 
         {/* Moderator Routes */}
         <Route path="/moderator/home" element={<ModeratorHome />} />

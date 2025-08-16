@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import Sidebar from '../../components/Sidebar';
-import Header from '../../components/Header';
+import Sidebar from '../components/Sidebar';
+import Header from '../components/Header';
 import '../styles/dashboard.css';
 import '../styles/facultyhistory.css';
 
