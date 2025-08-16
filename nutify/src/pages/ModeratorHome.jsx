@@ -344,6 +344,36 @@ const ModeratorHome = () => {
       </div>
 
       {/* Fixed Button */}
+      <style>
+        {`
+          .fixed-create-request-btn {
+            transition: all 0.2s, box-shadow 0.2s;
+          }
+          .fixed-create-request-btn:hover {
+            transform: scale(1.07);
+            box-shadow: 0 8px 32px rgba(44,62,80,0.18);
+            filter: brightness(1.08);
+          }
+          @media (max-width: 768px) {
+            .fixed-create-request-btn {
+              padding: 10px 18px !important;
+              font-size: 15px !important;
+              border-radius: 50px !important;
+              min-width: 0 !important;
+              width: 48px !important;
+              height: 48px !important;
+              justify-content: center !important;
+            }
+            .fixed-create-request-btn span:last-child {
+              display: none !important;
+            }
+            .fixed-create-request-btn span:first-child {
+              margin-right: 0 !important;
+              font-size: 22px !important;
+            }
+          }
+        `}
+      </style>
       <button
         className="fixed-create-request-btn"
         style={{
@@ -361,10 +391,9 @@ const ModeratorHome = () => {
           border: 'none',
           cursor: 'pointer',
           fontFamily: '"Montserrat", sans-serif',
-          transition: 'all 0.2s',
           display: 'flex',
           alignItems: 'center',
-          gap: '10px', // Ensure gap is present for inline style fallback
+          gap: '10px',
         }}
         onClick={() => setShowRequestModal(true)}
       >

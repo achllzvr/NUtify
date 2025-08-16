@@ -294,8 +294,6 @@ const ModeratorHistory = () => {
                                 alignItems: "center",
                                 width: "100%",
                                 marginBottom: "8px",
-                                border: "none",
-                                background: "none",
                                 fontSize: "16px",
                                 fontWeight: activeFilter === option.value ? 600 : 500,
                                 color: activeFilter === option.value ? "#35408e" : "#2c3e50",
