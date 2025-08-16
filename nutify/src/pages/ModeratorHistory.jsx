@@ -1,4 +1,4 @@
-// Moderator history list UI
+// Page: Moderator History
 import React, { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
@@ -14,6 +14,7 @@ import "../styles/moderatorhistory.css";
 import filterIcon from "../assets/icons/filter.svg";
 import checkIcon from "../assets/icons/check.svg";
 
+// Date formatting
 const formatDateMMDDYYYY = (dateStr) => {
   const d = new Date(dateStr);
   return isNaN(d.getTime())
@@ -25,6 +26,7 @@ const formatDateMMDDYYYY = (dateStr) => {
 };
 
 const ModeratorHistory = () => {
+  // State variables
   const [activeFilter, setActiveFilter] = useState("dailylog");
   const [searchTerm, setSearchTerm] = useState("");
   const [searchInput, setSearchInput] = useState("");
@@ -33,7 +35,7 @@ const ModeratorHistory = () => {
   const [verifyAlertTransition, setVerifyAlertTransition] = useState(false);
   const [filterModalOpen, setFilterModalOpen] = useState(false);
 
-  // Filter options for tabs
+  // Filter tab options
   const filterOptions = [
     { value: "dailylog", label: "Daily Log", icon: filterIcon },
     { value: "request", label: "Request", icon: filterIcon },
@@ -41,23 +43,27 @@ const ModeratorHistory = () => {
     { value: "onhold", label: "On Hold", icon: filterIcon },
   ];
 
+  // Filter tab change handler
   const handleFilterChange = (filter) => {
     setActiveFilter(filter);
   };
 
+  // Search input handler
   const handleSearchChange = (value) => {
     setSearchInput(value);
   };
 
+  // Search handler
   const handleSearch = () => {
     setSearchTerm(searchInput);
   };
 
+  // Details modal handler
   const handleViewDetails = (item) => {
     setSelectedItem(item);
   };
 
-  // Show verify alert and play sound
+  // Verify handler
   const handleVerify = (item) => {
     const audio = new window.Audio("/nutified.wav");
     audio.play();
@@ -69,25 +75,25 @@ const ModeratorHistory = () => {
     }, 2500);
   };
 
+  // Verify alert close handler
   const handleVerifyAlertClose = () => {
     setVerifyAlertTransition(false);
     setTimeout(() => setVerifyAlertVisible(false), 350);
   };
 
+  // Mobile filter modal open/close handler
   const handleMobileFilterBtnClick = () => {
     setFilterModalOpen(true);
   };
-
   const handleFilterModalClose = () => {
     setFilterModalOpen(false);
   };
-
   const handleFilterSelect = (filter) => {
     setActiveFilter(filter);
     setFilterModalOpen(false);
   };
 
-  // Check for URL parameters on component mount
+  // Check for URL parameters on mount
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const filterParam = urlParams.get("filter");
@@ -101,7 +107,7 @@ const ModeratorHistory = () => {
     document.title = "Inbox - NUtify";
   }, []);
 
-  // Close
+  // Escape handler for modal
   useEffect(() => {
     if (!selectedItem) return;
     const handleEsc = (e) => {
@@ -111,9 +117,10 @@ const ModeratorHistory = () => {
     return () => window.removeEventListener("keydown", handleEsc);
   }, [selectedItem]);
 
+  // Main render
   return (
     <div>
-      {/* Verified alert */}
+      {/* Verified notification */}
       {verifyAlertVisible && (
         <div
           style={{
@@ -169,6 +176,7 @@ const ModeratorHistory = () => {
         </div>
       )}
 
+      {/* Sidebar */}
       <Sidebar
         userType="moderator"
         userName="John Doe"
@@ -176,6 +184,7 @@ const ModeratorHistory = () => {
         userAvatar={null}
       />
 
+      {/* Header */}
       <Header
         title="Hello, John Doe"
         subtitle="Manage your appointments and consultations in one place"
@@ -185,12 +194,12 @@ const ModeratorHistory = () => {
         onSearch={handleSearch}
       />
 
+      {/* Main content area */}
       <div className="moderator-history-main-content">
         <div className="moderator-history-content-container">
           <div className="moderator-history-left-column">
-            {/* History Section */}
             <div className="moderator-history-section">
-              {/* Desktop Filter Tabs */}
+              {/* Filter tabs (desktop) */}
               <div
                 className="moderator-history-filter-tabs"
                 data-active={activeFilter}
@@ -208,8 +217,7 @@ const ModeratorHistory = () => {
                   </button>
                 ))}
               </div>
-
-              {/* Mobile Filter Button */}
+              {/* Filter button (mobile) */}
               <button
                 className="moderator-history-filter-mobile-btn"
                 onClick={handleMobileFilterBtnClick}
@@ -225,8 +233,7 @@ const ModeratorHistory = () => {
                     ?.label || "Daily Log"}
                 </span>
               </button>
-
-              {/* Filter Modal for Mobile */}
+              {/* Mobile filter modal */}
               {filterModalOpen && (
                 <div
                   className="modal fade show"
@@ -346,6 +353,7 @@ const ModeratorHistory = () => {
                 ></div>
               )}
 
+              {/* History list section */}
               <div
                 className="moderator-history-card-list"
                 style={{

@@ -1,9 +1,9 @@
+// Page: Moderator Home
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import '../styles/dashboard.css';
 import '../styles/moderatorhome.css';
-
 
 import bellIcon from '../assets/icons/bell-solid-full.svg';
 import searchIcon from '../assets/icons/search.svg';
@@ -15,6 +15,7 @@ import calendarIcon from '../assets/icons/calendar.svg';
 import folderIcon from '../assets/icons/folder.svg';
 import archiveIcon from '../assets/icons/archive.svg';
 
+// Reason options and mapping
 const REASON_OPTIONS = ['Consultation', 'Meeting', 'Project', 'Other'];
 function mapReason(reason) {
   if (!reason) return 'Other';
@@ -32,6 +33,7 @@ const truncateReason = (reason, maxLength = 40) => {
 };
 
 const ModeratorHome = () => {
+  // State variables
   const [selectedFaculty, setSelectedFaculty] = useState(null);
   const [selectedSchedule, setSelectedSchedule] = useState(null);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
@@ -52,50 +54,7 @@ const ModeratorHome = () => {
   const [facultyStatusFilter, setFacultyStatusFilter] = useState('all');
   const [showRequestModal, setShowRequestModal] = useState(false);
 
-  const handleFacultyClick = (faculty) => {
-    setSelectedFaculty(faculty);
-    setShowScheduleModal(true);
-  };
-
-  const handleScheduleSelect = (schedule) => {
-    setSelectedSchedule(schedule);
-  };
-
-  const handleScheduleSubmit = () => {
-    if (selectedSchedule) {
-      setShowScheduleModal(false);
-      setShowSuccessModal(true);
-    }
-  };
-
-  const handleMainSearchInputChange = (value) => {
-    setMainSearchInput(value);
-  };
-
-  const handleSearch = () => {
-    setMainSearch(mainSearchInput);
-  };
-
-  const handleViewDetails = (appointment) => {
-    setDetailsModalAppointment(appointment);
-  };
-
-  const handleNotifyAppointees = (appointment) => {
-    const audio = new window.Audio('/nutified.wav');
-    audio.play();
-    setAlertVisible(true);
-    setTimeout(() => setAlertTransition(true), 10);
-    setTimeout(() => {
-      setAlertTransition(false);
-      setTimeout(() => setAlertVisible(false), 350);
-    }, 2500);
-  };
-
-  const handleAlertClose = () => {
-    setAlertTransition(false);
-    setTimeout(() => setAlertVisible(false), 350);
-  };
-
+  // Faculty and student dropdown lists
   const facultyDropdownList = [
     { id: 1, name: 'Jayson Guia', avatar: null },
     { id: 2, name: 'Jei Pastrana', avatar: null },
@@ -109,7 +68,6 @@ const ModeratorHome = () => {
     { id: 10, name: 'Bobby Buendia', avatar: null },
     { id: 11, name: 'Penny Lumbera', avatar: null }
   ];
-
   const studentDropdownList = [
     { name: 'Beatriz Solis', avatar: null },
     { name: 'John Clarenz Dimazana', avatar: null },
@@ -117,14 +75,67 @@ const ModeratorHome = () => {
     { name: 'Niel Cerezo', avatar: null }
   ];
 
+  // Filtering logic
   const filteredFaculty = facultyDropdownList.filter(f =>
     f.name.toLowerCase().includes(facultySearch.toLowerCase())
   );
-
   const filteredStudents = studentDropdownList.filter(s =>
     s.name.toLowerCase().includes(studentSearch.toLowerCase())
   );
 
+  // Faculty click handler
+  const handleFacultyClick = (faculty) => {
+    setSelectedFaculty(faculty);
+    setShowScheduleModal(true);
+  };
+
+  // Schedule select handler
+  const handleScheduleSelect = (schedule) => {
+    setSelectedSchedule(schedule);
+  };
+
+  // Schedule submit handler
+  const handleScheduleSubmit = () => {
+    if (selectedSchedule) {
+      setShowScheduleModal(false);
+      setShowSuccessModal(true);
+    }
+  };
+
+  // Main search input handler
+  const handleMainSearchInputChange = (value) => {
+    setMainSearchInput(value);
+  };
+
+  // Main search handler
+  const handleSearch = () => {
+    setMainSearch(mainSearchInput);
+  };
+
+  // Details modal handler
+  const handleViewDetails = (appointment) => {
+    setDetailsModalAppointment(appointment);
+  };
+
+  // Notify appointees handler
+  const handleNotifyAppointees = (appointment) => {
+    const audio = new window.Audio('/nutified.wav');
+    audio.play();
+    setAlertVisible(true);
+    setTimeout(() => setAlertTransition(true), 10);
+    setTimeout(() => {
+      setAlertTransition(false);
+      setTimeout(() => setAlertVisible(false), 350);
+    }, 2500);
+  };
+
+  // Alert close handler
+  const handleAlertClose = () => {
+    setAlertTransition(false);
+    setTimeout(() => setAlertVisible(false), 350);
+  };
+
+  // Schedule request handler
   const handleSchedule = () => {
     setFacultySelected('');
     setFacultySearch('');
@@ -141,15 +152,18 @@ const ModeratorHome = () => {
     }, 2500);
   };
 
+  // Request alert close handler
   const handleRequestAlertClose = () => {
     setRequestAlertTransition(false);
     setTimeout(() => setRequestAlertVisible(false), 350);
   };
 
+  // Set page title
   useEffect(() => {
     document.title = "Home - NUtify";
   }, []);
 
+  // Escape key handler for modals
   useEffect(() => {
     if (detailsModalAppointment) {
       const handleEsc = (event) => {
@@ -161,7 +175,6 @@ const ModeratorHome = () => {
       return () => window.removeEventListener("keydown", handleEsc);
     }
   }, [detailsModalAppointment]);
-
   useEffect(() => {
     if (showRequestModal) {
       const handleEsc = (event) => {
@@ -181,8 +194,10 @@ const ModeratorHome = () => {
     'Other'
   ];
 
+  // Main render
   return (
     <div>
+      {/* Success notification */}
       {alertVisible && (
         <div
           style={{
@@ -236,6 +251,7 @@ const ModeratorHome = () => {
         </div>
       )}
 
+      {/* Request Created notification */}
       {requestAlertVisible && (
         <div
           style={{
@@ -289,6 +305,7 @@ const ModeratorHome = () => {
         </div>
       )}
 
+      {/* Sidebar */}
       <Sidebar
         userType="moderator"
         userName="John Doe"
@@ -296,6 +313,7 @@ const ModeratorHome = () => {
         userAvatar={null}
       />
 
+      {/* Header */}
       <Header
         title="Hello, John Doe"
         subtitle="Manage your appointments and consultations in one place"
@@ -305,6 +323,7 @@ const ModeratorHome = () => {
         onSearch={handleSearch}
       />
 
+      {/* Main content area */}
       <div className="moderator-home-main-content">
         <div className="moderator-home-content-container">
           <div className="moderator-home-left-column">
@@ -315,7 +334,6 @@ const ModeratorHome = () => {
               truncateReason={truncateReason}
             />
           </div>
-
           <div className="moderator-home-right-column">
             <FacultyList
               mainSearch={mainSearch}
@@ -326,7 +344,7 @@ const ModeratorHome = () => {
         </div>
       </div>
 
-      {/* Fixed Button */}
+      {/* Create Request Button */}
       <button
         className="fixed-create-request-btn"
         onClick={() => setShowRequestModal(true)}
@@ -335,7 +353,7 @@ const ModeratorHome = () => {
         <span className="fixed-create-request-btn-text">Create Request</span>
       </button>
 
-      {/* Modal for Create On-the-spot Request */}
+      {/* Modal: Create On-the-spot Request */}
       {showRequestModal && (
         <>
           <div className="modal fade show" style={{ display: 'block', zIndex: 3000 }}>
@@ -362,6 +380,7 @@ const ModeratorHome = () => {
                   </span>
                 </div>
                 <div className="modal-body" style={{ padding: '0 25px 25px 25px' }}>
+                  {/* Faculty select */}
                   <div style={{ fontWeight: 500, marginBottom: '6px' }}>Select Faculty</div>
                   <div className="input-group" style={{ marginBottom: '18px', position: 'relative' }}>
                     <img src={searchIcon} alt="Search" className="input-icon" style={{ left: 18, width: 22, height: 22 }} />
@@ -430,6 +449,7 @@ const ModeratorHome = () => {
                     )}
                   </div>
 
+                  {/* Student select */}
                   <div style={{ fontWeight: 500, marginBottom: '6px' }}>Select Student</div>
                   <div className="input-group" style={{ marginBottom: '18px', position: 'relative' }}>
                     <img src={searchIcon} alt="Search" className="input-icon" style={{ left: 18, width: 22, height: 22 }} />
@@ -498,6 +518,7 @@ const ModeratorHome = () => {
                     )}
                   </div>
 
+                  {/* Reason select */}
                   <div style={{ fontWeight: 500, marginBottom: '6px' }}>Reason</div>
                   <div style={{ marginBottom: '18px' }}>
                     <select
@@ -569,6 +590,7 @@ const ModeratorHome = () => {
         </>
       )}
 
+      {/* Modal: Appointment Details */}
       {detailsModalAppointment && (
         <div className="modal fade show" style={{ display: 'block' }}>
           <div className="modal-dialog modal-dialog-centered">
@@ -612,7 +634,6 @@ const ModeratorHome = () => {
           </div>
         </div>
       )}
-
       {detailsModalAppointment && (
         <div className="modal-backdrop fade show"></div>
       )}

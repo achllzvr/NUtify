@@ -1,3 +1,4 @@
+// Current queue section
 import React, { useState } from 'react';
 import messageCircleIcon from '../assets/icons/message-circle.svg';
 import calendarIcon from '../assets/icons/calendar.svg';
@@ -149,7 +150,6 @@ const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, truncateR
   const handleNext = () => setPage(prev => Math.min(prev + 1, totalPages));
 
   const formatDateWithYear = (dateStr) => {
-    // Accepts formats like "July 29 2025 • 09:00 - 10:00"
     if (!dateStr) return '';
     const [datePart, timePart] = dateStr.split('•').map(s => s.trim());
     let d = new Date(datePart);
@@ -192,12 +192,10 @@ const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, truncateR
           paginatedQueue.map(appointment => {
             const reasonLabel = mapReason(appointment.reason);
             const { icon, bg } = reasonIconMap[reasonLabel];
-            // Show lorem ipsum if reason is Other
             const fullReasonText =
               reasonLabel === 'Other'
                 ? 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam euismod, nunc ut laoreet.'
                 : reasonLabel;
-            // Limit to 6 words for card
             const words = fullReasonText.split(' ');
             const shortReasonText =
               words.length > 6 ? words.slice(0, 6).join(' ') + '...' : fullReasonText;
@@ -214,7 +212,7 @@ const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, truncateR
                   flexDirection: 'row'
                 }}
               >
-                {/* Icon bar: desktop row, mobile top */}
+                {/* Icon bar */}
                 <div
                   className="moderator-home-queue-icon-bar"
                   style={{

@@ -1,4 +1,4 @@
-/* Content Container: Main content area layout */
+/* Layout: main content area */
 .moderator-home-main-content {
   margin-left: 80px;
   margin-top: 98px;
@@ -10,13 +10,13 @@
   align-items: flex-start;
 }
 
-/* Content container: holds left and right columns */
+/* Layout: grid container for columns */
 .moderator-home-content-container {
   display: grid;
   grid-template-columns: 2fr 1fr;
   grid-template-rows: auto 1fr;
   grid-gap: 30px;
-  max-width: 1400px; /* increased for more screen usage */
+  max-width: 1400px;
   margin: 0;
   padding: 0;
   width: 100%;
@@ -25,7 +25,7 @@
     "bottom bottom";
 }
 
-/* Left column: appointment/faculty sections */
+/* Left column content */
 .moderator-home-left-column {
   grid-area: left;
   display: flex;
@@ -33,19 +33,19 @@
   gap: 30px;
 }
 
-/* Right column: queue/list panel */
+/* Right column content */
 .moderator-home-right-column {
   grid-area: right;
   flex: none;
 }
 
-/* Appointment section: bottom card spans both columns */
+/* Bottom section spans both columns */
 .moderator-home-appointment-section {
   grid-area: bottom;
   margin-top: 0;
 }
 
-/* Appointment and faculty sections: card layout */
+/* Card styles for appointment/faculty sections */
 .moderator-home-appointment-section,
 .moderator-home-faculty-section {
   background: #f0f0f0;
@@ -54,25 +54,24 @@
   box-shadow: 20px 20px 40px rgba(0, 0, 0, 0.1),
     -20px -20px 40px rgba(255, 255, 255, 0.8);
   transition: all 0.3s ease;
-  width: 100%; /* ensure card fills container width */
-  height: 780px;     /* fixed height */
+  width: 100%;
+  height: 780px;
   display: flex;
   flex-direction: column;
 }
 
-/* Faculty section: neumorphic style */
+/* Neumorphic faculty card */
 .moderator-home-faculty-section {
   padding: 25px 20px 25px 25px;
 }
 
-/* Section header: title and actions */
+/* Section headers */
 .moderator-home-section-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 20px;
 }
-
 .moderator-home-section-header h2 {
   font-family: "Montserrat", sans-serif;
   font-size: 18px;
@@ -81,7 +80,7 @@
   margin: 0;
 }
 
-/* Appointment and faculty list: vertical stack */
+/* List layout for appointments/faculty */
 .moderator-home-appointment-list,
 .moderator-home-faculty-list {
   display: flex;
@@ -89,7 +88,7 @@
   gap: 15px;
 }
 
-/* Appointment/faculty items: card style */
+/* Item styles for appointment/faculty */
 .moderator-home-appointment-item,
 .moderator-home-faculty-item {
   display: flex;
@@ -112,14 +111,14 @@
   cursor: pointer;
 }
 
-/* Card hover effect */
+/* Item hover effect */
 .moderator-home-appointment-item:hover,
 .moderator-home-faculty-item:hover {
   box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.08),
     inset -5px -5px 10px rgba(255, 255, 255, 0.9);
 }
 
-/* Avatar: profile image */
+/* Avatar styles */
 .moderator-home-appointment-avatar,
 .moderator-home-faculty-avatar {
   width: 50px;
@@ -129,21 +128,19 @@
   margin-right: 15px;
   flex-shrink: 0;
 }
-
 .moderator-home-avatar-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-/* Info name/details: text layout */
+/* Info section for appointment/faculty */
 .moderator-home-appointment-info,
 .moderator-home-faculty-info {
   flex: 1;
   display: flex;
   flex-direction: column;
 }
-
 .moderator-home-appointment-name,
 .moderator-home-faculty-name {
   font-family: "Montserrat", sans-serif;
@@ -152,51 +149,43 @@
   color: #2c3e50;
   margin-bottom: 4px;
 }
-
 .moderator-home-appointment-details,
 .moderator-home-faculty-department {
   font-family: "Helvetica", sans-serif;
   font-size: 14px;
-  color: #424A57; /* changed from #7f8c8d */
+  color: #424A57;
   margin-bottom: 2px;
 }
-
 .moderator-home-appointment-time {
   font-family: "Helvetica", sans-serif;
   font-size: 13px;
-  color: #424A57; /* changed from #95a5a6 */
+  color: #424A57;
 }
 
-/* Slightly increase card info font size (smaller than before) */
+/* Slightly larger fonts for info */
 .moderator-home-appointment-item .moderator-home-appointment-info {
   font-size: 1.03em;
 }
-
 .moderator-home-appointment-item .moderator-home-appointment-name {
   font-size: 1.08em;
 }
-
 .moderator-home-appointment-item .moderator-home-appointment-details,
 .moderator-home-appointment-item .moderator-home-appointment-time {
   font-size: 1.04em;
-  color: #424A57; /* ensure override for appointment details/time color */
+  color: #424A57;
 }
-
-/* Slightly increase faculty info font size in faculty list */
 .moderator-home-faculty-item .moderator-home-faculty-info {
   font-size: 1.03em;
 }
-
 .moderator-home-faculty-item .moderator-home-faculty-name {
   font-size: 1.08em;
 }
-
 .moderator-home-faculty-item .moderator-home-faculty-department {
   font-size: 1.04em;
-  color: #424A57; /* ensure override for department color */
+  color: #424A57;
 }
 
-/* Faculty status: online/offline indicator */
+/* Online/offline indicator */
 .moderator-home-faculty-status {
   width: 12px;
   height: 12px;
@@ -206,7 +195,6 @@
   box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.1),
     -3px -3px 6px rgba(255, 255, 255, 0.8);
 }
-
 .moderator-home-faculty-status.online {
   background: #27ae60;
   box-shadow: 3px 3px 6px rgba(39, 174, 96, 0.3),
@@ -214,7 +202,6 @@
     inset 2px 2px 4px rgba(39, 174, 96, 0.8),
     inset -2px -2px 4px rgba(46, 204, 113, 0.8);
 }
-
 .moderator-home-faculty-status.offline {
   background: #e74c3c;
   box-shadow: 3px 3px 6px rgba(231, 76, 60, 0.3),
@@ -223,7 +210,7 @@
     inset -2px -2px 4px rgba(255, 87, 79, 0.8);
 }
 
-/* Schedule modal times container */
+/* Schedule modal times */
 .moderator-home-schedule-times-container {
   margin: 20px 0 0 0;
   display: flex;
@@ -231,7 +218,7 @@
   align-items: center;
 }
 
-/* Schedule time card: selectable time slot */
+/* Schedule time card */
 .moderator-home-schedule-time-card {
   background: #ededed;
   border-radius: 10px;
@@ -256,13 +243,12 @@
   cursor: pointer;
   transition: box-shadow 0.2s, background 0.2s;
 }
-
 .moderator-home-schedule-time-card.selected {
   box-shadow: inset 6px 6px 12px #d1d1d1, inset -6px -6px 12px #ffffff;
   background: #e0e0e0;
 }
 
-/* Schedule button */
+/* Schedule button style */
 .moderator-home-schedule-btn {
   background: linear-gradient(145deg, #3c489f, #323c86);
   box-shadow: 6px 6px 12px rgba(53, 64, 142, 0.2),
@@ -276,7 +262,6 @@
   transition: all 0.3s ease-in-out;
   font-family: "Helvetica", sans-serif;
 }
-
 .moderator-home-schedule-btn:active {
   box-shadow: inset 15px 15px 30px #35408e, inset -15px -15px 30px #3b469c;
 }
@@ -286,60 +271,50 @@
   background: linear-gradient(145deg, #ffffff, #d7d7d7);
   border: none !important;
 }
-
 .modal-header,
 .modal-footer {
   border: none !important;
   box-shadow: none !important;
 }
-
 .btn-close {
   border: none !important;
   outline: none !important;
   box-shadow: none !important;
 }
-
 .btn-close:focus {
   border: none !important;
   outline: none !important;
   box-shadow: none !important;
 }
-
-/* Success modal: special box styling */
 .modal-content[style*="border-radius: 20px"] {
   background: #f8f8f8;
   box-shadow: 0 4px 32px rgba(44, 62, 80, 0.13);
 }
 
-/* Primary button styling */
+/* Primary button style */
 .btn-primary {
   background: #35408e;
   border: none;
   font-weight: 600;
   box-shadow: 2px 2px 8px rgba(53, 64, 142, 0.08);
 }
-
 .btn-primary:active {
   background: #2a3273;
 }
 
-/* Queue list: remove scrollable area for appointments */
+/* Queue list styles */
 .moderator-home-queue-list {
-  /* height: 350px;
-  overflow-y: auto;
-  padding-right: 8px;
-  margin-right: -15px; */
   display: flex;
   flex-direction: column;
   gap: 1px;
   justify-content: flex-start;
   align-items: center;
   flex: 1 1 auto;
-  min-height: 0; /* allow flex scroll */
+  min-height: 0;
   overflow-y: auto;
 }
 
-/* See more button: shows more items */
+/* See more button */
 .moderator-home-see-more-btn {
   background: #f0f0f0;
   border: none;
@@ -358,7 +333,6 @@
   position: relative;
   overflow: hidden;
 }
-
 .moderator-home-see-more-btn:active {
   box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.1),
     inset -5px -5px 10px rgba(255, 255, 255, 0.8),
@@ -367,7 +341,7 @@
   transition: all 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-/* Notify button: send notifications */
+/* Notify button */
 .moderator-home-notify-btn {
   background: #f0f0f0;
   border: none;
@@ -387,7 +361,7 @@
   overflow: hidden;
 }
 
-/* Make buttons bigger */
+/* Larger button styles */
 .moderator-home-see-more-btn,
 .moderator-home-notify-btn {
   font-size: 1em !important;
@@ -411,13 +385,13 @@
   transition: box-shadow 0.2s, background 0.2s;
 }
 
-/* Input group: icon + input field layout */
+/* Input group layout */
 .input-group {
   position: relative;
   margin-bottom: 25px;
 }
 
-/* Input icon: position inside input */
+/* Input icon style */
 .input-icon {
   position: absolute;
   left: 25px;
@@ -443,18 +417,16 @@
   font-family: "Helvetica", sans-serif;
   color: #aeaeae;
 }
-
 .login-input::placeholder {
   color: #aeaeae;
   font-weight: 400;
 }
-
 .login-input:focus {
   outline: none !important;
   border: none !important;
 }
 
-/* Login button */
+/* Login button style */
 .login-button {
   position: relative;
   width: 100%;
@@ -473,7 +445,6 @@
   font-family: "Montserrat", sans-serif;
   overflow: hidden;
 }
-
 .login-button::before {
   content: "";
   position: absolute;
@@ -484,12 +455,11 @@
   transition: opacity 0.25s ease-in-out;
   pointer-events: none;
 }
-
 .login-button:active::before {
   opacity: 1;
 }
 
-/* Faculty filter dropdown: neumorphism style */
+/* Faculty filter dropdown */
 .moderator-home-faculty-filter-dropdown {
   border-radius: 15px;
   padding: 8px 18px;
@@ -513,8 +483,6 @@
   background-position: right 14px center;
   background-size: 18px 18px;
 }
-
-/* Dropdown: hover/focus style */
 .moderator-home-faculty-filter-dropdown:hover,
 .moderator-home-faculty-filter-dropdown:focus {
   outline: none;
@@ -522,21 +490,17 @@
   box-shadow: 4px 4px 8px rgba(53, 64, 142, 0.12),
     -4px -4px 8px rgba(255, 255, 255, 0.8);
 }
-
-/* Remove blue border from select arrow in Firefox */
 .moderator-home-faculty-filter-dropdown:-moz-focusring {
   color: #7F8C8D;
   outline: none;
   border: none;
 }
-
-/* Ensure dropdown options also use #1c1d1e color */
 .moderator-home-faculty-filter-dropdown option,
 select.login-input option {
   color: #1c1d1e;
 }
 
-/* Responsive Design: inputs/buttons */
+/* Responsive: inputs/buttons */
 @media (max-width: 768px) {
   .login-input {
     padding: 12px 20px 12px 50px;
@@ -548,14 +512,13 @@ select.login-input option {
   }
 }
 
-/* Responsive Design: layout for screens */
+/* Responsive layout for screens */
 @media (max-width: 1024px) {
   .moderator-home-content-container {
     display: flex;
     flex-direction: column;
     gap: 20px;
   }
-
   .moderator-home-left-column,
   .moderator-home-right-column,
   .moderator-home-appointment-section {
@@ -565,30 +528,25 @@ select.login-input option {
 }
 
 @media (max-width: 768px) {
-
   .moderator-home-appointment-section {
-  grid-area: bottom;
-  margin-top: 3.15em !important; /* add margin top to outer card */
-}
+    grid-area: bottom;
+    margin-top: 3.15em !important;
+  }
   .moderator-home-main-content {
     margin-left: 3.7em;
     margin-top: 110px;
   }
-
   #moderator-home-upcomingAppointments {
     margin-top: 2.5em;
   }
-
   .moderator-home-appointment-section,
   .moderator-home-faculty-section {
-    width: 100%; /* was 20em, now fill parent */
+    width: 100%;
   }
-
   .moderator-home-content-container {
     padding: 15px;
     align-items: center;
   }
-
   .moderator-home-section-header h2 {
     font-size: 15px;
   }
@@ -605,20 +563,17 @@ select.login-input option {
     margin: 0;
     width: 100%;
   }
-
   .moderator-home-left-column {
     width: 100%;
-    max-width: 700px; /* increased from 500px for larger card */
+    max-width: 700px;
     align-items: center;
   }
-
   .moderator-home-section-header {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
     gap: 10px;
   }
-
   .moderator-home-section-header h2 {
     font-size: 14px;
     flex: 1;
@@ -626,13 +581,13 @@ select.login-input option {
   }
 }
 
+/* Appointment section layout */
 .moderator-home-left-column > .moderator-home-appointment-section {
-  /* Increase height for the outer card */
   display: flex;
   flex-direction: column;
 }
 
-/* Make queue list fill the parent card */
+/* Queue list fills parent card */
 .moderator-home-queue-list {
   flex: 1 1 auto;
   display: flex;
@@ -642,7 +597,7 @@ select.login-input option {
   align-items: center;
 }
 
-/* Ensure appointment items adapt to width */
+/* Appointment items adapt width */
 .moderator-home-appointment-item {
   width: 100%;
   min-width: 0;
@@ -670,28 +625,24 @@ select.login-input option {
   gap: 10px;
   transition: all 0.2s, box-shadow 0.2s;
 }
-
 .fixed-create-request-btn:hover {
   transform: scale(1.07);
   box-shadow: 0 8px 32px rgba(44,62,80,0.18);
   filter: brightness(1.08);
 }
-
 .fixed-create-request-btn:active {
   box-shadow: inset 15px 15px 30px #35408e, inset -15px -15px 30px #3b469c;
 }
-
 .fixed-create-request-btn-plus {
   font-size: 22px;
   font-weight: 900;
   margin-right: 6px;
 }
-
 .fixed-create-request-btn-text {
   font-size: 17px;
 }
 
-/* Schedule button */
+/* Schedule button style */
 .Schedule-Button {
   background: #3c489f;
   color: white;
@@ -708,12 +659,11 @@ select.login-input option {
   transition: box-shadow 0.2s, background 0.2s;
   display: block;
 }
-
 .Schedule-Button:active {
   box-shadow: inset 15px 15px 30px #35408e, inset -15px -15px 30px #3b469c;
 }
 
-/* Gray and yellow button styles */
+/* Gray/yellow button variants */
 .moderator-home-see-more-btn.gray,
 .moderator-home-see-more-btn.details {
   background: #d4d4d4 !important;
@@ -730,7 +680,6 @@ select.login-input option {
   color: #5a6c7d;
   transition: all 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
-
 .moderator-home-notify-btn.verify {
   background: #ffd36b !important;
   color: #7a5c00 !important;
@@ -746,42 +695,39 @@ select.login-input option {
   transition: box-shadow 0.2s, background 0.2s;
 }
 
-/* Custom scrollbar styles for queue and faculty lists */
+/* Custom scrollbar styles */
 .moderator-home-queue-list,
 .moderator-home-faculty-list {
   scrollbar-width: thin;
-  scrollbar-color: #5a6c7d #e8e8f0; /* bluish gray thumb, lighter track */
+  scrollbar-color: #5a6c7d #e8e8f0;
 }
-
 .moderator-home-queue-list::-webkit-scrollbar,
 .moderator-home-faculty-list::-webkit-scrollbar {
   width: 8px;
-  background: #e8e8f0; /* lighter track */
+  background: #e8e8f0;
 }
-
 .moderator-home-queue-list::-webkit-scrollbar-thumb,
 .moderator-home-faculty-list::-webkit-scrollbar-thumb {
-  background: #5a6c7d; /* bluish gray thumb */
+  background: #5a6c7d;
   border-radius: 4px;
 }
-
 .moderator-home-queue-list::-webkit-scrollbar-track,
 .moderator-home-faculty-list::-webkit-scrollbar-track {
-  background: #e8e8f0; /* lighter track */
+  background: #e8e8f0;
   border-radius: 4px;
 }
 
-/* Neumorphic vertical icon bar for queue card */
+/* Neumorphic icon bar for queue card */
 .moderator-home-queue-icon-bar {
   box-shadow: inset 8px 8px 15px rgba(0,0,0,0.10), inset -8px -8px 15px rgba(255,255,255,0.08);
-  /* No border-right, no white border */
 }
+
+/* Responsive styles for buttons and queue on <=768px */
 @media (max-width: 768px) {
   .small-btn-text {
     font-size: 14px !important;
     padding: 5px 11px !important;
   }
-
   .moderator-home-appointment-item {
     flex-direction: column !important;
     align-items: flex-start !important;
@@ -791,7 +737,6 @@ select.login-input option {
     margin-bottom: 8px !important;
     margin-right: 0 !important;
   }
-
   .fixed-create-request-btn {
     padding: 10px 18px !important;
     font-size: 15px !important;

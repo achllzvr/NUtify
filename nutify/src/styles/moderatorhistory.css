@@ -1,20 +1,20 @@
-/* Main content container layout */
+/* Layout: main content container */
 .moderator-history-main-content {
   margin-left: 80px;
   margin-top: 88px;
   min-height: calc(100vh - 88px);
-  padding: 10px; /* match moderatorhome */
+  padding: 10px;
   transition: margin-left 0.3s ease;
   display: flex;
   justify-content: center;
   align-items: flex-start;
 }
 
-/* Content container: centers left column */
+/* Layout: content container */
 .moderator-history-content-container {
   max-width: 1400px;
-  margin: 0; /* remove auto margin */
-  padding: 0; /* match moderatorhome */
+  margin: 0;
+  padding: 0;
   width: 100%;
 }
 
@@ -39,7 +39,6 @@
   position: relative;
   border-bottom: 2px solid #e8e8e8;
 }
-
 .moderator-history-filter-tabs::after {
   content: "";
   position: absolute;
@@ -68,73 +67,40 @@
   border-bottom: 2px solid transparent;
   flex: 1;
 }
-
 .moderator-history-filter-btn:hover {
   color: #5a6c7d;
   background: rgba(53, 64, 142, 0.05);
 }
-
 .moderator-history-filter-btn.active {
   color: #35408e;
   font-weight: 600;
   background: rgba(53, 64, 142, 0.08);
 }
 
-/* Active tab indicator width/position per status */
-.moderator-history-filter-tabs[data-active="pending"]::after {
-  width: 14.28%;
-  left: 14.28%;
-}
-.moderator-history-filter-tabs[data-active="accepted"]::after {
-  width: 14.28%;
-  left: 28.56%;
-}
-.moderator-history-filter-tabs[data-active="completed"]::after {
-  width: 14.28%;
-  left: 42.84%;
-}
-.moderator-history-filter-tabs[data-active="missed"]::after {
-  width: 14.28%;
-  left: 57.12%;
-}
-.moderator-history-filter-tabs[data-active="cancelled"]::after {
-  width: 14.28%;
-  left: 71.4%;
-}
-.moderator-history-filter-tabs[data-active="declined"]::after {
-  width: 14.28%;
-  left: 85.68%;
-}
-.moderator-history-filter-tabs[data-active="dailylog"]::after {
-  width: 25%;
-  left: 0;
-}
-.moderator-history-filter-tabs[data-active="request"]::after {
-  width: 25%;
-  left: 25%;
-}
-.moderator-history-filter-tabs[data-active="approval"]::after {
-  width: 25%;
-  left: 50%;
-}
-.moderator-history-filter-tabs[data-active="onhold"]::after {
-  width: 25%;
-  left: 75%;
-}
+/* Active tab indicator width/position */
+.moderator-history-filter-tabs[data-active="pending"]::after { width: 14.28%; left: 14.28%; }
+.moderator-history-filter-tabs[data-active="accepted"]::after { width: 14.28%; left: 28.56%; }
+.moderator-history-filter-tabs[data-active="completed"]::after { width: 14.28%; left: 42.84%; }
+.moderator-history-filter-tabs[data-active="missed"]::after { width: 14.28%; left: 57.12%; }
+.moderator-history-filter-tabs[data-active="cancelled"]::after { width: 14.28%; left: 71.4%; }
+.moderator-history-filter-tabs[data-active="declined"]::after { width: 14.28%; left: 85.68%; }
+.moderator-history-filter-tabs[data-active="dailylog"]::after { width: 25%; left: 0; }
+.moderator-history-filter-tabs[data-active="request"]::after { width: 25%; left: 25%; }
+.moderator-history-filter-tabs[data-active="approval"]::after { width: 25%; left: 50%; }
+.moderator-history-filter-tabs[data-active="onhold"]::after { width: 25%; left: 75%; }
 
 /* History card section */
 .moderator-history-section {
   background: #f0f0f0;
   border-radius: 20px;
   padding: 15px 25px 25px 25px;
-
   box-shadow: 20px 20px 40px rgba(0, 0, 0, 0.1),
     -20px -20px 40px rgba(255, 255, 255, 0.8);
   transition: all 0.3s ease;
-  height: 780px; /* fixed height */
+  height: 780px;
   display: flex;
   flex-direction: column;
-  width: 100%; /* ensure card fills container width */
+  width: 100%;
 }
 
 /* Card list: scrollable container for history items */
@@ -148,21 +114,18 @@
   padding: 10px 12px 10px 0;
   margin-right: -12px;
   scrollbar-width: thin;
-  scrollbar-color: #5a6c7d #e8e8f0; /* bluish gray thumb, lighter track */
+  scrollbar-color: #5a6c7d #e8e8f0;
 }
-
 .moderator-history-card-list::-webkit-scrollbar {
   width: 8px;
-  background: #e8e8f0; /* lighter track */
+  background: #e8e8f0;
 }
-
 .moderator-history-card-list::-webkit-scrollbar-thumb {
-  background: #5a6c7d; /* bluish gray thumb */
+  background: #5a6c7d;
   border-radius: 4px;
 }
-
 .moderator-history-card-list::-webkit-scrollbar-track {
-  background: #e8e8f0; /* lighter track */
+  background: #e8e8f0;
   border-radius: 4px;
 }
 
@@ -171,8 +134,8 @@
 .moderator-history-item {
   display: flex;
   align-items: center;
-  justify-content: space-between; /* Add this for horizontal layout */
-  padding: 82px 32px 82px 32px; /* increased top and horizontal padding */
+  justify-content: space-between;
+  padding: 82px 32px 82px 32px;
   margin: 0 2px 24px 2px;
   background: #f0f0f0;
   border-radius: 15px;
@@ -182,15 +145,15 @@
   min-height: 140px;
 }
 
-/* Ensure button container aligns right */
+/* Button container aligns right */
 .moderator-history-item > div:last-child,
 .moderator-history-appointment-item > div:last-child {
   display: flex;
   align-items: center;
   margin-left: 18px;
   gap: 10px;
-  flex-shrink: 0; /* Prevent shrinking */
-  min-width: 200px; /* Ensure enough space for both buttons */
+  flex-shrink: 0;
+  min-width: 200px;
 }
 
 /* Avatar for history cards */
@@ -204,7 +167,6 @@
   margin-right: 32px;
   flex-shrink: 0;
 }
-
 .moderator-history-avatar-img {
   width: 70px;
   height: 70px;
@@ -217,7 +179,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 0 12px; /* Added padding for inner card info */
+  padding: 0 12px;
 }
 
 /* Name/title in card */
@@ -238,7 +200,6 @@
   color: #7f8c8d;
   margin-bottom: 2px;
 }
-
 .moderator-history-appointment-time {
   font-family: "Helvetica", sans-serif;
   font-size: 14px;
@@ -253,11 +214,11 @@
 .moderator-history-see-more-btn,
 .moderator-home-see-more-btn {
   background: #f0f0f0;
-  width: 260px; /* Even wider */
+  width: 260px;
   margin-top: 5px;
   border: none;
   border-radius: 15px;
-  padding: 10px 0; /* Reduced vertical padding */
+  padding: 10px 0;
   font-size: 20px;
   color: #35408e;
   cursor: pointer;
@@ -275,7 +236,6 @@
   text-align: center;
   display: inline-block;
 }
-
 .moderator-history-see-more-btn:active,
 .moderator-home-see-more-btn:active {
   box-shadow: inset 8px 8px 15px rgba(0, 0, 0, 0.13),
@@ -356,27 +316,6 @@
   transition: box-shadow 0.2s, background 0.2s;
 }
 
-/* Custom scrollbar for card list */
-.moderator-history-card-list {
-  scrollbar-width: thin;
-  scrollbar-color: #5a6c7d #e8e8f0; /* bluish gray thumb, lighter track */
-}
-
-.moderator-history-card-list::-webkit-scrollbar {
-  width: 8px;
-  background: #e8e8f0; /* lighter track */
-}
-
-.moderator-history-card-list::-webkit-scrollbar-thumb {
-  background: #5a6c7d; /* bluish gray thumb */
-  border-radius: 4px;
-}
-
-.moderator-history-card-list::-webkit-scrollbar-track {
-  background: #e8e8f0; /* lighter track */
-  border-radius: 4px;
-}
-
 /* Filter modal options */
 .moderator-history-filter-modal-options {
   display: flex;
@@ -400,19 +339,16 @@
   font-weight: 500;
   color: #2c3e50;
 }
-
 .moderator-history-filter-option:hover {
   background: #f0f0f0;
   border-color: #e8e8e8;
 }
-
 .moderator-history-filter-option.selected {
   background: rgba(53, 64, 142, 0.1);
   border-color: #35408e;
   color: #35408e;
   font-weight: 600;
 }
-
 .moderator-history-filter-option-icon {
   width: 20px;
   height: 20px;
@@ -420,7 +356,6 @@
   filter: brightness(0) saturate(100%) invert(25%) sepia(15%) saturate(1000%)
     hue-rotate(200deg) brightness(95%) contrast(90%);
 }
-
 .moderator-history-filter-option.selected
   .moderator-history-filter-option-icon {
   filter: brightness(0) saturate(100%) invert(28%) sepia(80%) saturate(1000%)
@@ -445,7 +380,6 @@
   font-family: "Helvetica", sans-serif;
   overflow: hidden;
 }
-
 #moderator-history-filterModalBtn::before {
   content: "";
   position: absolute;
@@ -456,7 +390,6 @@
   transition: opacity 0.25s ease-in-out;
   pointer-events: none;
 }
-
 #moderator-history-filterModalBtn:active::before {
   opacity: 1;
 }
@@ -476,50 +409,18 @@
 }
 
 /* Status badge colors per state */
-.moderator-history-status-pending {
-  background: #ffd36b;
-  color: #7a5c00;
-}
-.moderator-history-status-missed {
-  background: #ff7a7a;
-  color: #fff;
-}
-.moderator-history-status-completed {
-  background: #4caf50;
-  color: #fff;
-}
-.moderator-history-status-cancelled {
-  background: #ff7a7a;
-  color: #fff;
-}
-.moderator-history-status-declined {
-  background: #ff7a7a;
-  color: #fff;
-}
-.moderator-history-status-accepted {
-  background: #4caf50;
-  color: #fff;
-}
-.moderator-history-status-dailylog {
-  background: #4caf50;
-  color: #fff;
-}
-.moderator-history-status-request {
-  background: #ffd36b;
-  color: #7a5c00;
-}
-.moderator-history-status-approval {
-  background: #4caf50;
-  color: #fff;
-}
-.moderator-history-status-onhold {
-  background: #ff7a7a;
-  color: #fff;
-}
+.moderator-history-status-pending { background: #ffd36b; color: #7a5c00; }
+.moderator-history-status-missed { background: #ff7a7a; color: #fff; }
+.moderator-history-status-completed { background: #4caf50; color: #fff; }
+.moderator-history-status-cancelled { background: #ff7a7a; color: #fff; }
+.moderator-history-status-declined { background: #ff7a7a; color: #fff; }
+.moderator-history-status-accepted { background: #4caf50; color: #fff; }
+.moderator-history-status-dailylog { background: #4caf50; color: #fff; }
+.moderator-history-status-request { background: #ffd36b; color: #7a5c00; }
+.moderator-history-status-approval { background: #4caf50; color: #fff; }
+.moderator-history-status-onhold { background: #ff7a7a; color: #fff; }
 
-.moderator-history-filter-mobile-btn {
-  display: none;
-}
+.moderator-history-filter-mobile-btn { display: none; }
 
 /* History details modal */
 .moderator-history-details-modal-content {
@@ -527,7 +428,6 @@
   border-radius: 20px;
   border: none !important;
 }
-
 .moderator-history-details-modal-body {
   display: flex;
   flex-direction: column;
@@ -535,7 +435,6 @@
   gap: 15px;
   padding: 12px 0;
 }
-
 .moderator-history-details-modal-title {
   font-family: "Montserrat", sans-serif;
   font-size: 2rem;
@@ -543,7 +442,6 @@
   color: #2c3e50;
   text-align: center;
 }
-
 .moderator-history-details-modal-time {
   font-family: "Helvetica", sans-serif;
   font-size: 1rem;
@@ -552,7 +450,6 @@
   text-align: center;
   margin-bottom: 1em;
 }
-
 .moderator-history-details-modal-status {
   width: 100%;
   max-width: 320px;
@@ -598,19 +495,16 @@
   background: linear-gradient(145deg, #ffffff, #d7d7d7);
   border: none !important;
 }
-
 .modal-header,
 .modal-footer {
   border: none !important;
   box-shadow: none !important;
 }
-
 .btn-close {
   border: none !important;
   outline: none !important;
   box-shadow: none !important;
 }
-
 .btn-close:focus {
   border: none !important;
   outline: none !important;
@@ -642,17 +536,17 @@
   }
   .moderator-history-content-container {
     margin-top: 10.5px!important;
-    padding: 0; /* match moderatorhome */
+    padding: 0;
     max-width: 100%;
-    margin: 0; /* remove auto margin */
+    margin: 0;
   }
   .moderator-history-filter-tabs {
     display: none;
   }
   .moderator-history-see-more-btn {
-    width: 210px; /* Wider for mobile */
+    width: 210px;
     min-width: 210px;
-    padding: 8px 0; /* Reduced vertical padding for mobile */
+    padding: 8px 0;
     font-size: 18px;
     border-radius: 12px;
   }
@@ -676,7 +570,7 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    height: 780px; /* ensure fixed height */
+    height: 780px;
   }
   .moderator-history-card-list {
     flex: 1 1 auto;
@@ -685,7 +579,6 @@
     flex-direction: column;
     justify-content: flex-start;
     overflow-y: auto;
-    /* Remove max-height */
   }
 }
 
@@ -695,10 +588,10 @@
     margin-top: 150px;
   }
   .moderator-history-see-more-btn {
-    padding: 8px 0; /* Reduced vertical padding for tablet */
+    padding: 8px 0;
     font-size: 16px;
     border-radius: 14px;
-    width: 100%; /* Keep full width for tablet */
+    width: 100%;
     display: block;
     text-align: center;
     margin-top: 10px;
@@ -723,55 +616,24 @@
       -6px -6px 12px rgba(255, 255, 255, 0.8);
     padding: 4px 0;
   }
-  .moderator-history-status-pending.moderator-history-status-mobile {
-    background: #ffd36b;
-    color: #7a5c00;
-  }
-  .moderator-history-status-missed.moderator-history-status-mobile {
-    background: #ff7a7a;
-    color: #fff;
-  }
-  .moderator-history-status-completed.moderator-history-status-mobile {
-    background: #4caf50;
-    color: #fff;
-  }
-  .moderator-history-status-cancelled.moderator-history-status-mobile {
-    background: #ff7a7a;
-    color: #fff;
-  }
-  .moderator-history-status-declined.moderator-history-status-mobile {
-    background: #ff7a7a;
-    color: #fff;
-  }
-  .moderator-history-status-accepted.moderator-history-status-mobile {
-    background: #4caf50;
-    color: #fff;
-  }
-  .moderator-history-status-dailylog.moderator-history-status-mobile {
-    background: #4caf50;
-    color: #fff;
-  }
-  .moderator-history-status-request.moderator-history-status-mobile {
-    background: #ffd36b;
-    color: #7a5c00;
-  }
-  .moderator-history-status-approval.moderator-history-status-mobile {
-    background: #4caf50;
-    color: #fff;
-  }
-  .moderator-history-status-onhold.moderator-history-status-mobile {
-    background: #ff7a7a;
-    color: #fff;
-  }
+  .moderator-history-status-pending.moderator-history-status-mobile { background: #ffd36b; color: #7a5c00; }
+  .moderator-history-status-missed.moderator-history-status-mobile { background: #ff7a7a; color: #fff; }
+  .moderator-history-status-completed.moderator-history-status-mobile { background: #4caf50; color: #fff; }
+  .moderator-history-status-cancelled.moderator-history-status-mobile { background: #ff7a7a; color: #fff; }
+  .moderator-history-status-declined.moderator-history-status-mobile { background: #ff7a7a; color: #fff; }
+  .moderator-history-status-accepted.moderator-history-status-mobile { background: #4caf50; color: #fff; }
+  .moderator-history-status-dailylog.moderator-history-status-mobile { background: #4caf50; color: #fff; }
+  .moderator-history-status-request.moderator-history-status-mobile { background: #ffd36b; color: #7a5c00; }
+  .moderator-history-status-approval.moderator-history-status-mobile { background: #4caf50; color: #fff; }
+  .moderator-history-status-onhold.moderator-history-status-mobile { background: #ff7a7a; color: #fff; }
 }
 
 /* Responsive history card layout for <=768px */
 @media (max-width: 768px) {
   .moderator-history-section {
     border-radius: 14px !important;
-    width: 100% !important; /* ensure full width like moderatorhome */
+    width: 100% !important;
     height: auto !important;
-
   }
   .moderator-history-card-list {
     padding: 0 !important;
@@ -829,19 +691,17 @@
   }
 }
 
-/* Slightly increase card info font size (smaller than before) */
+/* Slightly increase card info font size */
 .moderator-history-item .moderator-history-appointment-info,
 .moderator-history-appointment-item .moderator-history-appointment-info {
   font-size: 1.03em;
 }
-
 .moderator-history-item .moderator-history-appointment-name,
 .moderator-history-appointment-item .moderator-history-appointment-name,
 .moderator-history-item .moderator-history-name,
 .moderator-history-appointment-item .moderator-history-name {
   font-size: 1.08em;
 }
-
 .moderator-history-item .moderator-history-appointment-details,
 .moderator-history-appointment-item .moderator-history-appointment-details,
 .moderator-history-item .moderator-history-details,
@@ -861,12 +721,9 @@
 .moderator-history-appointment-item .moderator-history-appointment-time {
   font-size: 1.04em;
 }
-
-/* Make buttons a bit smaller */
 .moderator-history-see-more-btn,
 .moderator-home-see-more-btn {
   font-size: 1em !important;
   padding: 10px 0 !important;
   min-height: 38px;
 }
-
