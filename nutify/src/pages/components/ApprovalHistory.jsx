@@ -152,7 +152,7 @@ const ApprovalHistory = ({ onVerify, searchTerm }) => {
             >
               <div
                 className="moderator-history-appointment-name moderator-history-name"
-                style={{ fontSize: "1.25em", color: "#424A57" }} // slightly bigger name
+                style={{ fontSize: "1.6em", color: "#424A57" }} 
               >
                 {item.name}
               </div>
