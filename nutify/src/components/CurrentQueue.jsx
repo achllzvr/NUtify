@@ -38,6 +38,24 @@ function parseDateSafe(input) {
   return null;
 }
 
+// Format a time (Date or HH:mm[:ss] string) to 12-hour with AM/PM
+function formatTime12(dateOrString) {
+  if (!dateOrString) return '';
+  const d = parseDateSafe(dateOrString);
+  if (d) return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+  if (typeof dateOrString === 'string') {
+    const m = dateOrString.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
+    if (m) {
+      const hh = m[1].padStart(2, '0');
+      const mm = m[2];
+      const ss = m[3] ? m[3] : '00';
+      const d2 = parseDateSafe(`1970-01-01 ${hh}:${mm}:${ss}`);
+      if (d2) return d2.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+    }
+  }
+  return String(dateOrString);
+}
+
 function formatDateRange(dateLike, fromTimeLike, toTimeLike) {
   // dateLike can be a full datetime or just a date string.
   const dateObj = parseDateSafe(dateLike);
@@ -52,14 +70,12 @@ function formatDateRange(dateLike, fromTimeLike, toTimeLike) {
   }
 
   // Build time labels
-  const timeFrom = parseDateSafe(fromTimeLike);
-  const timeTo = parseDateSafe(toTimeLike);
-  const timeFromLabel = timeFrom ? timeFrom.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }) : (typeof fromTimeLike === 'string' ? fromTimeLike : '');
-  const timeToLabel = timeTo ? timeTo.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }) : (typeof toTimeLike === 'string' ? toTimeLike : '');
+  const timeFromLabel = formatTime12(fromTimeLike);
+  const timeToLabel = formatTime12(toTimeLike);
 
   // If dateLike includes time (full datetime) and no separate times provided
   if (!hasSeparateTimes && dateObj && typeof dateLike === 'string' && /\d{2}:\d{2}/.test(dateLike)) {
-    const t = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+    const t = dateObj.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
     return `${dateLabel}${t ? ' • ' + t : ''}`;
   }
 
