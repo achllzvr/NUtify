@@ -36,9 +36,9 @@ export async function notifyAppointees(appointment_id) {
   return apiPost('notifyAppointees', { appointment_id });
 }
 
-// Create an on-the-spot request (moderator) — renamed to avoid backend name clashes
+// Create an on-the-spot request (moderator) — calls existing backend action
 export async function createImmediateAppointment(teacher_id, student_id, appointment_reason) {
-  return apiPost('createImmediateAppointment', { teacher_id, student_id, appointment_reason });
+  return apiPost('moderatorCreateOnSpotRequest', { teacher_id, student_id, appointment_reason });
 }
 
 // Helper: fetch user id by full name (form POST)
@@ -47,4 +47,10 @@ export async function fetchIdByName(name) {
   return apiPost('fetchID', formBody, {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
   });
+}
+
+// Search users by role for typeahead (returns up to 20 verified users)
+// role: 'teacher' | 'student', q: search string
+export async function searchUsers(role, q) {
+  return apiPost('searchUsers', { q, role });
 }

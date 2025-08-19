@@ -1,6 +1,6 @@
 // Page: Moderator Home
 import React, { useState, useEffect } from 'react';
-import { notifyAppointees, createImmediateAppointment, fetchIdByName } from '../api/moderator';
+import { notifyAppointees, createImmediateAppointment, fetchIdByName, searchUsers } from '../api/moderator';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import '../styles/dashboard.css';
@@ -44,8 +44,14 @@ const ModeratorHome = () => {
   const [alertTransition, setAlertTransition] = useState(false);
   const [facultySearch, setFacultySearch] = useState('');
   const [facultySelected, setFacultySelected] = useState('');
+  const [facultySelectedId, setFacultySelectedId] = useState(null);
+  const [facultyResults, setFacultyResults] = useState([]);
+  const [facultyLoading, setFacultyLoading] = useState(false);
   const [studentName, setStudentName] = useState('');
   const [studentSearch, setStudentSearch] = useState('');
+  const [studentSelectedId, setStudentSelectedId] = useState(null);
+  const [studentResults, setStudentResults] = useState([]);
+  const [studentLoading, setStudentLoading] = useState(false);
   const [reason, setReason] = useState('');
   const [reasonType, setReasonType] = useState('Consultation');
   const [mainSearchInput, setMainSearchInput] = useState('');
@@ -55,34 +61,53 @@ const ModeratorHome = () => {
   const [facultyStatusFilter, setFacultyStatusFilter] = useState('all');
   const [showRequestModal, setShowRequestModal] = useState(false);
 
-  // Faculty and student dropdown lists
-  const facultyDropdownList = [
-    { id: 1, name: 'Jayson Guia', avatar: null },
-    { id: 2, name: 'Jei Pastrana', avatar: null },
-    { id: 3, name: 'Irene Balmes', avatar: null },
-    { id: 4, name: 'Carlo Torres', avatar: null },
-    { id: 5, name: 'Archie Menisis', avatar: null },
-    { id: 6, name: 'Michael Joseph Aramil', avatar: null },
-    { id: 7, name: 'Erwin De Castro', avatar: null },
-    { id: 8, name: 'Joel Enriquez', avatar: null },
-    { id: 9, name: 'Bernie Fabito', avatar: null },
-    { id: 10, name: 'Bobby Buendia', avatar: null },
-    { id: 11, name: 'Penny Lumbera', avatar: null }
-  ];
-  const studentDropdownList = [
-    { name: 'Beatriz Solis', avatar: null },
-    { name: 'John Clarenz Dimazana', avatar: null },
-    { name: 'Kriztopher Kier Estioco', avatar: null },
-    { name: 'Niel Cerezo', avatar: null }
-  ];
+  // Debounced typeahead: Faculty (teachers)
+  useEffect(() => {
+    let active = true;
+    const q = (facultySearch || '').trim();
+    if (!q) {
+      setFacultyResults([]);
+      return () => { active = false; };
+    }
+    setFacultyLoading(true);
+    const t = setTimeout(async () => {
+      try {
+        const res = await searchUsers('teacher', q);
+        if (!active) return;
+        const list = Array.isArray(res) ? res : (res.results || []);
+        setFacultyResults(list);
+      } catch (e) {
+        if (active) setFacultyResults([]);
+      } finally {
+        if (active) setFacultyLoading(false);
+      }
+    }, 250);
+    return () => { active = false; clearTimeout(t); };
+  }, [facultySearch]);
 
-  // Filtering logic
-  const filteredFaculty = facultyDropdownList.filter(f =>
-    f.name.toLowerCase().includes(facultySearch.toLowerCase())
-  );
-  const filteredStudents = studentDropdownList.filter(s =>
-    s.name.toLowerCase().includes(studentSearch.toLowerCase())
-  );
+  // Debounced typeahead: Students
+  useEffect(() => {
+    let active = true;
+    const q = (studentSearch || '').trim();
+    if (!q) {
+      setStudentResults([]);
+      return () => { active = false; };
+    }
+    setStudentLoading(true);
+    const t = setTimeout(async () => {
+      try {
+        const res = await searchUsers('student', q);
+        if (!active) return;
+        const list = Array.isArray(res) ? res : (res.results || []);
+        setStudentResults(list);
+      } catch (e) {
+        if (active) setStudentResults([]);
+      } finally {
+        if (active) setStudentLoading(false);
+      }
+    }, 250);
+    return () => { active = false; clearTimeout(t); };
+  }, [studentSearch]);
 
   // Faculty click handler
   const handleFacultyClick = (faculty) => {
@@ -148,11 +173,17 @@ const ModeratorHome = () => {
   // Schedule request handler
   const handleSchedule = async () => {
     try {
-      // Resolve IDs by full names via backend
-      const teacherRes = facultySelected ? await fetchIdByName(facultySelected) : null;
-      const studentRes = studentName ? await fetchIdByName(studentName) : null;
-      const teacher_id = teacherRes && (teacherRes.user_id || teacherRes.id || teacherRes.userID);
-      const student_id = studentRes && (studentRes.user_id || studentRes.id || studentRes.userID);
+      // Prefer IDs selected from typeahead; fallback to name lookup
+      let teacher_id = facultySelectedId;
+      let student_id = studentSelectedId;
+      if (!teacher_id && facultySelected) {
+        const teacherRes = await fetchIdByName(facultySelected);
+        teacher_id = teacherRes && (teacherRes.user_id || teacherRes.id || teacherRes.userID);
+      }
+      if (!student_id && studentName) {
+        const studentRes = await fetchIdByName(studentName);
+        student_id = studentRes && (studentRes.user_id || studentRes.id || studentRes.userID);
+      }
       const appointment_reason = reasonType === 'Other' ? (reason || 'Other') : reasonType;
       if (teacher_id && student_id) {
         await createImmediateAppointment(teacher_id, student_id, appointment_reason);
@@ -161,9 +192,13 @@ const ModeratorHome = () => {
       // Non-blocking: still show success UX to keep parity with current UI
     } finally {
       setFacultySelected('');
+  setFacultySelectedId(null);
       setFacultySearch('');
+  setFacultyResults([]);
       setStudentName('');
       setStudentSearch('');
+  setStudentSelectedId(null);
+  setStudentResults([]);
       setReason('');
       const audio = new window.Audio('/nutified.wav');
       audio.play();
@@ -416,6 +451,7 @@ const ModeratorHome = () => {
                       onChange={e => {
                         setFacultySearch(e.target.value);
                         setFacultySelected('');
+                        setFacultySelectedId(null);
                       }}
                       style={{ paddingLeft: '55px', borderRadius: '15px' }}
                     />
@@ -432,12 +468,15 @@ const ModeratorHome = () => {
                         maxHeight: '180px',
                         overflowY: 'auto'
                       }}>
-                        {filteredFaculty.length === 0 && (
+                        {facultyLoading && (
+                          <div style={{ padding: '10px 18px', color: '#888' }}>Searching…</div>
+                        )}
+                        {!facultyLoading && facultyResults.length === 0 && (
                           <div style={{ padding: '10px 18px', color: '#888' }}>No faculty found</div>
                         )}
-                        {filteredFaculty.map(f => (
+                        {facultyResults.map(f => (
                           <div
-                            key={f.id}
+                            key={f.user_id}
                             style={{
                               padding: '10px 18px',
                               cursor: 'pointer',
@@ -446,8 +485,10 @@ const ModeratorHome = () => {
                               gap: '10px'
                             }}
                             onClick={() => {
-                              setFacultySelected(f.name);
-                              setFacultySearch(f.name);
+                              const name = f.full_name || `${f.user_fn || ''} ${f.user_ln || ''}`.trim();
+                              setFacultySelected(name);
+                              setFacultySearch(name);
+                              setFacultySelectedId(f.user_id || f.id);
                             }}
                           >
                             <div
@@ -464,9 +505,9 @@ const ModeratorHome = () => {
                                 color: '#666'
                               }}
                             >
-                              {f.name.split(' ').map(n => n[0]).join('').substring(0, 2)}
+                              {(f.full_name || `${f.user_fn || ''} ${f.user_ln || ''}`.trim()).split(' ').map(n => n[0]).join('').substring(0, 2)}
                             </div>
-                            <span>{f.name}</span>
+                            <span>{f.full_name || `${f.user_fn || ''} ${f.user_ln || ''}`.trim()}</span>
                           </div>
                         ))}
                       </div>
@@ -485,6 +526,7 @@ const ModeratorHome = () => {
                       onChange={e => {
                         setStudentSearch(e.target.value);
                         setStudentName('');
+                        setStudentSelectedId(null);
                       }}
                       style={{ paddingLeft: '55px', borderRadius: '15px' }}
                     />
@@ -501,12 +543,15 @@ const ModeratorHome = () => {
                         maxHeight: '180px',
                         overflowY: 'auto'
                       }}>
-                        {filteredStudents.length === 0 && (
+                        {studentLoading && (
+                          <div style={{ padding: '10px 18px', color: '#888' }}>Searching…</div>
+                        )}
+                        {!studentLoading && studentResults.length === 0 && (
                           <div style={{ padding: '10px 18px', color: '#888' }}>No student found</div>
                         )}
-                        {filteredStudents.map(s => (
+                        {studentResults.map(s => (
                           <div
-                            key={s.name}
+                            key={s.user_id}
                             style={{
                               padding: '10px 18px',
                               cursor: 'pointer',
@@ -515,8 +560,10 @@ const ModeratorHome = () => {
                               gap: '10px'
                             }}
                             onClick={() => {
-                              setStudentName(s.name);
-                              setStudentSearch(s.name);
+                              const name = s.full_name || `${s.user_fn || ''} ${s.user_ln || ''}`.trim();
+                              setStudentName(name);
+                              setStudentSearch(name);
+                              setStudentSelectedId(s.user_id || s.id);
                             }}
                           >
                             <div
@@ -533,9 +580,9 @@ const ModeratorHome = () => {
                                 color: '#666'
                               }}
                             >
-                              {s.name.split(' ').map(n => n[0]).join('').substring(0, 2)}
+                              {(s.full_name || `${s.user_fn || ''} ${s.user_ln || ''}`.trim()).split(' ').map(n => n[0]).join('').substring(0, 2)}
                             </div>
-                            <span>{s.name}</span>
+                            <span>{s.full_name || `${s.user_fn || ''} ${s.user_ln || ''}`.trim()}</span>
                           </div>
                         ))}
                       </div>
