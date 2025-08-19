@@ -1,5 +1,6 @@
 // Approval history list UI
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { getPendingUsers, updateUserVerification } from "../../api/moderator";
 
 const facultyList = [
   { id: 1, name: 'Jayson Guia', type: 'Professor', details: 'Faculty - SACE', avatar: null },
@@ -21,95 +22,94 @@ const studentNames = [
   "Mike Roan"
 ];
 
-const initialApprovalItems = [
-  {
-    id: 1,
-    name: facultyList[0].name,
-    type: facultyList[0].type,
-    details: facultyList[0].details,
-    studentName: studentNames[0]
-  },
-  {
-    id: 2,
-    name: facultyList[1].name,
-    type: facultyList[1].type,
-    details: facultyList[1].details,
-    studentName: studentNames[1]
-  },
-  {
-    id: 3,
-    name: facultyList[2].name,
-    type: facultyList[2].type,
-    details: facultyList[2].details,
-    studentName: studentNames[2]
-  },
-  {
-    id: 4,
-    name: facultyList[3].name,
-    type: facultyList[3].type,
-    details: facultyList[3].details,
-    studentName: studentNames[3]
-  },
-  {
-    id: 5,
-    name: facultyList[4].name,
-    type: facultyList[4].type,
-    details: facultyList[4].details,
-    studentName: studentNames[4]
-  },
-  {
-    id: 6,
-    name: facultyList[5].name,
-    type: facultyList[5].type,
-    details: facultyList[5].details,
-    studentName: studentNames[5]
-  },
-  {
-    id: 7,
-    name: facultyList[0].name,
-    type: facultyList[0].type,
-    details: facultyList[0].details,
-    studentName: studentNames[6]
-  },
-  {
-    id: 8,
-    name: facultyList[1].name,
-    type: facultyList[1].type,
-    details: facultyList[1].details,
-    studentName: studentNames[7]
-  }
-];
+const initialApprovalItems = [];
 
 const ITEMS_PER_PAGE = 10;
 
 const ApprovalHistory = ({ onVerify, searchTerm }) => {
   const [approvalItems, setApprovalItems] = useState(initialApprovalItems);
   const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        setLoading(true);
+        setError("");
+        const data = await getPendingUsers();
+        // Expect { users: [...] } or array
+        const list = Array.isArray(data) ? data : (data.users || []);
+        const mapped = list.map(u => ({
+          id: u.user_id || u.id,
+          name: [u.user_fn, u.user_ln].filter(Boolean).join(' ') || u.name || '',
+          type: u.user_type || u.type || 'User',
+          details: u.department ? `Faculty - ${u.department}` : (u.details || ''),
+          studentName: u.studentName || '',
+        }));
+        if (mounted) setApprovalItems(mapped);
+      } catch (e) {
+        if (mounted) setError(e.message || 'Failed to load pending approvals');
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
 
   // Remove item
-  const handleHold = (id) => {
-    setApprovalItems((items) => items.filter((item) => item.id !== id));
+  const handleHold = async (id) => {
+    // is_verified = 2 means hold
+    try {
+      await updateUserVerification(id, 2);
+      setApprovalItems((items) => items.filter((item) => item.id !== id));
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   // Verify item
-  const handleVerify = (item) => {
-    setApprovalItems((items) => items.filter((i) => i.id !== item.id));
-    if (onVerify) onVerify(item);
+  const handleVerify = async (item) => {
+    try {
+      // is_verified = 1 means verified
+      await updateUserVerification(item.id, 1);
+      setApprovalItems((items) => items.filter((i) => i.id !== item.id));
+      if (onVerify) onVerify(item);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   // Filter items by search
-  const filteredItems = approvalItems.filter(
+  const filteredItems = useMemo(() => approvalItems.filter(
     (item) =>
       !searchTerm ||
       item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.details.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  ), [approvalItems, searchTerm]);
 
   const totalPages = Math.max(1, Math.ceil(filteredItems.length / ITEMS_PER_PAGE));
   const paginatedItems = filteredItems.slice(
     (page - 1) * ITEMS_PER_PAGE,
     page * ITEMS_PER_PAGE
   );
+
+  if (loading) {
+    return (
+      <div style={{ textAlign: "center", color: "#888", marginTop: "40px", fontSize: '1.2em', fontWeight: 500 }}>
+        Loading approvals...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={{ textAlign: "center", color: "#d9534f", marginTop: "40px", fontSize: '1.0em', fontWeight: 500 }}>
+        {error}
+      </div>
+    );
+  }
 
   if (filteredItems.length === 0) {
     return (

@@ -1,5 +1,6 @@
 // Daily log history list UI
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { getStudentsLog } from "../../api/moderator";
 
 // Helper to normalize date string to YYYY-MM-DD
 const normalizeDateKey = (dateStr) => {
@@ -171,6 +172,36 @@ const DailyLogHistory = ({
 }) => {
   const [page, setPage] = useState(1);
   const [selectedDate, setSelectedDate] = useState(""); // new state for date picker
+  const [items, setItems] = useState(historyItems);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        setLoading(true);
+        setError("");
+        const data = await getStudentsLog();
+        const list = Array.isArray(data) ? data : (data.logs || []);
+        const mapped = list.map((l) => ({
+          id: l.id || l.log_id || Math.random(),
+          studentName: l.student_name || l.studentName || l.student || '',
+          name: l.teacher_name || l.faculty_name || l.teacher || '',
+          details: l.department ? `Faculty - ${l.department}` : (l.details || ''),
+          time: l.timestamp || l.time || l.created_at || l.date || '',
+          status: 'dailylog',
+          reason: l.reason || l.appointment_reason || '',
+        }));
+        if (mounted) setItems(mapped);
+      } catch (e) {
+        if (mounted) setError(e.message || 'Failed to load daily logs');
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
 
   // Handle date picker change
   const handleDateChange = (e) => {
@@ -179,7 +210,7 @@ const DailyLogHistory = ({
   };
 
   // Filter items by search and selected date
-  const filteredItems = historyItems.filter(
+  const filteredItems = useMemo(() => (items || []).filter(
     (item) =>
       item.status === "dailylog" &&
       (!searchTerm ||
@@ -190,8 +221,8 @@ const DailyLogHistory = ({
         (item.reason &&
           item.reason.toLowerCase().includes(searchTerm.toLowerCase()))) &&
       (!selectedDate ||
-        normalizeDateKey(item.time) === selectedDate) // filter by normalized date
-  );
+        normalizeDateKey(item.time) === selectedDate)
+  ), [items, searchTerm, selectedDate]);
 
   const groups = getDailyLogGroups(filteredItems).filter(
     (group) =>
@@ -218,6 +249,22 @@ const DailyLogHistory = ({
 
   const handlePrev = () => setPage(prev => Math.max(prev - 1, 1));
   const handleNext = () => setPage(prev => Math.min(prev + 1, totalPages));
+
+  if (loading) {
+    return (
+      <div style={{ textAlign: 'center', color: '#888', marginTop: '40px', fontSize: '1.2em', fontWeight: 500 }}>
+        Loading daily logs...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={{ textAlign: 'center', color: '#d9534f', marginTop: '40px', fontSize: '1.0em', fontWeight: 500 }}>
+        {error}
+      </div>
+    );
+  }
 
   return (
     <>

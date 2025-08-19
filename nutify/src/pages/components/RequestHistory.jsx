@@ -1,5 +1,6 @@
 // Request history list UI
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { getModeratorRequests } from "../../api/moderator";
 
 // Format date as "Month Day, Year • hh:mm am/pm"
 const formatDateWithTime = (dateStr) => {
@@ -33,57 +34,47 @@ const studentNames = [
   "Stud. Charlie Lane"
 ];
 
-// Example request items
-export const requestHistoryItems = [
-  {
-    id: 101,
-    name: facultyList[0].name,
-    studentName: studentNames[0],
-    status: "pending",
-    time: "July 29, 2025 09:00",
-    reason: "Consultation",
-  },
-  {
-    id: 102,
-    name: facultyList[1].name,
-    studentName: studentNames[1],
-    status: "pending",
-    time: "July 29, 2025 10:00",
-    reason: "Meeting",
-  },
-  {
-    id: 103,
-    name: facultyList[2].name,
-    studentName: studentNames[2],
-    status: "pending",
-    time: "July 29, 2025 11:00",
-    reason: "Project",
-  },
-  {
-    id: 104,
-    name: facultyList[3].name,
-    studentName: studentNames[3],
-    status: "pending",
-    time: "July 29, 2025 13:00",
-    reason: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor.",
-  },
-  {
-    id: 105,
-    name: facultyList[4].name,
-    studentName: studentNames[4],
-    status: "pending",
-    time: "July 29, 2025 14:00",
-    reason: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor.",
-  },
-];
+// Placeholder removed; will fetch from backend
+export const requestHistoryItems = [];
 
 const ITEMS_PER_PAGE = 10;
 
-const RequestHistory = ({ onViewDetails, searchTerm }) => {
+const RequestHistory = ({ onViewDetails, searchTerm, moderatorId }) => {
   const [page, setPage] = useState(1);
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        setLoading(true);
+        setError("");
+  const data = await getModeratorRequests();
+        // Expecting shape { error:false, requests:[...] } or a plain array
+        const list = Array.isArray(data) ? data : (data.requests || []);
+        // Map to UI shape
+        const mapped = list.map((r) => ({
+          id: r.appointment_id || r.id || Math.random(),
+          name: r.teacher_name || r.faculty_name || r.teacher || r.name || "",
+          studentName: r.student_name || r.student || r.studentName || "",
+          status: (r.status || "pending").toLowerCase(),
+          time: r.appointment_date || r.time || r.created_at || "",
+          reason: r.appointment_reason || r.reason || "",
+        }));
+        if (mounted) setItems(mapped);
+      } catch (e) {
+        if (mounted) setError(e.message || "Failed to load requests");
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, [moderatorId]);
 
   // Filter by search
-  const filteredRequests = requestHistoryItems.filter(
+  const filteredRequests = useMemo(() => (items || []).filter(
     (item) =>
       !searchTerm ||
       (item.name &&
@@ -91,8 +82,8 @@ const RequestHistory = ({ onViewDetails, searchTerm }) => {
       (item.studentName &&
         item.studentName.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (item.reason &&
-        item.reason.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+    item.reason.toLowerCase().includes(searchTerm.toLowerCase()))
+  ), [items, searchTerm]);
 
   const totalPages = Math.max(1, Math.ceil(filteredRequests.length / ITEMS_PER_PAGE));
   const paginatedRequests = filteredRequests.slice(
@@ -110,6 +101,22 @@ const RequestHistory = ({ onViewDetails, searchTerm }) => {
     if (words.length <= 6) return reason;
     return words.slice(0, 6).join(" ") + "...";
   };
+
+  if (loading) {
+    return (
+      <div style={{ textAlign: 'center', color: '#888', marginTop: '40px', fontSize: '1.2em', fontWeight: 500 }}>
+        Loading requests...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={{ textAlign: 'center', color: '#d9534f', marginTop: '40px', fontSize: '1.0em', fontWeight: 500 }}>
+        {error}
+      </div>
+    );
+  }
 
   return (
     <>
