@@ -53,12 +53,11 @@ class _TeacherHomeState extends State<TeacherHome> {
         final now = DateTime.now();
         final startOfToday = DateTime(now.year, now.month, now.day);
 
-        // Upcoming: only today and not in the past (relative to now)
+        // Upcoming: all appointments for today (ignore past vs future time to ensure visibility)
         final upcomingToday = all.where((a) {
           final start = _parseStartDateTime(a);
           if (start != null) {
-            final isToday = start.year == startOfToday.year && start.month == startOfToday.month && start.day == startOfToday.day;
-            return isToday && !start.isBefore(now);
+            return start.year == startOfToday.year && start.month == startOfToday.month && start.day == startOfToday.day;
           }
           final d = _parseDateOnly(a.scheduleDate);
           return d != null && d.year == startOfToday.year && d.month == startOfToday.month && d.day == startOfToday.day;
