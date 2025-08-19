@@ -141,28 +141,43 @@ class _TeacherHomeState extends State<TeacherHome> {
 
   DateTime? _parseStartDateTime(TeacherHomeAppointments a) {
     try {
-      // Parse date (handles 'YYYY-MM-DD' or 'YYYY-MM-DD HH:mm:ss')
+      // Parse date: try ISO first, then human-readable like 'August 19' (assume current year)
       DateTime date;
       try {
+        // Handles 'YYYY-MM-DD' or 'YYYY-MM-DD HH:mm:ss'
         date = DateTime.parse(a.scheduleDate);
       } catch (_) {
-        final dOnly = a.scheduleDate.split(' ').first;
-        date = DateTime.parse(dOnly);
+        // Try 'MMMM d, y'
+        try {
+          date = DateFormat('MMMM d, y').parseStrict(a.scheduleDate);
+        } catch (_) {
+          // Try 'MMMM d' with current year
+          final now = DateTime.now();
+          final md = DateFormat('MMMM d').parseStrict(a.scheduleDate);
+          date = DateTime(now.year, md.month, md.day);
+        }
       }
 
-      // Extract start time
+      // Extract start time portion (before dash if a range like "08:00 AM - 09:00 AM")
       String startStr = a.scheduleTime.contains('-')
           ? a.scheduleTime.split('-')[0].trim()
           : a.scheduleTime.trim();
 
+      // Parse time: support 24h and 12h with AM/PM
       DateTime t;
-      try {
-        t = DateFormat('HH:mm:ss').parse(startStr);
-      } catch (_) {
-        t = DateFormat('HH:mm').parse(startStr);
+      bool parsed = false;
+      for (final fmt in ['HH:mm:ss', 'HH:mm', 'h:mm a', 'hh:mm a']) {
+        try {
+          t = DateFormat(fmt).parseStrict(startStr);
+          parsed = true;
+          // Combine and return
+          return DateTime(date.year, date.month, date.day, t.hour, t.minute, t.second);
+        } catch (_) {
+          // try next format
+        }
       }
-
-      return DateTime(date.year, date.month, date.day, t.hour, t.minute, t.second);
+      if (!parsed) return null;
+      return null;
     } catch (_) {
       return null;
     }
@@ -170,7 +185,20 @@ class _TeacherHomeState extends State<TeacherHome> {
 
   DateTime? _parseDateOnly(String scheduleDate) {
     try {
-      return DateTime.parse(scheduleDate.split(' ').first);
+      // Try ISO date first
+      try {
+        return DateTime.parse(scheduleDate.split(' ').first);
+      } catch (_) {
+        // Try 'MMMM d, y'
+        try {
+          return DateFormat('MMMM d, y').parseStrict(scheduleDate);
+        } catch (_) {
+          // Try 'MMMM d' with current year
+          final now = DateTime.now();
+          final md = DateFormat('MMMM d').parseStrict(scheduleDate);
+          return DateTime(now.year, md.month, md.day);
+        }
+      }
     } catch (_) {
       return null;
     }
@@ -262,7 +290,7 @@ class _TeacherHomeState extends State<TeacherHome> {
                             color: Colors.grey.shade600,
                           ),
                         ),
-                        if (appointment.appointmentReason != null && appointment.appointmentReason!.isNotEmpty) ...[
+                        if (appointment.appointmentReason.isNotEmpty) ...[
                           SizedBox(height: 4),
                           Text(
                             'Reason: ${appointment.appointmentReason}',
