@@ -2,18 +2,21 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { getModeratorRequests } from "../../api/moderator";
 
-// Format date as "Month Day, Year • hh:mm am/pm"
+// Format date as "Month Day, Year • hh:mm AM/PM" (Safari-safe)
 const formatDateWithTime = (dateStr) => {
-  // Accepts "July 29, 2025 09:00"
-  const d = new Date(dateStr);
-  if (isNaN(d.getTime())) return dateStr;
-  const datePart = d.toLocaleString("en-US", { month: "long", day: "numeric", year: "numeric" });
-  let hours = d.getHours();
-  let minutes = d.getMinutes();
-  let ampm = hours >= 12 ? "pm" : "am";
-  hours = hours % 12;
-  hours = hours === 0 ? 12 : hours;
-  const timePart = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")} ${ampm}`;
+  const tryParse = (s) => {
+    const d = new Date(s);
+    if (!isNaN(d.getTime())) return d;
+    const d2 = new Date(s.replace(' ', 'T'));
+    if (!isNaN(d2.getTime())) return d2;
+    const d3 = new Date(s.replace(/-/g, '/'));
+    if (!isNaN(d3.getTime())) return d3;
+    return null;
+  };
+  const d = tryParse((dateStr || '').toString());
+  if (!d) return dateStr;
+  const datePart = d.toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  const timePart = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
   return `${datePart} • ${timePart}`;
 };
 

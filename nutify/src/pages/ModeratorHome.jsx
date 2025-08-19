@@ -369,14 +369,14 @@ const ModeratorHome = () => {
       {/* Sidebar */}
       <Sidebar
         userType="moderator"
-        userName="John Doe"
+        userName="Moderator"
         userRole="Moderator"
         userAvatar={null}
       />
 
       {/* Header */}
       <Header
-        title="Hello, John Doe"
+        title="Hello, Moderator!"
         subtitle="Manage your appointments and consultations in one place"
         searchPlaceholder="Search Faculty or Queue"
         searchValue={mainSearchInput}

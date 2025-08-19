@@ -23,10 +23,24 @@ const formatDateHeader = (dateStr) => {
 
 // Format date and time for item row
 const formatDateTime = (dateStr) => {
-  const d = new Date(dateStr);
-  if (isNaN(d.getTime())) return dateStr;
-  const datePart = d.toLocaleString("en-US", { month: "long", day: "numeric", year: "numeric" });
-  const timePart = d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
+  const d = new Date((dateStr || '').toString());
+  if (isNaN(d.getTime())) {
+    // Safari-safe retries
+    const iso = (dateStr || '').toString().replace(' ', 'T');
+    const d2 = new Date(iso);
+    if (isNaN(d2.getTime())) {
+      const d3 = new Date((dateStr || '').toString().replace(/-/g, '/'));
+      if (isNaN(d3.getTime())) return dateStr;
+      const datePart = d3.toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+      const timePart = d3.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+      return `${datePart} • ${timePart}`;
+    }
+    const datePart = d2.toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    const timePart = d2.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+    return `${datePart} • ${timePart}`;
+  }
+  const datePart = d.toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  const timePart = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
   return `${datePart} • ${timePart}`;
 };
 
