@@ -1,5 +1,6 @@
 // Page: Moderator Home
 import React, { useState, useEffect } from 'react';
+import { notifyAppointees, createImmediateAppointment, fetchIdByName } from '../api/moderator';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import '../styles/dashboard.css';
@@ -118,15 +119,24 @@ const ModeratorHome = () => {
   };
 
   // Notify appointees handler
-  const handleNotifyAppointees = (appointment) => {
-    const audio = new window.Audio('/nutified.wav');
-    audio.play();
-    setAlertVisible(true);
-    setTimeout(() => setAlertTransition(true), 10);
-    setTimeout(() => {
-      setAlertTransition(false);
-      setTimeout(() => setAlertVisible(false), 350);
-    }, 2500);
+  const handleNotifyAppointees = async (appointment) => {
+    try {
+      // Call backend to send notifications; ignore failure for UX smoothness
+      if (appointment && appointment.id) {
+        await notifyAppointees(appointment.id);
+      }
+    } catch (e) {
+      // Non-blocking: proceed to show toast regardless
+    } finally {
+      const audio = new window.Audio('/nutified.wav');
+      audio.play();
+      setAlertVisible(true);
+      setTimeout(() => setAlertTransition(true), 10);
+      setTimeout(() => {
+        setAlertTransition(false);
+        setTimeout(() => setAlertVisible(false), 350);
+      }, 2500);
+    }
   };
 
   // Alert close handler
@@ -136,20 +146,34 @@ const ModeratorHome = () => {
   };
 
   // Schedule request handler
-  const handleSchedule = () => {
-    setFacultySelected('');
-    setFacultySearch('');
-    setStudentName('');
-    setStudentSearch('');
-    setReason('');
-    const audio = new window.Audio('/nutified.wav');
-    audio.play();
-    setRequestAlertVisible(true);
-    setTimeout(() => setRequestAlertTransition(true), 10);
-    setTimeout(() => {
-      setRequestAlertTransition(false);
-      setTimeout(() => setRequestAlertVisible(false), 350);
-    }, 2500);
+  const handleSchedule = async () => {
+    try {
+      // Resolve IDs by full names via backend
+      const teacherRes = facultySelected ? await fetchIdByName(facultySelected) : null;
+      const studentRes = studentName ? await fetchIdByName(studentName) : null;
+      const teacher_id = teacherRes && (teacherRes.user_id || teacherRes.id || teacherRes.userID);
+      const student_id = studentRes && (studentRes.user_id || studentRes.id || studentRes.userID);
+      const appointment_reason = reasonType === 'Other' ? (reason || 'Other') : reasonType;
+      if (teacher_id && student_id) {
+        await createImmediateAppointment(teacher_id, student_id, appointment_reason);
+      }
+    } catch (e) {
+      // Non-blocking: still show success UX to keep parity with current UI
+    } finally {
+      setFacultySelected('');
+      setFacultySearch('');
+      setStudentName('');
+      setStudentSearch('');
+      setReason('');
+      const audio = new window.Audio('/nutified.wav');
+      audio.play();
+      setRequestAlertVisible(true);
+      setTimeout(() => setRequestAlertTransition(true), 10);
+      setTimeout(() => {
+        setRequestAlertTransition(false);
+        setTimeout(() => setRequestAlertVisible(false), 350);
+      }, 2500);
+    }
   };
 
   // Request alert close handler

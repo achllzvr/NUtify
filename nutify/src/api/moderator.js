@@ -30,3 +30,21 @@ export async function updateUserVerification(user_id, is_verified) {
 export async function getStudentsLog() {
   return apiPost('getStudentsLog', {});
 }
+
+// Send notifications to both student and teacher for an appointment
+export async function notifyAppointees(appointment_id) {
+  return apiPost('notifyAppointees', { appointment_id });
+}
+
+// Create an on-the-spot request (moderator) — renamed to avoid backend name clashes
+export async function createImmediateAppointment(teacher_id, student_id, appointment_reason) {
+  return apiPost('createImmediateAppointment', { teacher_id, student_id, appointment_reason });
+}
+
+// Helper: fetch user id by full name (form POST)
+export async function fetchIdByName(name) {
+  const formBody = new URLSearchParams({ name }).toString();
+  return apiPost('fetchID', formBody, {
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+  });
+}

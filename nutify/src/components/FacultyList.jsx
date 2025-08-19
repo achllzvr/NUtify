@@ -1,30 +1,48 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { apiPost } from '../api/http';
 
-const facultyList = [
-  { id: 1, name: 'Jayson Guia', department: 'Faculty - SACE', status: 'online', avatar: null },
-  { id: 2, name: 'Jei Pastrana', department: 'Faculty - SACE', status: 'offline', avatar: null },
-  { id: 3, name: 'Irene Balmes', department: 'Faculty - SACE', status: 'online', avatar: null },
-  { id: 4, name: 'Carlo Torres', department: 'Faculty - SACE', status: 'offline', avatar: null },
-  { id: 5, name: 'Archie Menisis', department: 'Faculty - SACE', status: 'online', avatar: null },
-  { id: 6, name: 'Michael Joseph Aramil', department: 'Faculty - SACE', status: 'offline', avatar: null },
-  { id: 7, name: 'Erwin De Castro', department: 'Faculty - SACE', status: 'online', avatar: null },
-  { id: 8, name: 'Joel Enriquez', department: 'Faculty - SACE', status: 'offline', avatar: null },
-  { id: 9, name: 'Bernie Fabito', department: 'Faculty - SACE', status: 'online', avatar: null },
-  { id: 10, name: 'Bobby Buendia', department: 'Faculty - SAHS', status: 'online', avatar: null },
-  { id: 11, name: 'Penny Lumbera', department: 'Faculty - SAHS', status: 'offline', avatar: null },
-  { id: 12, name: 'Larry Fronda', department: 'Faculty - SAHS', status: 'offline', avatar: null }
-];
+// We'll fetch teachers from backend; status kept 'offline' to gray indicators for now
+const initialFaculty = [];
 
 const FACULTY_PER_PAGE = 10;
 
 const FacultyList = ({ mainSearch, facultyStatusFilter, setFacultyStatusFilter }) => {
   const [page, setPage] = useState(1);
+  const [items, setItems] = useState(initialFaculty);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  const filteredFacultyList = facultyList.filter(f =>
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        setLoading(true); setError('');
+        // Use searchUsers; if mainSearch empty, seed with 'a' to get some results
+        const q = mainSearch && mainSearch.trim() ? mainSearch.trim() : 'a';
+  const data = await apiPost('findFacultyDirectory', { q });
+        const list = Array.isArray(data) ? data : (data.results || []);
+        const mapped = list.map(u => ({
+          id: u.user_id || u.id,
+          name: [u.user_fn, u.user_ln].filter(Boolean).join(' ') || u.name || '',
+          department: u.department ? `Faculty - ${u.department}` : (u.department_label || 'Faculty'),
+          status: 'offline', // keep grayed out for now
+          avatar: null,
+        }));
+        if (mounted) setItems(mapped);
+      } catch (e) {
+        if (mounted) setError(e.message || 'Failed to load faculty list');
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, [mainSearch]);
+
+  const filteredFacultyList = useMemo(() => items.filter(f =>
     (facultyStatusFilter === 'all' || f.status === facultyStatusFilter) &&
     (f.name.toLowerCase().includes(mainSearch.toLowerCase()) ||
       f.department.toLowerCase().includes(mainSearch.toLowerCase()))
-  );
+  ), [items, facultyStatusFilter, mainSearch]);
 
   const totalPages = Math.max(1, Math.ceil(filteredFacultyList.length / FACULTY_PER_PAGE));
   const paginatedFaculty = filteredFacultyList.slice(
@@ -70,7 +88,15 @@ const FacultyList = ({ mainSearch, facultyStatusFilter, setFacultyStatusFilter }
           marginRight: '-8px'
         }}
       >
-        {paginatedFaculty.length === 0 ? (
+        {loading ? (
+          <div style={{ textAlign: 'center', color: '#888', marginTop: '40px', fontSize: '1.2em', fontWeight: 500 }}>
+            Loading faculty...
+          </div>
+        ) : error ? (
+          <div style={{ textAlign: 'center', color: '#d9534f', marginTop: '40px', fontSize: '1.0em', fontWeight: 500 }}>
+            {error}
+          </div>
+        ) : paginatedFaculty.length === 0 ? (
           <div style={{ textAlign: 'center', color: '#888', marginTop: '40px', fontSize: '1.2em', fontWeight: 500 }}>
             No faculty users found.
           </div>

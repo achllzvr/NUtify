@@ -1,5 +1,6 @@
 // Current queue section
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { getModeratorHomeAppointments } from '../api/moderator';
 import messageCircleIcon from '../assets/icons/message-circle.svg';
 import calendarIcon from '../assets/icons/calendar.svg';
 import folderIcon from '../assets/icons/folder.svg';
@@ -45,100 +46,74 @@ const studentNames = [
   "Romeo Paolo"
 ];
 
-const upcomingAppointments = [
-  {
-    id: 1,
-    name: facultyList[0].name,
-    studentName: studentNames[0],
-    department: facultyList[0].department,
-    time: 'July 29, 2025 • 09:00 - 10:00',
-    avatar: facultyList[0].avatar,
-    reason: mapReason('Consultation')
-  },
-  {
-    id: 2,
-    name: facultyList[1].name,
-    studentName: studentNames[1],
-    department: facultyList[1].department,
-    time: 'July 29, 2025 • 10:00 - 11:00',
-    avatar: facultyList[1].avatar,
-    reason: mapReason('Meeting')
-  },
-  {
-    id: 3,
-    name: facultyList[2].name,
-    studentName: studentNames[2],
-    department: facultyList[2].department,
-    time: 'July 29, 2025 • 11:00 - 12:00',
-    avatar: facultyList[2].avatar,
-    reason: mapReason('Project')
-  },
-  {
-    id: 4,
-    name: facultyList[3].name,
-    studentName: studentNames[3],
-    department: facultyList[3].department,
-    time: 'July 29, 2025 • 13:00 - 14:00',
-    avatar: facultyList[3].avatar,
-    reason: mapReason('Other')
-  },
-  {
-    id: 5,
-    name: facultyList[4].name,
-    studentName: studentNames[4],
-    department: facultyList[4].department,
-    time: 'July 29, 2025 • 14:00 - 15:00',
-    avatar: facultyList[4].avatar,
-    reason: mapReason('Consultation')
-  },
-  {
-    id: 6,
-    name: facultyList[5].name,
-    studentName: studentNames[5],
-    department: facultyList[5].department,
-    time: 'July 29, 2025 • 15:00 - 16:00',
-    avatar: facultyList[5].avatar,
-    reason: mapReason('Other')
-  },
-  {
-    id: 7,
-    name: facultyList[6].name,
-    studentName: studentNames[6],
-    department: facultyList[6].department,
-    time: 'July 29, 2025 • 16:00 - 17:00',
-    avatar: facultyList[6].avatar,
-    reason: mapReason('Meeting')
-  },
-  {
-    id: 8,
-    name: facultyList[7].name,
-    studentName: studentNames[7],
-    department: facultyList[7].department,
-    time: 'July 29, 2025 • 17:00 - 18:00',
-    avatar: facultyList[7].avatar,
-    reason: mapReason('Consultation')
-  },
-  {
-    id: 9,
-    name: facultyList[8].name,
-    studentName: studentNames[8],
-    department: facultyList[8].department,
-    time: 'July 29, 2025 • 18:00 - 19:00',
-    avatar: facultyList[8].avatar,
-    reason: mapReason('Other')
-  }
-];
-
+// state will hold backend appointments
 const QUEUE_PER_PAGE = 10;
 
-const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, truncateReason }) => {
+const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, truncateReason, moderatorId = 0 }) => {
   const [page, setPage] = useState(1);
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  const filteredQueue = upcomingAppointments.filter(a =>
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        setLoading(true);
+        setError('');
+        // Use provided moderatorId or default 0; backend may ignore or use permissions
+        const data = await getModeratorHomeAppointments(moderatorId);
+        // Expect { appointments: [...] } or an array
+        const list = Array.isArray(data) ? data : (data.appointments || []);
+        // Map to UI fields
+        const mapped = list
+          .filter(a => a) // safety
+          .map(a => {
+            const id = a.appointment_id || a.id;
+            const studentName = a.student_name || a.student || [a.student_fn, a.student_ln].filter(Boolean).join(' ');
+            const facultyName = a.teacher_name || a.faculty || [a.teacher_fn, a.teacher_ln].filter(Boolean).join(' ');
+            const department = a.department ? `Faculty - ${a.department}` : (a.faculty_department || 'Faculty');
+            const reason = a.appointment_reason || a.reason || 'Other';
+            const start = a.appointment_date || a.start_time || a.time;
+            const end = a.end_time;
+            let timeStr = '';
+            if (start) {
+              const d = new Date(start);
+              const datePart = isNaN(d.getTime()) ? start : d.toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+              const timePart = isNaN(d.getTime()) ? '' : d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+              if (end) {
+                const d2 = new Date(end);
+                const timePart2 = isNaN(d2.getTime()) ? '' : d2.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+                timeStr = `${datePart} • ${timePart}${timePart2 ? ' - ' + timePart2 : ''}`;
+              } else {
+                timeStr = `${datePart}${timePart ? ' • ' + timePart : ''}`;
+              }
+            }
+            return {
+              id,
+              name: facultyName || '',
+              studentName: studentName || '',
+              department,
+              time: timeStr,
+              avatar: null,
+              reason: mapReason(reason)
+            };
+          });
+        if (mounted) setItems(mapped);
+      } catch (e) {
+        if (mounted) setError(e.message || 'Failed to load current queue');
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, [moderatorId]);
+
+  const filteredQueue = useMemo(() => items.filter(a =>
     a.name.toLowerCase().includes(mainSearch.toLowerCase()) ||
     a.studentName.toLowerCase().includes(mainSearch.toLowerCase()) ||
     a.department.toLowerCase().includes(mainSearch.toLowerCase())
-  );
+  ), [items, mainSearch]);
 
   const totalPages = Math.max(1, Math.ceil(filteredQueue.length / QUEUE_PER_PAGE));
   const paginatedQueue = filteredQueue.slice(
@@ -184,7 +159,15 @@ const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, truncateR
           marginRight: '-8px'
         }}
       >
-        {paginatedQueue.length === 0 ? (
+        {loading ? (
+          <div style={{ textAlign: 'center', color: '#888', marginTop: '40px', fontSize: '1.2em', fontWeight: 500 }}>
+            Loading queue...
+          </div>
+        ) : error ? (
+          <div style={{ textAlign: 'center', color: '#d9534f', marginTop: '40px', fontSize: '1.0em', fontWeight: 500 }}>
+            {error}
+          </div>
+        ) : paginatedQueue.length === 0 ? (
           <div style={{ textAlign: 'center', color: '#888', marginTop: '40px', fontSize: '1.2em', fontWeight: 500 }}>
             No queue for today.
           </div>
