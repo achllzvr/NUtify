@@ -58,9 +58,15 @@ const OnHoldHistory = ({ onVerify, searchTerm }) => {
     return () => { mounted = false; };
   }, []);
 
-  const handleVerify = (item) => {
-    setOnHoldItems((items) => items.filter((i) => i.id !== item.id));
-    if (onVerify) onVerify(item);
+  const handleVerify = async (item) => {
+    try {
+      // is_verified = 1 means verified
+      await updateUserVerification(item.id, 1);
+      setOnHoldItems((items) => items.filter((i) => i.id !== item.id));
+      if (onVerify) onVerify(item);
+    } catch (e) {
+      setError(e.message || 'Failed to verify account');
+    }
   };
 
   const filteredItems = useMemo(() => onHoldItems.filter(
