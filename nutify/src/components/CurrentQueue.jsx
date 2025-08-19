@@ -19,6 +19,58 @@ function mapReason(reason) {
   return found || 'Other';
 }
 
+// Safari-safe Date parser for common backend formats (e.g., "YYYY-MM-DD HH:mm:ss")
+function parseDateSafe(input) {
+  if (!input) return null;
+  if (input instanceof Date) return isNaN(input.getTime()) ? null : input;
+  // numeric timestamp
+  if (typeof input === 'number') {
+    const d = new Date(input);
+    return isNaN(d.getTime()) ? null : d;
+  }
+  if (typeof input !== 'string') return null;
+  // Try ISO-like by replacing space with 'T'
+  let d = new Date(input.replace(' ', 'T'));
+  if (!isNaN(d.getTime())) return d;
+  // Fallback: replace '-' with '/' for older WebKit
+  d = new Date(input.replace(/-/g, '/'));
+  if (!isNaN(d.getTime())) return d;
+  return null;
+}
+
+function formatDateRange(dateLike, fromTimeLike, toTimeLike) {
+  // dateLike can be a full datetime or just a date string.
+  const dateObj = parseDateSafe(dateLike);
+  const hasSeparateTimes = !!(fromTimeLike || toTimeLike);
+
+  let dateLabel = '';
+  if (dateObj) {
+    dateLabel = dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  } else if (typeof dateLike === 'string' && dateLike.trim()) {
+    // Use raw string if we can't parse
+    dateLabel = dateLike.trim();
+  }
+
+  // Build time labels
+  const timeFrom = parseDateSafe(fromTimeLike);
+  const timeTo = parseDateSafe(toTimeLike);
+  const timeFromLabel = timeFrom ? timeFrom.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }) : (typeof fromTimeLike === 'string' ? fromTimeLike : '');
+  const timeToLabel = timeTo ? timeTo.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }) : (typeof toTimeLike === 'string' ? toTimeLike : '');
+
+  // If dateLike includes time (full datetime) and no separate times provided
+  if (!hasSeparateTimes && dateObj && typeof dateLike === 'string' && /\d{2}:\d{2}/.test(dateLike)) {
+    const t = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+    return `${dateLabel}${t ? ' • ' + t : ''}`;
+  }
+
+  // If we have separate times
+  if (dateLabel && (timeFromLabel || timeToLabel)) {
+    return `${dateLabel} • ${timeFromLabel}${timeToLabel ? ' - ' + timeToLabel : ''}`.trim();
+  }
+
+  return dateLabel; // may be '' if nothing available
+}
+
 const facultyList = [
   { id: 1, name: 'Jayson Guia', department: 'Faculty - SACE', avatar: null },
   { id: 2, name: 'Jei Pastrana', department: 'Faculty - SACE', avatar: null },
@@ -74,20 +126,21 @@ const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, truncateR
             const facultyName = a.teacher_name || a.faculty || [a.teacher_fn, a.teacher_ln].filter(Boolean).join(' ');
             const department = a.department ? `Faculty - ${a.department}` : (a.faculty_department || 'Faculty');
             const reason = a.appointment_reason || a.reason || 'Other';
-            const start = a.appointment_date || a.start_time || a.time;
-            const end = a.end_time;
+            // Try multiple common backend shapes for date/time
+            // 1) Single datetime (appointment_date | appointment_datetime | datetime | created_at)
+            const singleDateTime = a.appointment_date || a.appointment_datetime || a.datetime || a.time || a.created_at;
+            // 2) Separate date + time fields (schedule_date + schedule_time_from/to OR date + start_time/end_time)
+            const dateOnly = a.schedule_date || a.date || a.appointment_day;
+            const fromTime = a.schedule_time_from || a.start_time || a.time_from;
+            const toTime = a.schedule_time_to || a.end_time || a.time_to;
+
             let timeStr = '';
-            if (start) {
-              const d = new Date(start);
-              const datePart = isNaN(d.getTime()) ? start : d.toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-              const timePart = isNaN(d.getTime()) ? '' : d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-              if (end) {
-                const d2 = new Date(end);
-                const timePart2 = isNaN(d2.getTime()) ? '' : d2.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-                timeStr = `${datePart} • ${timePart}${timePart2 ? ' - ' + timePart2 : ''}`;
-              } else {
-                timeStr = `${datePart}${timePart ? ' • ' + timePart : ''}`;
-              }
+            if (singleDateTime) {
+              // This will also pick up when backend sends "YYYY-MM-DD HH:mm:ss"
+              timeStr = formatDateRange(singleDateTime, null, null);
+            }
+            if (!timeStr && (dateOnly || fromTime || toTime)) {
+              timeStr = formatDateRange(dateOnly || singleDateTime, fromTime, toTime);
             }
             return {
               id,
@@ -126,9 +179,11 @@ const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, truncateR
 
   const formatDateWithYear = (dateStr) => {
     if (!dateStr) return '';
-    const [datePart, timePart] = dateStr.split('•').map(s => s.trim());
-    let d = new Date(datePart);
-    if (isNaN(d.getTime())) return dateStr;
+    const parts = dateStr.split('•');
+    const datePart = parts[0] ? parts[0].trim() : '';
+    const timePart = parts[1] ? parts[1].trim() : '';
+    const d = parseDateSafe(datePart);
+    if (!d) return dateStr; // keep original if we cannot parse
     const formattedDate = d.toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
     return `${formattedDate}${timePart ? ' • ' + timePart : ''}`;
   };
@@ -177,7 +232,7 @@ const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, truncateR
             const { icon, bg } = reasonIconMap[reasonLabel];
             const fullReasonText =
               reasonLabel === 'Other'
-                ? 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam euismod, nunc ut laoreet.'
+                ? '*Unspecified Reason. Please consult with appointee.'
                 : reasonLabel;
             const words = fullReasonText.split(' ');
             const shortReasonText =

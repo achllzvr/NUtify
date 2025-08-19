@@ -25,7 +25,7 @@ function mapReason(reason) {
 }
 const getReasonText = (reason) =>
   mapReason(reason) === 'Other'
-    ? 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam euismod, nunc ut laoreet.'
+    ? (<em>*Unspecified Reason. Please consult with appointee.</em>)
     : mapReason(reason);
 
 const truncateReason = (reason, maxLength = 40) => {
@@ -34,6 +34,8 @@ const truncateReason = (reason, maxLength = 40) => {
 };
 
 const ModeratorHome = () => {
+  // TODO(session): Replace hardcoded moderator ID with authenticated session user_id
+  const MODERATOR_ID = 57;
   // State variables
   const [selectedFaculty, setSelectedFaculty] = useState(null);
   const [selectedSchedule, setSelectedSchedule] = useState(null);
@@ -391,6 +393,7 @@ const ModeratorHome = () => {
               onViewDetails={handleViewDetails}
               onNotifyAppointees={handleNotifyAppointees}
               truncateReason={truncateReason}
+              moderatorId={MODERATOR_ID}
             />
           </div>
           <div className="moderator-home-right-column">
@@ -691,7 +694,7 @@ const ModeratorHome = () => {
                   <strong>Student:</strong> {detailsModalAppointment.studentName}
                 </div>
                 <div style={{ fontSize: '16px', marginBottom: '10px' }}>
-                  <strong>Date:</strong> {detailsModalAppointment.time.split('•')[0].trim()} 2025
+                  <strong>Date:</strong> {detailsModalAppointment.time.split('•')[0].trim()}
                 </div>
                 <div style={{ fontSize: '16px', marginBottom: '10px' }}>
                   <strong>Time:</strong> {detailsModalAppointment.time.split('•')[1]?.trim()}
