@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { apiPost } from '../api/http';
+import { getUserStatus, getUserStatuses } from '../api/moderator';
 
 // We'll fetch teachers from backend; status kept 'offline' to gray indicators for now
 const initialFaculty = [];
@@ -25,10 +26,52 @@ const FacultyList = ({ mainSearch, facultyStatusFilter, setFacultyStatusFilter, 
           id: u.user_id || u.id,
           name: [u.user_fn, u.user_ln].filter(Boolean).join(' ') || u.name || '',
           department: u.department ? `Faculty - ${u.department}` : (u.department_label || 'Faculty'),
-          status: 'offline', // keep grayed out for now
+          status: (u.status || u.user_status || 'offline').toString().toLowerCase(),
           avatar: null,
         }));
-        if (mounted) setItems(mapped);
+
+        // Try batch status fetch first for performance
+        let withStatus = mapped;
+        try {
+          const ids = mapped.map(m => m.id).filter(Boolean);
+          if (ids.length) {
+            const resp = await getUserStatuses(ids);
+            // Normalize response into a map { id: status }
+            let map = {};
+            if (resp) {
+              if (Array.isArray(resp.statuses)) {
+                resp.statuses.forEach(s => { if (s && s.user_id != null) map[s.user_id] = s.status || s.user_status; });
+              } else if (resp.statuses && typeof resp.statuses === 'object') {
+                map = resp.statuses;
+              } else if (typeof resp === 'object') {
+                map = resp; // accept a plain map
+              }
+            }
+            const normStatus = (raw) => {
+              const norm = (raw || '').toString().toLowerCase();
+              if (norm === 'online') return 'online';
+              if (norm === 'busy' || norm === 'away' || norm === 'engaged') return 'busy';
+              return 'offline';
+            };
+            withStatus = mapped.map(f => ({ ...f, status: normStatus(map[f.id] ?? f.status) }));
+          }
+        } catch {
+          // Fallback to per-user fetch if batch is unavailable
+          withStatus = await Promise.all(mapped.map(async (f) => {
+            try {
+              const r = await getUserStatus(f.id);
+              const raw = (r && (r.status || r.user_status)) || f.status;
+              const norm = (raw || '').toString().toLowerCase();
+              if (norm === 'online') return { ...f, status: 'online' };
+              if (norm === 'busy' || norm === 'away' || norm === 'engaged') return { ...f, status: 'busy' };
+              return { ...f, status: 'offline' };
+            } catch {
+              return f;
+            }
+          }));
+        }
+
+        if (mounted) setItems(withStatus);
       } catch (e) {
         if (mounted) setError(e.message || 'Failed to load faculty list');
       } finally {

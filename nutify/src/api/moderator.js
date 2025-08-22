@@ -46,6 +46,18 @@ export async function sendDirectFacultyNotification(faculty_id, message = 'You a
   return apiPost('sendDirectFacultyNotification', { faculty_id, message });
 }
 
+// Get a user's current presence/status (online | busy | offline)
+export async function getUserStatus(user_id) {
+  return apiPost('getUserStatus', { user_id });
+}
+
+// Batch: Get multiple user statuses at once
+// Expects backend action 'getUserStatuses' to accept { user_ids: number[] }
+// and return either { statuses: [{ user_id, status }, ...] } or a map { [user_id]: status }
+export async function getUserStatuses(user_ids) {
+  return apiPost('getUserStatuses', { user_ids });
+}
+
 // Create an on-the-spot request (moderator) — calls existing backend action
 export async function createImmediateAppointment(teacher_id, student_id, appointment_reason) {
   return apiPost('moderatorCreateOnSpotRequest', { teacher_id, student_id, appointment_reason });
