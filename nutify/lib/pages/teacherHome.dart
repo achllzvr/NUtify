@@ -101,6 +101,7 @@ class _TeacherHomeState extends State<TeacherHome> {
               (a.studentName).toLowerCase().contains(q) ||
               (a.department).toLowerCase().contains(q) ||
               (a.appointmentReason).toLowerCase().contains(q) ||
+              (a.appointmentRemarks).toLowerCase().contains(q) ||
               (a.scheduleDate).toLowerCase().contains(q) ||
               (a.scheduleTime).toLowerCase().contains(q)
             );
@@ -353,6 +354,17 @@ class _TeacherHomeState extends State<TeacherHome> {
                               fontSize: 12,
                               color: Colors.grey.shade700,
                               fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ],
+                        if (appointment.appointmentRemarks.isNotEmpty) ...[
+                          SizedBox(height: 4),
+                          Text(
+                            'Remarks: ${appointment.appointmentRemarks}',
+                            style: TextStyle(
+                              fontFamily: 'Arimo',
+                              fontSize: 12,
+                              color: Colors.grey.shade700,
                             ),
                           ),
                         ],

@@ -232,6 +232,17 @@ class _StudentHomeState extends State<StudentHome> {
                                       ),
                                     ),
                                   ],
+                                  if (appointment.appointmentRemarks.isNotEmpty) ...[
+                                    SizedBox(height: 4),
+                                    Text(
+                                      'Remarks: ${appointment.appointmentRemarks}',
+                                      style: TextStyle(
+                                        fontFamily: 'Arimo',
+                                        fontSize: 13,
+                                        color: Colors.grey[700],
+                                      ),
+                                    ),
+                                  ],
                                 ],
                               ),
                             ),

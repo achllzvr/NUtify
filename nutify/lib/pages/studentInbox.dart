@@ -164,6 +164,17 @@ class _StudentInboxState extends State<StudentInbox>
                                   ),
                                 ),
                               ],
+                              if (appointment.appointmentRemarks.isNotEmpty) ...[
+                                SizedBox(height: 4),
+                                Text(
+                                  'Remarks: ${appointment.appointmentRemarks}',
+                                  style: TextStyle(
+                                    fontFamily: 'Arimo',
+                                    fontSize: 12,
+                                    color: Colors.grey.shade700,
+                                  ),
+                                ),
+                              ],
                             ],
                           ),
                         ),
@@ -322,6 +333,17 @@ class _StudentInboxState extends State<StudentInbox>
                                     fontSize: 12,
                                     color: Colors.grey.shade700,
                                     fontStyle: FontStyle.italic,
+                                  ),
+                                ),
+                              ],
+                              if (appointment.appointmentRemarks.isNotEmpty) ...[
+                                SizedBox(height: 4),
+                                Text(
+                                  'Remarks: ${appointment.appointmentRemarks}',
+                                  style: TextStyle(
+                                    fontFamily: 'Arimo',
+                                    fontSize: 12,
+                                    color: Colors.grey.shade700,
                                   ),
                                 ),
                               ],
@@ -486,6 +508,17 @@ class _StudentInboxState extends State<StudentInbox>
                                   ),
                                 ),
                               ],
+                              if (appointment.appointmentRemarks.isNotEmpty) ...[
+                                SizedBox(height: 4),
+                                Text(
+                                  'Remarks: ${appointment.appointmentRemarks}',
+                                  style: TextStyle(
+                                    fontFamily: 'Arimo',
+                                    fontSize: 12,
+                                    color: Colors.grey.shade700,
+                                  ),
+                                ),
+                              ],
                             ],
                           ),
                         ),
@@ -644,6 +677,17 @@ class _StudentInboxState extends State<StudentInbox>
                                     fontSize: 12,
                                     color: Colors.grey.shade700,
                                     fontStyle: FontStyle.italic,
+                                  ),
+                                ),
+                              ],
+                              if (appointment.appointmentRemarks.isNotEmpty) ...[
+                                SizedBox(height: 4),
+                                Text(
+                                  'Remarks: ${appointment.appointmentRemarks}',
+                                  style: TextStyle(
+                                    fontFamily: 'Arimo',
+                                    fontSize: 12,
+                                    color: Colors.grey.shade700,
                                   ),
                                 ),
                               ],

@@ -205,14 +205,15 @@ class _TeacherInboxState extends State<TeacherInbox>
         );
 
         // Apply filtering
-        final q = (_inboxQuery + ' ' + _pendingQuery).trim().toLowerCase();
-        if (q.isNotEmpty) {
+  final q = (_inboxQuery + ' ' + _pendingQuery).trim().toLowerCase();
+  if (q.isNotEmpty) {
           pendingAppointments = pendingAppointments.where((a) {
             return a.studentName.toLowerCase().contains(q)
                 || a.department.toLowerCase().contains(q)
                 || a.scheduleDate.toLowerCase().contains(q)
                 || a.scheduleTime.toLowerCase().contains(q)
-                || (a.appointmentReason).toLowerCase().contains(q);
+    || (a.appointmentReason).toLowerCase().contains(q)
+    || (a.appointmentRemarks).toLowerCase().contains(q);
           }).toList();
         }
 
@@ -240,6 +241,7 @@ class _TeacherInboxState extends State<TeacherInbox>
                     'pending',
                     appointment.id,
                     appointment.appointmentReason,
+                    appointmentRemarks: '',
                   );
                 },
               ),
@@ -277,14 +279,15 @@ class _TeacherInboxState extends State<TeacherInbox>
           ),
         );
 
-        final q = (_inboxQuery + ' ' + _declinedQuery).trim().toLowerCase();
-        if (q.isNotEmpty) {
+  final q = (_inboxQuery + ' ' + _declinedQuery).trim().toLowerCase();
+  if (q.isNotEmpty) {
           declinedAppointments = declinedAppointments.where((a) {
             return a.studentName.toLowerCase().contains(q)
                 || a.department.toLowerCase().contains(q)
                 || a.scheduleDate.toLowerCase().contains(q)
                 || a.scheduleTime.toLowerCase().contains(q)
-                || (a.appointmentReason).toLowerCase().contains(q);
+    || (a.appointmentReason).toLowerCase().contains(q)
+    || (a.appointmentRemarks).toLowerCase().contains(q);
           }).toList();
         }
 
@@ -312,6 +315,7 @@ class _TeacherInboxState extends State<TeacherInbox>
                     'declined',
                     appointment.id,
                     appointment.appointmentReason,
+                    appointmentRemarks: appointment.appointmentRemarks,
                   );
                 },
               ),
@@ -349,14 +353,15 @@ class _TeacherInboxState extends State<TeacherInbox>
           ),
         );
 
-        final q = (_inboxQuery + ' ' + _missedQuery).trim().toLowerCase();
-        if (q.isNotEmpty) {
+  final q = (_inboxQuery + ' ' + _missedQuery).trim().toLowerCase();
+  if (q.isNotEmpty) {
           missedAppointments = missedAppointments.where((a) {
             return a.studentName.toLowerCase().contains(q)
                 || a.department.toLowerCase().contains(q)
                 || a.scheduleDate.toLowerCase().contains(q)
                 || a.scheduleTime.toLowerCase().contains(q)
-                || (a.appointmentReason).toLowerCase().contains(q);
+    || (a.appointmentReason).toLowerCase().contains(q)
+    || (a.appointmentRemarks).toLowerCase().contains(q);
           }).toList();
         }
 
@@ -384,6 +389,7 @@ class _TeacherInboxState extends State<TeacherInbox>
                     'missed',
                     appointment.id,
                     appointment.appointmentReason,
+                    appointmentRemarks: appointment.appointmentRemarks,
                   );
                 },
               ),
@@ -421,14 +427,15 @@ class _TeacherInboxState extends State<TeacherInbox>
           ),
         );
 
-        final q = (_inboxQuery + ' ' + _completedQuery).trim().toLowerCase();
-        if (q.isNotEmpty) {
+  final q = (_inboxQuery + ' ' + _completedQuery).trim().toLowerCase();
+  if (q.isNotEmpty) {
           completedAppointments = completedAppointments.where((a) {
             return a.studentName.toLowerCase().contains(q)
                 || a.department.toLowerCase().contains(q)
                 || a.scheduleDate.toLowerCase().contains(q)
                 || a.scheduleTime.toLowerCase().contains(q)
-                || (a.appointmentReason).toLowerCase().contains(q);
+    || (a.appointmentReason).toLowerCase().contains(q)
+    || (a.appointmentRemarks).toLowerCase().contains(q);
           }).toList();
         }
 
@@ -456,6 +463,7 @@ class _TeacherInboxState extends State<TeacherInbox>
                     'completed',
                     appointment.id,
                     appointment.appointmentReason,
+                    appointmentRemarks: appointment.appointmentRemarks,
                   );
                 },
               ),
@@ -696,9 +704,15 @@ class _TeacherInboxState extends State<TeacherInbox>
     String status,
     String appointmentId,
     String? appointmentReason,
+    {String? appointmentRemarks}
   ) {
-    // Get initials for avatar
-    String initials = studentName.split(' ').map((name) => name.isNotEmpty ? name[0] : '').take(2).join('').toUpperCase();
+  // Get initials for avatar
+  String initials = studentName
+    .split(' ')
+    .map((name) => name.isNotEmpty ? name[0] : '')
+    .take(2)
+    .join('')
+    .toUpperCase();
     
     // Get status-specific icon and colors
     IconData statusIcon;
@@ -800,6 +814,17 @@ class _TeacherInboxState extends State<TeacherInbox>
                             ),
                           ),
                         ],
+                        if (status != 'pending' && (appointmentRemarks != null && appointmentRemarks.isNotEmpty)) ...[
+                          SizedBox(height: 4),
+                          Text(
+                            'Remarks: $appointmentRemarks',
+                            style: TextStyle(
+                              fontFamily: 'Arimo',
+                              fontSize: 12,
+                              color: Colors.grey.shade700,
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -829,31 +854,7 @@ class _TeacherInboxState extends State<TeacherInbox>
                         ),
                         child: ElevatedButton(
                           onPressed: teacherUserId == null || teacherUserId?.isEmpty == true ? null : () {
-                            _showStatusConfirmationDialog(
-                              context,
-                              'accepted',
-                              appointmentId,
-                              () async {
-                                print('Sending: appointmentId=$appointmentId, facultyId=${teacherUserId!}, status=accepted');
-                                final result = await _updateAppointmentStatus(appointmentId, 'accepted', teacherUserId!);
-                                if (result['error'] == false) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('Appointment marked as accepted!', style: TextStyle(fontFamily: 'Arimo', color: Colors.white)),
-                                      backgroundColor: Color(0xFF35408E),
-                                    ),
-                                  );
-                                  setState(() {}); // Refresh UI
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(result['message'] ?? 'Failed to update appointment', style: TextStyle(fontFamily: 'Arimo', color: Colors.white)),
-                                      backgroundColor: Colors.red,
-                                    ),
-                                  );
-                                }
-                              },
-                            );
+                            _showRemarksDialogAndSubmit(context, 'accepted', appointmentId);
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.transparent,
@@ -895,31 +896,7 @@ class _TeacherInboxState extends State<TeacherInbox>
                         ),
                         child: ElevatedButton(
                           onPressed: teacherUserId == null ? null : () {
-                            _showStatusConfirmationDialog(
-                              context,
-                              'declined',
-                              appointmentId,
-                              () async {
-                                print('Sending: appointmentId=$appointmentId, facultyId=${teacherUserId!}, status=declined');
-                                final result = await _updateAppointmentStatus(appointmentId, 'declined', teacherUserId!);
-                                if (result['error'] == false) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('Appointment marked as declined!', style: TextStyle(fontFamily: 'Arimo', color: Colors.white)),
-                                      backgroundColor: Color(0xFF35408E),
-                                    ),
-                                  );
-                                  setState(() {}); // Refresh UI
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(result['message'] ?? 'Failed to update appointment', style: TextStyle(fontFamily: 'Arimo', color: Colors.white)),
-                                      backgroundColor: Colors.red,
-                                    ),
-                                  );
-                                }
-                              },
-                            );
+                            _showRemarksDialogAndSubmit(context, 'declined', appointmentId);
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.transparent,
@@ -1142,7 +1119,7 @@ class _TeacherInboxState extends State<TeacherInbox>
   }
 
   Future<Map<String, dynamic>> _updateAppointmentStatus(
-      String appointmentId, String status, String facultyId) async {
+  String appointmentId, String status, String facultyId, {String? remarks}) async {
     // Map status to API action
     String action;
     switch (status) {
@@ -1163,10 +1140,112 @@ class _TeacherInboxState extends State<TeacherInbox>
         'appointment_id': appointmentId,
         'faculty_id': facultyId,
         'status': status,
+        if (remarks != null) 'appointment_remarks': remarks,
       }),
     );
     print('teacherUserId: $teacherUserId, appointmentId: $appointmentId, status: $status');
     return jsonDecode(response.body);
+  }
+
+  Future<void> _showRemarksDialogAndSubmit(BuildContext context, String status, String appointmentId) async {
+    final TextEditingController remarksCtrl = TextEditingController();
+    String? errorText;
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return StatefulBuilder(
+          builder: (ctx, setLocalState) {
+            return Dialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              insetPadding: EdgeInsets.symmetric(horizontal: 24),
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      status == 'accepted' ? 'Accept Appointment' : 'Decline Appointment',
+                      style: TextStyle(fontFamily: 'Arimo', fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 12),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text('Remarks (required, shown to student):', style: TextStyle(fontFamily: 'Arimo', fontSize: 14, color: Colors.grey[700])),
+                    ),
+                    SizedBox(height: 8),
+                    TextField(
+                      controller: remarksCtrl,
+                      maxLength: 255,
+                      maxLines: 3,
+                      decoration: InputDecoration(
+                        hintText: 'Enter remarks... (max 255 characters)',
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                        errorText: errorText,
+                        counterText: '',
+                      ),
+                      onChanged: (_) {
+                        if (errorText != null) setLocalState(() => errorText = null);
+                      },
+                    ),
+                    SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () => Navigator.of(dialogContext).pop(),
+                            child: Text('Cancel', style: TextStyle(fontFamily: 'Arimo')),
+                          ),
+                        ),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(backgroundColor: Color(0xFF35408E), foregroundColor: Colors.white),
+                            onPressed: () async {
+                              final text = remarksCtrl.text.trim();
+                              if (text.isEmpty) {
+                                setLocalState(() => errorText = 'Remarks are required');
+                                return;
+                              }
+                              Navigator.of(dialogContext).pop();
+                              final res = await _updateAppointmentStatus(appointmentId, status, teacherUserId!, remarks: text);
+                              if (res['error'] == false) {
+                                if (!mounted) return;
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Appointment marked as $status!', style: TextStyle(fontFamily: 'Arimo', color: Colors.white)),
+                                    backgroundColor: Color(0xFF35408E),
+                                  ),
+                                );
+                                setState(() {
+                                  _pendingFuture = TeacherInboxPending.getTeacherInboxPendings();
+                                  _declinedFuture = TeacherInboxCancelled.getTeacherInboxCancelleds();
+                                  _missedFuture = TeacherInboxMissed.getTeacherInboxMisseds();
+                                  _completedFuture = TeacherInboxCompleted.getTeacherInboxCompleteds();
+                                });
+                              } else {
+                                if (!mounted) return;
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text((res['message'] ?? 'Failed to update appointment').toString(), style: TextStyle(fontFamily: 'Arimo', color: Colors.white)),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              }
+                            },
+                            child: Text('Submit'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
 }
