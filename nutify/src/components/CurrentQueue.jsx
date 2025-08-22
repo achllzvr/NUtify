@@ -215,7 +215,27 @@ const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, truncateR
       }}
     >
       <div className="moderator-home-section-header">
-        <h2>Current Queue</h2>
+    <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
+          Current Queue
+          <span
+            aria-label="queued appointments count"
+            style={{
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontSize: '13px',
+      padding: '4px 10px',
+              borderRadius: '9999px',
+      background: loading ? '#9CA3AF' : (error ? '#EF4444' : '#ffa600ff'),
+      color: '#ffffff',
+      fontWeight: 700,
+      lineHeight: 1,
+      boxShadow: '0 1px 3px rgba(0,0,0,0.15)'
+            }}
+          >
+            {loading ? '...' : (error ? '—' : items.length)}
+          </span>
+        </h2>
       </div>
       <div
         className="moderator-home-queue-list"
