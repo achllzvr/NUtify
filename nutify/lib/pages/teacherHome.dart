@@ -16,11 +16,24 @@ class TeacherHome extends StatefulWidget {
 
 class _TeacherHomeState extends State<TeacherHome> {
   String? teacherUserId;
+  // Search state
+  final TextEditingController _homeSearchController = TextEditingController();
+  String _homeQuery = '';
+  // Cache the future to avoid refetching on each rebuild
+  Future<List<TeacherHomeAppointments>>? _homeFuture;
   
   @override
   void initState() {
     super.initState();
     _loadTeacherUserId();
+    _homeFuture = TeacherHomeAppointments.getTeacherHomeAppointments();
+    _homeSearchController.addListener(() {
+      if (_homeQuery != _homeSearchController.text) {
+        setState(() {
+          _homeQuery = _homeSearchController.text;
+        });
+      }
+    });
   }
   
   Future<void> _loadTeacherUserId() async {
@@ -28,6 +41,12 @@ class _TeacherHomeState extends State<TeacherHome> {
     setState(() {
       teacherUserId = prefs.getString('userId');
     });
+  }
+
+  @override
+  void dispose() {
+    _homeSearchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -42,7 +61,7 @@ class _TeacherHomeState extends State<TeacherHome> {
   Widget _buildMainContent() {
     // Fetch once and split into two scrollable sections
     return FutureBuilder<List<TeacherHomeAppointments>>(
-      future: TeacherHomeAppointments.getTeacherHomeAppointments(),
+  future: _homeFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -73,9 +92,45 @@ class _TeacherHomeState extends State<TeacherHome> {
           return d != null && d.isBefore(startOfToday);
         }).toList();
 
+        // Apply query filtering
+        bool hasQuery = _homeQuery.trim().isNotEmpty;
+        if (hasQuery) {
+          final q = _homeQuery.toLowerCase().trim();
+          bool matches(TeacherHomeAppointments a) {
+            return (
+              (a.studentName).toLowerCase().contains(q) ||
+              (a.department).toLowerCase().contains(q) ||
+              (a.appointmentReason).toLowerCase().contains(q) ||
+              (a.scheduleDate).toLowerCase().contains(q) ||
+              (a.scheduleTime).toLowerCase().contains(q)
+            );
+          }
+          upcomingToday.retainWhere(matches);
+          missed.retainWhere(matches);
+        }
+
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Search bar
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+              child: TextField(
+                controller: _homeSearchController,
+                textInputAction: TextInputAction.search,
+                decoration: InputDecoration(
+                  hintText: 'Search by student, department, reason...',
+                  prefixIcon: const Icon(Icons.search),
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+            ),
             const SizedBox(height: 12),
             const Padding(
               padding: EdgeInsets.only(left: 20.0),
