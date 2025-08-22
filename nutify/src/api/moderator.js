@@ -8,7 +8,7 @@ export async function getModeratorHomeAppointments(userID) {
 
 // Fetch moderator requests for inbox page
 export async function getModeratorRequests() {
-  return apiPost('getModeratorRequests', {});
+  return apiPost('getModeratorOnTheSpotRequests', {});
 }
 
 // Fetch accounts on hold (is_verified = 2)

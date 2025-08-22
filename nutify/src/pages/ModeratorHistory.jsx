@@ -38,7 +38,7 @@ const ModeratorHistory = () => {
   // Filter tab options
   const filterOptions = [
     { value: "dailylog", label: "Daily Log", icon: filterIcon },
-    { value: "request", label: "Request", icon: filterIcon },
+    { value: "request", label: "Today's Requests", icon: filterIcon },
     { value: "approval", label: "Approval", icon: filterIcon },
     { value: "onhold", label: "On Hold", icon: filterIcon },
   ];

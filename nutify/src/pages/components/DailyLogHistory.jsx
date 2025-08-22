@@ -66,108 +66,11 @@ const getDailyLogGroups = (items) => {
   }));
 };
 
-const facultyList = [
-  { id: 1, name: 'Jayson Guia', avatar: null },
-  { id: 2, name: 'Jei Pastrana', avatar: null },
-  { id: 3, name: 'Irene Balmes', avatar: null },
-  { id: 4, name: 'Carlo Torres', avatar: null },
-  { id: 5, name: 'Archie Menisis', avatar: null },
-  { id: 6, name: 'Michael Joseph Aramil', avatar: null }
-];
+const facultyList = [];
 
-const studentNames = [
-  "Kier Kriztopher",
-  "Achilles Vonn",
-  "Sophia Marie",
-  "Beatriz Gail",
-  "Prinz Noel",
-  "Mark Matthew"
-];
+const studentNames = [];
 
-const dailyLogHistoryItems = [
-  {
-    id: 1,
-    studentName: studentNames[0],
-    name: facultyList[0].name,
-    details: "Faculty - SACE",
-    time: "July 29, 2025 09:00",
-    status: "dailylog",
-    reason: "Consultation about thesis",
-  },
-  {
-    id: 2,
-    studentName: studentNames[1],
-    name: facultyList[1].name,
-    details: "Faculty - SACE",
-    time: "July 29, 2025 10:00",
-    status: "dailylog",
-    reason: "Grade inquiry",
-  },
-  {
-    id: 3,
-    studentName: studentNames[2],
-    name: facultyList[2].name,
-    details: "Faculty - SACE",
-    time: "July 29, 2025 11:00",
-    status: "dailylog",
-    reason: "Follow-up on project",
-  },
-  {
-    id: 4,
-    studentName: studentNames[3],
-    name: facultyList[3].name,
-    details: "Faculty - SACE",
-    time: "July 29, 2025 13:00",
-    status: "dailylog",
-    reason: "Request for extension",
-  },
-  {
-    id: 5,
-    studentName: studentNames[4],
-    name: facultyList[4].name,
-    details: "Faculty - SACE",
-    time: "July 29, 2025 14:00",
-    status: "dailylog",
-    reason: "Consultation about requirements",
-  },
-  {
-    id: 6,
-    studentName: studentNames[5],
-    name: facultyList[5].name,
-    details: "Faculty - SACE",
-    time: "July 29, 2025 15:00",
-    status: "dailylog",
-    reason: "Feedback on assignment",
-  },
-  // --- Added July 30 logs ---
-  {
-    id: 7,
-    studentName: studentNames[0],
-    name: facultyList[1].name,
-    details: "Faculty - SACE",
-    time: "July 30, 2025 09:30",
-    status: "dailylog",
-    reason: "Schedule consultation",
-  },
-  {
-    id: 8,
-    studentName: studentNames[2],
-    name: facultyList[2].name,
-    details: "Faculty - SACE",
-    time: "July 30, 2025 10:30",
-    status: "dailylog",
-    reason: "Discuss project updates",
-  },
-  {
-    id: 9,
-    studentName: studentNames[4],
-    name: facultyList[4].name,
-    details: "Faculty - SACE",
-    time: "July 30, 2025 13:00",
-    status: "dailylog",
-    reason: "Request for feedback",
-  },
-];
+const dailyLogHistoryItems = [];
 
 const ITEMS_PER_PAGE = 10;
 

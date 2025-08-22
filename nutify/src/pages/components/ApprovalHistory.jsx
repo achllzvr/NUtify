@@ -2,26 +2,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { getPendingUsers, updateUserVerification } from "../../api/moderator";
 
-const facultyList = [
-  { id: 1, name: 'Jayson Guia', type: 'Professor', details: 'Faculty - SACE', avatar: null },
-  { id: 2, name: 'Jei Pastrana', type: 'Professor', details: 'Faculty - SACE', avatar: null },
-  { id: 3, name: 'Irene Balmes', type: 'Professor', details: 'Faculty - SACE', avatar: null },
-  { id: 4, name: 'Carlo Torres', type: 'Professor', details: 'Faculty - SACE', avatar: null },
-  { id: 5, name: 'Archie Menisis', type: 'Professor', details: 'Faculty - SACE', avatar: null },
-  { id: 6, name: 'Michael Joseph Aramil', type: 'Professor', details: 'Faculty - SACE', avatar: null }
-];
-
-const studentNames = [
-  "Kier Kriztopher",
-  "Achilles Vonn",
-  "Sophia Marie",
-  "Beatriz Gail",
-  "Prinz Noel",
-  "Mark Matthew",
-  "Nicole Aermione",
-  "Mike Roan"
-];
-
 const initialApprovalItems = [];
 
 const ITEMS_PER_PAGE = 10;

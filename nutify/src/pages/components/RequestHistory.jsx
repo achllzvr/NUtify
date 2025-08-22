@@ -20,23 +20,6 @@ const formatDateWithTime = (dateStr) => {
   return `${datePart} • ${timePart}`;
 };
 
-const facultyList = [
-  { id: 1, name: 'Prof. Alex Carter', avatar: null },
-  { id: 2, name: 'Prof. Sam Rivers', avatar: null },
-  { id: 3, name: 'Prof. Morgan Lee', avatar: null },
-  { id: 4, name: 'Prof. Charlie Lane', avatar: null },
-  { id: 5, name: 'Prof. Taylor Brooks', avatar: null },
-  { id: 6, name: 'Prof. Avery West', avatar: null }
-];
-
-const studentNames = [
-  "Stud. Jordan Smith",
-  "Stud. Morgan Fox",
-  "Stud. Taylor Brooks",
-  "Stud. Avery West",
-  "Stud. Charlie Lane"
-];
-
 // Placeholder removed; will fetch from backend
 export const requestHistoryItems = [];
 
