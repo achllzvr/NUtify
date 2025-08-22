@@ -1156,31 +1156,86 @@ class _TeacherInboxState extends State<TeacherInbox>
       builder: (BuildContext dialogContext) {
         return StatefulBuilder(
           builder: (ctx, setLocalState) {
+            final colors = _getStatusColors(status);
             return Dialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              elevation: 0,
+              backgroundColor: Colors.transparent,
               insetPadding: EdgeInsets.symmetric(horizontal: 24),
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
+              child: Container(
+                padding: EdgeInsets.all(22),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.15),
+                      spreadRadius: 3,
+                      blurRadius: 20,
+                      offset: Offset(0, 8),
+                    ),
+                  ],
+                ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    // Status Icon with gradient background
+                    Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: LinearGradient(
+                          colors: [
+                            colors[0].withOpacity(0.12),
+                            colors[1].withOpacity(0.12),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                      ),
+                      child: Icon(
+                        _getStatusIcon(status),
+                        color: colors[0],
+                        size: 30,
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    // Title
                     Text(
                       status == 'accepted' ? 'Accept Appointment' : 'Decline Appointment',
-                      style: TextStyle(fontFamily: 'Arimo', fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 12),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text('Remarks (required, shown to student):', style: TextStyle(fontFamily: 'Arimo', fontSize: 14, color: Colors.grey[700])),
+                      style: TextStyle(
+                        fontFamily: 'Arimo',
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF2C3E50),
+                      ),
                     ),
                     SizedBox(height: 8),
+                    // Subtitle
+                    Text(
+                      'Please provide a brief remark. This will be visible to the student.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'Arimo',
+                        fontSize: 14,
+                        color: Colors.grey.shade600,
+                        height: 1.4,
+                      ),
+                    ),
+                    SizedBox(height: 14),
+                    // Remarks field
                     TextField(
                       controller: remarksCtrl,
                       maxLength: 255,
                       maxLines: 3,
                       decoration: InputDecoration(
                         hintText: 'Enter remarks... (max 255 characters)',
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                        hintStyle: TextStyle(fontFamily: 'Arimo'),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                         errorText: errorText,
                         counterText: '',
                       ),
@@ -1188,52 +1243,117 @@ class _TeacherInboxState extends State<TeacherInbox>
                         if (errorText != null) setLocalState(() => errorText = null);
                       },
                     ),
-                    SizedBox(height: 12),
+                    SizedBox(height: 14),
+                    // Actions
                     Row(
                       children: [
+                        // Cancel
                         Expanded(
-                          child: OutlinedButton(
-                            onPressed: () => Navigator.of(dialogContext).pop(),
-                            child: Text('Cancel', style: TextStyle(fontFamily: 'Arimo')),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [Colors.grey.shade200, Colors.grey.shade300],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.3),
+                                  spreadRadius: 1,
+                                  blurRadius: 6,
+                                  offset: Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: ElevatedButton(
+                              onPressed: () => Navigator.of(dialogContext).pop(),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.transparent,
+                                foregroundColor: Colors.grey.shade700,
+                                padding: EdgeInsets.symmetric(vertical: 12),
+                                textStyle: TextStyle(
+                                  fontFamily: 'Arimo',
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                elevation: 0,
+                              ),
+                              child: Text('Cancel'),
+                            ),
                           ),
                         ),
                         SizedBox(width: 12),
+                        // Submit
                         Expanded(
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(backgroundColor: Color(0xFF35408E), foregroundColor: Colors.white),
-                            onPressed: () async {
-                              final text = remarksCtrl.text.trim();
-                              if (text.isEmpty) {
-                                setLocalState(() => errorText = 'Remarks are required');
-                                return;
-                              }
-                              Navigator.of(dialogContext).pop();
-                              final res = await _updateAppointmentStatus(appointmentId, status, teacherUserId!, remarks: text);
-                              if (res['error'] == false) {
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [colors[0], colors[1]],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: colors[0].withOpacity(0.4),
+                                  spreadRadius: 1,
+                                  blurRadius: 8,
+                                  offset: Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                final text = remarksCtrl.text.trim();
+                                if (text.isEmpty) {
+                                  setLocalState(() => errorText = 'Remarks are required');
+                                  return;
+                                }
+                                Navigator.of(dialogContext).pop();
+                                final res = await _updateAppointmentStatus(appointmentId, status, teacherUserId!, remarks: text);
                                 if (!mounted) return;
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('Appointment marked as $status!', style: TextStyle(fontFamily: 'Arimo', color: Colors.white)),
-                                    backgroundColor: Color(0xFF35408E),
-                                  ),
-                                );
-                                setState(() {
-                                  _pendingFuture = TeacherInboxPending.getTeacherInboxPendings();
-                                  _declinedFuture = TeacherInboxCancelled.getTeacherInboxCancelleds();
-                                  _missedFuture = TeacherInboxMissed.getTeacherInboxMisseds();
-                                  _completedFuture = TeacherInboxCompleted.getTeacherInboxCompleteds();
-                                });
-                              } else {
-                                if (!mounted) return;
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text((res['message'] ?? 'Failed to update appointment').toString(), style: TextStyle(fontFamily: 'Arimo', color: Colors.white)),
-                                    backgroundColor: Colors.red,
-                                  ),
-                                );
-                              }
-                            },
-                            child: Text('Submit'),
+                                if (res['error'] == false) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Appointment marked as $status!', style: TextStyle(fontFamily: 'Arimo', color: Colors.white)),
+                                      backgroundColor: Color(0xFF35408E),
+                                    ),
+                                  );
+                                  setState(() {
+                                    _pendingFuture = TeacherInboxPending.getTeacherInboxPendings();
+                                    _declinedFuture = TeacherInboxCancelled.getTeacherInboxCancelleds();
+                                    _missedFuture = TeacherInboxMissed.getTeacherInboxMisseds();
+                                    _completedFuture = TeacherInboxCompleted.getTeacherInboxCompleteds();
+                                  });
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text((res['message'] ?? 'Failed to update appointment').toString(), style: TextStyle(fontFamily: 'Arimo', color: Colors.white)),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.transparent,
+                                foregroundColor: Colors.white,
+                                padding: EdgeInsets.symmetric(vertical: 12),
+                                textStyle: TextStyle(
+                                  fontFamily: 'Arimo',
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                elevation: 0,
+                              ),
+                              child: Text('Submit'),
+                            ),
                           ),
                         ),
                       ],
