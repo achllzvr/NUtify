@@ -375,7 +375,6 @@ class _RegisterPageState extends State<RegisterPage> {
             children: [
               accountTypeButton('Student'),
               accountTypeButton('Faculty'),
-              accountTypeButton('Moderator'),
             ],
           ),
           SizedBox(height: 25),

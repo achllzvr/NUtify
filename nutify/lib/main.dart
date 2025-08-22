@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:nutify/pages/login.dart';
 import 'package:nutify/pages/studentHome.dart';
 import 'package:nutify/pages/teacherHome.dart';
-import 'package:nutify/pages/moderatorHome.dart';
 import 'package:nutify/services/firebase_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -94,15 +93,7 @@ class _SplashScreenState extends State<SplashScreen> {
             settings: RouteSettings(name: '/teacherHome'),
           ),
         );
-      } else if (userType == 'moderator') {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ModeratorHome(),
-            settings: RouteSettings(name: '/moderatorHome'),
-          ),
-        );
-      } else {
+  } else {
         // Unknown user type, go to login
         Navigator.pushReplacement(
           context,

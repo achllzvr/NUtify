@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:nutify/pages/studentHome.dart';
 import 'package:nutify/pages/teacherHome.dart';
 import 'package:nutify/pages/register.dart';
-import 'package:nutify/pages/moderatorHome.dart';
 import 'package:nutify/services/firebase_service.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -191,7 +190,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               );
 
-              // Navigate based on user type (student, teacher, moderator)
+              // Navigate based on user type (student, teacher)
               if (userType == 'student') {
                 // Student
                 Navigator.pushAndRemoveUntil(
@@ -209,16 +208,6 @@ class _LoginPageState extends State<LoginPage> {
                   MaterialPageRoute(
                     builder: (context) => TeacherHome(),
                     settings: RouteSettings(name: '/teacherHome'),
-                  ),
-                  (Route<dynamic> route) => false,
-                );
-              } else if (userType == 'moderator') {
-                // Moderator
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ModeratorHome(),
-                    settings: RouteSettings(name: '/moderatorHome'),
                   ),
                   (Route<dynamic> route) => false,
                 );
@@ -382,7 +371,6 @@ class _LoginPageState extends State<LoginPage> {
             children: [
               accountTypeButton('Student'),
               accountTypeButton('Teacher'),
-              accountTypeButton('Moderator'),
             ],
           ),
           SizedBox(height: 30),
