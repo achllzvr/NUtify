@@ -45,8 +45,10 @@ const ApprovalHistory = ({ onVerify, searchTerm }) => {
           id: u.user_id || u.id,
           name: [u.user_fn, u.user_ln].filter(Boolean).join(' ') || u.name || '',
           type: u.user_type || u.type || 'User',
-          details: u.department ? `Faculty - ${u.department}` : (u.details || ''),
-          studentName: u.studentName || '',
+          // Newly fetched fields
+          idNumber: u.id_number || u.student_id || u.employee_id || '',
+          email: u.email || u.user_email || '',
+          department: u.department || u.dept || u.department_name || (u.user_dept && (u.user_dept.department || u.user_dept.dept || u.user_dept.name)) || '',
         }));
         if (mounted) setApprovalItems(mapped);
       } catch (e) {
@@ -83,10 +85,17 @@ const ApprovalHistory = ({ onVerify, searchTerm }) => {
 
   // Filter items by search
   const filteredItems = useMemo(() => approvalItems.filter(
-    (item) =>
-      !searchTerm ||
-      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.details.toLowerCase().includes(searchTerm.toLowerCase())
+    (item) => {
+      if (!searchTerm) return true;
+      const q = searchTerm.toLowerCase();
+      return (
+        (item.name || '').toLowerCase().includes(q) ||
+        (item.idNumber || '').toLowerCase().includes(q) ||
+        (item.email || '').toLowerCase().includes(q) ||
+        (item.department || '').toLowerCase().includes(q) ||
+        (item.type || '').toLowerCase().includes(q)
+      );
+    }
   ), [approvalItems, searchTerm]);
 
   const totalPages = Math.max(1, Math.ceil(filteredItems.length / ITEMS_PER_PAGE));
@@ -155,6 +164,16 @@ const ApprovalHistory = ({ onVerify, searchTerm }) => {
                 style={{ fontSize: "1.6em", color: "#424A57" }} 
               >
                 {item.name}
+              </div>
+              <div style={{ marginTop: 6, color: '#65727F', fontSize: '0.95em', lineHeight: 1.5 }}>
+                <div><strong style={{ color: '#47505B' }}>NU ID:</strong> {item.idNumber || '—'}</div>
+                <div>
+                  <strong style={{ color: '#47505B' }}>Email:</strong>{' '}
+                  {item.email ? (
+                    <a href={`mailto:${item.email}`} style={{ color: '#3B82F6', textDecoration: 'none' }}>{item.email}</a>
+                  ) : '—'}
+                </div>
+                <div><strong style={{ color: '#47505B' }}>Department:</strong> {item.department || '—'}</div>
               </div>
             </div>
             {/* Action buttons - moved to right */}
