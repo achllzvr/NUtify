@@ -81,6 +81,49 @@ const FacultyList = ({ mainSearch, facultyStatusFilter, setFacultyStatusFilter, 
     return () => { mounted = false; };
   }, [mainSearch]);
 
+  // Normalize various backend status strings to online|busy|offline
+  const normalizeStatus = (raw) => {
+    const norm = (raw || '').toString().toLowerCase();
+    if (norm === 'online') return 'online';
+    if (norm === 'busy' || norm === 'away' || norm === 'engaged') return 'busy';
+    return 'offline';
+  };
+
+  // Poll statuses every 5 seconds for current faculty list
+  useEffect(() => {
+    if (!items || items.length === 0) return; // nothing to poll
+    let mounted = true;
+    const ids = items.map(i => i.id).filter(Boolean);
+    const tick = async () => {
+      try {
+        if (!ids.length) return;
+        const resp = await getUserStatuses(ids);
+        // Build a map of id -> status from possible response shapes
+        let map = {};
+        if (resp) {
+          if (Array.isArray(resp.statuses)) {
+            resp.statuses.forEach(s => { if (s && s.user_id != null) map[s.user_id] = s.status || s.user_status; });
+          } else if (resp.statuses && typeof resp.statuses === 'object') {
+            map = resp.statuses;
+          } else if (typeof resp === 'object') {
+            map = resp;
+          }
+        }
+        if (!mounted) return;
+        setItems(prev => prev.map(f => ({ ...f, status: normalizeStatus(map[f.id] ?? f.status) })));
+      } catch {
+        // ignore polling errors; next tick will retry
+      }
+    };
+    // Prime immediately then poll
+    tick();
+    const handle = setInterval(tick, 5000);
+    return () => {
+      mounted = false;
+      clearInterval(handle);
+    };
+  }, [items.map(i => i.id).join(',')]);
+
   const filteredFacultyList = useMemo(() => items.filter(f =>
     (facultyStatusFilter === 'all' || f.status === facultyStatusFilter) &&
     (f.name.toLowerCase().includes(mainSearch.toLowerCase()) ||
