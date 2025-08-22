@@ -1,6 +1,6 @@
 // Page: Moderator Home
 import React, { useState, useEffect } from 'react';
-import { notifyAppointees, createImmediateAppointment, fetchIdByName, searchUsers } from '../api/moderator';
+import { notifyAppointees, createImmediateAppointment, fetchIdByName, searchUsers, sendDirectFacultyNotification } from '../api/moderator';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import '../styles/dashboard.css';
@@ -170,6 +170,25 @@ const ModeratorHome = () => {
   const handleAlertClose = () => {
     setAlertTransition(false);
     setTimeout(() => setAlertVisible(false), 350);
+  };
+
+  // Faculty click -> send teacher call notification
+  const handleFacultyNotify = async (faculty) => {
+    try {
+      if (!faculty || !faculty.id) return;
+      await sendDirectFacultyNotification(faculty.id);
+    } catch (e) {
+      // ignore failure; keep UX smooth
+    } finally {
+      const audio = new window.Audio('/nutified.wav');
+      audio.play();
+      setAlertVisible(true);
+      setTimeout(() => setAlertTransition(true), 10);
+      setTimeout(() => {
+        setAlertTransition(false);
+        setTimeout(() => setAlertVisible(false), 350);
+      }, 2500);
+    }
   };
 
   // Schedule request handler
@@ -401,6 +420,7 @@ const ModeratorHome = () => {
               mainSearch={mainSearch}
               facultyStatusFilter={facultyStatusFilter}
               setFacultyStatusFilter={setFacultyStatusFilter}
+              onFacultyClick={handleFacultyNotify}
             />
           </div>
         </div>

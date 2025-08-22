@@ -36,6 +36,16 @@ export async function notifyAppointees(appointment_id) {
   return apiPost('notifyAppointees', { appointment_id });
 }
 
+// Send a direct call notification to a teacher (front desk)
+export async function sendTeacherCallNotification(faculty_id, message = 'You are being called to the front desk.') {
+  return apiPost('sendTeacherCallNotification', { faculty_id, message });
+}
+
+// New: Directly notify a faculty without tying to an appointment
+export async function sendDirectFacultyNotification(faculty_id, message = 'You are being called to the front desk.') {
+  return apiPost('sendDirectFacultyNotification', { faculty_id, message });
+}
+
 // Create an on-the-spot request (moderator) — calls existing backend action
 export async function createImmediateAppointment(teacher_id, student_id, appointment_reason) {
   return apiPost('moderatorCreateOnSpotRequest', { teacher_id, student_id, appointment_reason });

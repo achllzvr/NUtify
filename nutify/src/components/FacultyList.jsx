@@ -6,7 +6,7 @@ const initialFaculty = [];
 
 const FACULTY_PER_PAGE = 10;
 
-const FacultyList = ({ mainSearch, facultyStatusFilter, setFacultyStatusFilter }) => {
+const FacultyList = ({ mainSearch, facultyStatusFilter, setFacultyStatusFilter, onFacultyClick }) => {
   const [page, setPage] = useState(1);
   const [items, setItems] = useState(initialFaculty);
   const [loading, setLoading] = useState(true);
@@ -105,6 +105,16 @@ const FacultyList = ({ mainSearch, facultyStatusFilter, setFacultyStatusFilter }
             <div
               key={faculty.id}
               className="moderator-home-faculty-item"
+              onClick={() => onFacultyClick && onFacultyClick(faculty)}
+              role={onFacultyClick ? 'button' : undefined}
+              tabIndex={onFacultyClick ? 0 : undefined}
+              onKeyDown={e => {
+                if (!onFacultyClick) return;
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onFacultyClick(faculty);
+                }
+              }}
             >
               <div className="moderator-home-faculty-avatar">
                 <div
