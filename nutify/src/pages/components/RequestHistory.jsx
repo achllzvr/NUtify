@@ -23,6 +23,9 @@ const formatDateWithTime = (dateStr) => {
 // Placeholder removed; will fetch from backend
 export const requestHistoryItems = [];
 
+// Display helper: Capitalize first letter, rest lowercase
+const capitalizeStatus = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : "");
+
 const ITEMS_PER_PAGE = 10;
 
 const RequestHistory = ({ onViewDetails, searchTerm, moderatorId }) => {
@@ -45,7 +48,7 @@ const RequestHistory = ({ onViewDetails, searchTerm, moderatorId }) => {
           id: r.appointment_id || r.id || Math.random(),
           name: r.teacher_name || r.faculty_name || r.teacher || r.name || "",
           studentName: r.student_name || r.student || r.studentName || "",
-          status: (r.status || "pending").toLowerCase(),
+          status: (r.status).toLowerCase(),
           time: r.appointment_date || r.time || r.created_at || "",
           reason: r.appointment_reason || r.reason || "",
         }));
@@ -128,7 +131,7 @@ const RequestHistory = ({ onViewDetails, searchTerm, moderatorId }) => {
             <div
               key={item.id}
               className="moderator-history-item"
-              data-status="pending"
+              data-status={item.status}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -152,7 +155,7 @@ const RequestHistory = ({ onViewDetails, searchTerm, moderatorId }) => {
                   className="moderator-history-appointment-details moderator-history-details"
                   style={{ fontSize: "1.08em", color: "#424A57" }} // slightly bigger status
                 >
-                  Status: Pending
+                  Status: {capitalizeStatus(item.status)}
                 </div>
                 <div
                   className="moderator-history-appointment-time"

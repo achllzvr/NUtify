@@ -449,7 +449,7 @@ const ModeratorHistory = () => {
                 )}
                 {activeFilter === "request" && (
                   <div style={{ fontSize: "16px", marginBottom: "10px" }}>
-                    <strong>Status:</strong> Pending
+                    <strong>Status:</strong> {selectedItem.status ? selectedItem.status.charAt(0).toUpperCase() + selectedItem.status.slice(1).toLowerCase() : ""}
                   </div>
                 )}
               </div>
