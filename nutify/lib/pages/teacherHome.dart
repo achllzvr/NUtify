@@ -22,6 +22,13 @@ class _TeacherHomeState extends State<TeacherHome> {
   // Cache the future to avoid refetching on each rebuild
   Future<List<TeacherHomeAppointments>>? _homeFuture;
   
+  // Refresh helper: re-fetch home data
+  void _refreshHome() {
+    setState(() {
+      _homeFuture = TeacherHomeAppointments.getTeacherHomeAppointments();
+    });
+  }
+  
   @override
   void initState() {
     super.initState();
@@ -394,7 +401,7 @@ class _TeacherHomeState extends State<TeacherHome> {
                         ],
                       ),
                       child: ElevatedButton(
-                        onPressed: () {
+      onPressed: () {
                           _showStatusConfirmationDialog(
                             context,
                             'completed',
@@ -408,7 +415,7 @@ class _TeacherHomeState extends State<TeacherHome> {
                                     backgroundColor: Color(0xFF35408E),
                                   ),
                                 );
-                                setState(() {}); // Refresh UI
+        _refreshHome(); // Reload data
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
@@ -459,7 +466,7 @@ class _TeacherHomeState extends State<TeacherHome> {
                         ],
                       ),
                       child: ElevatedButton(
-                        onPressed: () {
+      onPressed: () {
                           _showStatusConfirmationDialog(
                             context,
                             'missed',
@@ -473,7 +480,7 @@ class _TeacherHomeState extends State<TeacherHome> {
                                     backgroundColor: Color(0xFF35408E),
                                   ),
                                 );
-                                setState(() {}); // Refresh UI
+        _refreshHome(); // Reload data
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
