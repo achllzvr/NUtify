@@ -718,6 +718,66 @@
   padding: 10px 0 !important;
   min-height: 38px;
 }
+
+/* Polished primary Verify button (used in modals) */
+.verify-primary-btn {
+  background: linear-gradient(145deg, #3c489f, #323c86);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 22px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  box-shadow: 0 8px 24px rgba(44, 62, 80, 0.18);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease, opacity 0.2s ease;
+  font-family: "Montserrat", sans-serif;
+}
+.verify-primary-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 28px rgba(44, 62, 80, 0.22);
+  filter: brightness(1.05);
+}
+.verify-primary-btn:active {
+  transform: translateY(0);
+  box-shadow: inset 12px 12px 24px #35408e, inset -12px -12px 24px #3b469c;
+}
+.verify-primary-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  filter: grayscale(10%);
+}
+
+/* Gold theme verify button for modals */
+.verify-gold-btn {
+  background: linear-gradient(145deg, #ffd36b, #f4c34e);
+  color: #5d4300;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 22px;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  box-shadow: 0 8px 24px rgba(93, 67, 0, 0.18);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease, opacity 0.2s ease;
+  font-family: "Montserrat", sans-serif;
+}
+.verify-gold-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 28px rgba(93, 67, 0, 0.24);
+  filter: brightness(1.03);
+}
+.verify-gold-btn:active {
+  transform: translateY(0);
+  box-shadow: inset 10px 10px 22px rgba(164, 120, 0, 0.25), inset -10px -10px 22px rgba(255, 255, 255, 0.08);
+}
+.verify-gold-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  filter: grayscale(10%);
+}
 .moderator-history-appointment-item .moderator-history-appointment-time {
   font-size: 1.04em;
 }

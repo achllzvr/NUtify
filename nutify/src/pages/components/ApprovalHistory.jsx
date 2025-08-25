@@ -61,7 +61,13 @@ const VerifyModal = ({ open, onClose, onSubmit, user }) => {
           </label>
         </div>
         <div style={{ marginTop: 18, display: 'flex', justifyContent: 'center' }}>
-          <button disabled={!valid} onClick={() => onSubmit({ id_number: idNumber.trim(), department: department.trim(), email: email.trim() })} className="moderator-home-notify-btn verify" style={{ padding: '10px 18px', borderRadius: 12, border: 'none', fontSize: 15, fontWeight: 600, opacity: valid ? 1 : 0.6, cursor: valid ? 'pointer' : 'not-allowed' }}>Verify</button>
+          <button
+            disabled={!valid}
+            onClick={() => onSubmit({ id_number: idNumber.trim(), department: department.trim(), email: email.trim() })}
+            className="verify-gold-btn"
+          >
+            Verify
+          </button>
         </div>
       </div>
     </div>
