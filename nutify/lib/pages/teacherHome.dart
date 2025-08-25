@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
+import 'package:nutify/services/user_status_service.dart';
 
 class TeacherHome extends StatefulWidget {
   TeacherHome({super.key});
@@ -16,6 +17,8 @@ class TeacherHome extends StatefulWidget {
 
 class _TeacherHomeState extends State<TeacherHome> {
   String? teacherUserId;
+  String _userStatus = 'online';
+  bool _statusLoading = false;
   // Search state
   final TextEditingController _homeSearchController = TextEditingController();
   String _homeQuery = '';
@@ -41,6 +44,34 @@ class _TeacherHomeState extends State<TeacherHome> {
         });
       }
     });
+    _initUserStatus();
+  }
+
+  Future<void> _initUserStatus() async {
+    setState(() => _statusLoading = true);
+    final s = await UserStatusService.fetchStatus();
+    setState(() {
+      if (s != null) _userStatus = s;
+      _statusLoading = false;
+    });
+  }
+
+  Future<void> _cycleStatus() async {
+    if (_statusLoading) return;
+    final order = ['online', 'busy', 'offline'];
+    final idx = order.indexOf(_userStatus);
+    final next = order[(idx + 1) % order.length];
+    setState(() => _statusLoading = true);
+    final ok = await UserStatusService.updateStatus(next);
+    setState(() {
+      if (ok) _userStatus = next;
+      _statusLoading = false;
+    });
+    if (!ok && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update status', style: TextStyle(fontFamily: 'Arimo', color: Colors.white)), backgroundColor: Colors.red),
+      );
+    }
   }
   
   Future<void> _loadTeacherUserId() async {
@@ -760,6 +791,47 @@ class _TeacherHomeState extends State<TeacherHome> {
         ),
       ),
       actions: [
+        // Status toggle
+        Padding(
+          padding: const EdgeInsets.only(right: 8.0),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(20),
+            onTap: _cycleStatus,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.white24),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _statusLoading
+                      ? SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Colors.white)))
+                      : Icon(
+                          _userStatus == 'online'
+                              ? Icons.circle
+                              : _userStatus == 'busy'
+                                  ? Icons.do_not_disturb_on
+                                  : Icons.circle_outlined,
+                          size: 16,
+                          color: _userStatus == 'online'
+                              ? Colors.limeAccent
+                              : _userStatus == 'busy'
+                                  ? Colors.orangeAccent
+                                  : Colors.white70,
+                        ),
+                  const SizedBox(width: 6),
+                  Text(
+                    _userStatus[0].toUpperCase() + _userStatus.substring(1),
+                    style: const TextStyle(fontFamily: 'Arimo', color: Colors.white, fontSize: 13),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
         // Profile button
         GestureDetector(
           onTap: () {

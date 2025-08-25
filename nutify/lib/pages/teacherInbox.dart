@@ -8,6 +8,7 @@ import 'package:nutify/models/teacherInboxMissed.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:nutify/services/user_status_service.dart';
 
 class TeacherInbox extends StatefulWidget {
   TeacherInbox({super.key});
@@ -21,6 +22,8 @@ class _TeacherInboxState extends State<TeacherInbox>
   late TabController _tabController;
 
   String? teacherUserId;
+  String _userStatus = 'online';
+  bool _statusLoading = false;
   // Global search (applies to all tabs)
   final TextEditingController _inboxSearchController = TextEditingController();
   String _inboxQuery = '';
@@ -44,6 +47,7 @@ class _TeacherInboxState extends State<TeacherInbox>
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
     _loadTeacherUserId();
+  _initUserStatus();
     _pendingFuture = TeacherInboxPending.getTeacherInboxPendings();
     _declinedFuture = TeacherInboxCancelled.getTeacherInboxCancelleds();
     _missedFuture = TeacherInboxMissed.getTeacherInboxMisseds();
@@ -69,6 +73,33 @@ class _TeacherInboxState extends State<TeacherInbox>
       final v = _completedCtrl.text;
       if (v != _completedQuery) setState(() => _completedQuery = v);
     });
+  }
+
+  Future<void> _initUserStatus() async {
+    setState(() => _statusLoading = true);
+    final s = await UserStatusService.fetchStatus();
+    setState(() {
+      if (s != null) _userStatus = s;
+      _statusLoading = false;
+    });
+  }
+
+  Future<void> _cycleStatus() async {
+    if (_statusLoading) return;
+    final order = ['online', 'busy', 'offline'];
+    final idx = order.indexOf(_userStatus);
+    final next = order[(idx + 1) % order.length];
+    setState(() => _statusLoading = true);
+    final ok = await UserStatusService.updateStatus(next);
+    setState(() {
+      if (ok) _userStatus = next;
+      _statusLoading = false;
+    });
+    if (!ok && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update status', style: TextStyle(fontFamily: 'Arimo', color: Colors.white)), backgroundColor: Colors.red),
+      );
+    }
   }
 
   bool _isUserIdLoading = true;
@@ -1017,6 +1048,47 @@ class _TeacherInboxState extends State<TeacherInbox>
         ),
       ),
       actions: [
+        // Status toggle
+        Padding(
+          padding: const EdgeInsets.only(right: 8.0),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(20),
+            onTap: _cycleStatus,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.white24),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _statusLoading
+                      ? SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Colors.white)))
+                      : Icon(
+                          _userStatus == 'online'
+                              ? Icons.circle
+                              : _userStatus == 'busy'
+                                  ? Icons.do_not_disturb_on
+                                  : Icons.circle_outlined,
+                          size: 16,
+                          color: _userStatus == 'online'
+                              ? Colors.limeAccent
+                              : _userStatus == 'busy'
+                                  ? Colors.orangeAccent
+                                  : Colors.white70,
+                        ),
+                  const SizedBox(width: 6),
+                  Text(
+                    _userStatus[0].toUpperCase() + _userStatus.substring(1),
+                    style: const TextStyle(fontFamily: 'Arimo', color: Colors.white, fontSize: 13),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
         // Profile button
         GestureDetector(
           onTap: () {
