@@ -6,11 +6,75 @@ const initialApprovalItems = [];
 
 const ITEMS_PER_PAGE = 10;
 
+// Simple in-file modal component to avoid external deps
+const VerifyModal = ({ open, onClose, onSubmit, user }) => {
+  const [idNumber, setIdNumber] = useState(user?.idNumber || "");
+  const [department, setDepartment] = useState(user?.department || "");
+  const [email, setEmail] = useState(user?.email || "");
+  const [checks, setChecks] = useState({ c1: false, c2: false, c3: false });
+
+  useEffect(() => {
+    if (open) {
+      setIdNumber(user?.idNumber || "");
+      setDepartment(user?.department || "");
+      setEmail(user?.email || "");
+      setChecks({ c1: false, c2: false, c3: false });
+    }
+  }, [open, user]);
+
+  const valid = idNumber.trim() && department.trim() && email.trim() && checks.c1 && checks.c2 && checks.c3;
+  if (!open) return null;
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+      <div style={{ width: 'min(560px, 92vw)', background: '#f8f8f8', borderRadius: 16, boxShadow: '0 10px 40px rgba(0,0,0,0.2)', padding: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+          <h3 style={{ margin: 0, fontSize: 20, color: '#2c3e50', fontWeight: 700 }}>Verify Account</h3>
+          <button onClick={onClose} aria-label="Close" style={{ background: 'transparent', border: 'none', fontSize: 24, cursor: 'pointer', color: '#666', lineHeight: 1 }}>×</button>
+        </div>
+        <div style={{ color: '#47505B', fontSize: 15, marginBottom: 10 }}>Please confirm the details for <strong style={{ color: '#2c3e50' }}>{user?.name}</strong>.</div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 12 }}>
+          <label style={{ display: 'grid', gap: 6 }}>
+            <span style={{ fontWeight: 600, color: '#47505B', fontSize: 14 }}>NU ID</span>
+            <input value={idNumber} onChange={e => setIdNumber(e.target.value)} placeholder="e.g., 20XX-XXXXX" className="login-input" style={{ padding: '12px 14px', borderRadius: 10, border: '1px solid #ddd', background: '#fff', color: '#000', fontSize: 15 }} />
+          </label>
+          <label style={{ display: 'grid', gap: 6 }}>
+            <span style={{ fontWeight: 600, color: '#47505B', fontSize: 14 }}>Department</span>
+            <input value={department} onChange={e => setDepartment(e.target.value)} placeholder="e.g., SACE" className="login-input" style={{ padding: '12px 14px', borderRadius: 10, border: '1px solid #ddd', background: '#fff', color: '#000', fontSize: 15 }} />
+          </label>
+          <label style={{ display: 'grid', gap: 6 }}>
+            <span style={{ fontWeight: 600, color: '#47505B', fontSize: 14 }}>Email</span>
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="name@students.national-u.edu.ph" className="login-input" style={{ padding: '12px 14px', borderRadius: 10, border: '1px solid #ddd', background: '#fff', color: '#000', fontSize: 15 }} />
+          </label>
+        </div>
+        <div style={{ marginTop: 14, display: 'grid', gap: 10, color: '#47505B' }}>
+          <label style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+            <input type="checkbox" checked={checks.c1} onChange={e => setChecks({ ...checks, c1: e.target.checked })} style={{ accentColor: '#3B82F6', width: 16, height: 16 }} />
+            <span style={{ fontSize: 14 }}>I have double-checked the NU ID matches the user's record.</span>
+          </label>
+          <label style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+            <input type="checkbox" checked={checks.c2} onChange={e => setChecks({ ...checks, c2: e.target.checked })} style={{ accentColor: '#3B82F6', width: 16, height: 16 }} />
+            <span style={{ fontSize: 14 }}>The department entered is accurate and up to date.</span>
+          </label>
+          <label style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+            <input type="checkbox" checked={checks.c3} onChange={e => setChecks({ ...checks, c3: e.target.checked })} style={{ accentColor: '#3B82F6', width: 16, height: 16 }} />
+            <span style={{ fontSize: 14 }}>The email belongs to this user and has been verified.</span>
+          </label>
+        </div>
+        <div style={{ marginTop: 18, display: 'flex', justifyContent: 'center' }}>
+          <button disabled={!valid} onClick={() => onSubmit({ id_number: idNumber.trim(), department: department.trim(), email: email.trim() })} className="moderator-home-notify-btn verify" style={{ padding: '10px 18px', borderRadius: 12, border: 'none', fontSize: 15, fontWeight: 600, opacity: valid ? 1 : 0.6, cursor: valid ? 'pointer' : 'not-allowed' }}>Verify</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const ApprovalHistory = ({ onVerify, searchTerm }) => {
   const [approvalItems, setApprovalItems] = useState(initialApprovalItems);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selected, setSelected] = useState(null);
 
   useEffect(() => {
     let mounted = true;
@@ -51,15 +115,23 @@ const ApprovalHistory = ({ onVerify, searchTerm }) => {
     }
   };
 
-  // Verify item
-  const handleVerify = async (item) => {
+  // Open modal for verify
+  const handleOpenVerify = (item) => {
+    setSelected(item);
+    setModalOpen(true);
+  };
+
+  const handleSubmitVerify = async (extra) => {
+    if (!selected) return;
     try {
-      // is_verified = 1 means verified
-      await updateUserVerification(item.id, 1);
-      setApprovalItems((items) => items.filter((i) => i.id !== item.id));
-      if (onVerify) onVerify(item);
+      await updateUserVerification(selected.id, 1, extra);
+      setApprovalItems((items) => items.filter((i) => i.id !== selected.id));
+      if (onVerify) onVerify(selected);
     } catch (e) {
       console.error(e);
+    } finally {
+      setModalOpen(false);
+      setSelected(null);
     }
   };
 
@@ -166,7 +238,7 @@ const ApprovalHistory = ({ onVerify, searchTerm }) => {
               </button>
               <button
                 className="moderator-history-see-more-btn verify"
-                onClick={() => handleVerify(item)}
+                onClick={() => handleOpenVerify(item)}
               >
                 Verify
               </button>
@@ -174,6 +246,12 @@ const ApprovalHistory = ({ onVerify, searchTerm }) => {
           </div>
         ))}
       </div>
+      <VerifyModal
+        open={modalOpen}
+        onClose={() => { setModalOpen(false); setSelected(null); }}
+        onSubmit={handleSubmitVerify}
+        user={selected}
+      />
       <div style={{ display: 'flex', justifyContent: 'center', marginTop: '12px', gap: '10px' }}>
         <button
           onClick={() => setPage(prev => Math.max(prev - 1, 1))}

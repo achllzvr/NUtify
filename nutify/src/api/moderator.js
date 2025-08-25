@@ -22,8 +22,10 @@ export async function getPendingUsers() {
 }
 
 // Update user verification: is_verified 1 (verified) or 2 (on hold)
-export async function updateUserVerification(user_id, is_verified) {
-  return apiPost('updateUserVerification', { user_id, is_verified });
+// Optionally include extra fields when verifying: { id_number, department, email }
+export async function updateUserVerification(user_id, is_verified, extra = {}) {
+  // Merge extras only if provided; backend will ignore unknown fields
+  return apiPost('updateUserVerification', { user_id, is_verified, ...extra });
 }
 
 // Manual Logging Sheet (to replace the log book)
