@@ -30,6 +30,16 @@ class _StudentHomeState extends State<StudentHome> {
   String _userStatus = 'online';
   bool _statusLoading = false;
 
+  Future<void> _reloadHome() async {
+    // Refresh both the professors list and upcoming appointments
+    await _loadProfessors();
+    final fut = StudentHomeAppointments.getStudentHomeAppointments();
+    setState(() {
+      _upcomingFuture = fut;
+    });
+    await fut;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -118,20 +128,23 @@ class _StudentHomeState extends State<StudentHome> {
         children: [
           studentSearchBar(),
           Expanded(
-            child: _isSearching
-                ? searchResults()
-                : FutureBuilder<List<RecentProfessor>>(
-                    future: RecentProfessor.getRecentProfessors(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(child: CircularProgressIndicator());
-                      }
+            child: RefreshIndicator(
+              onRefresh: _reloadHome,
+              child: _isSearching
+                  ? searchResults()
+                  : FutureBuilder<List<RecentProfessor>>(
+                      future: RecentProfessor.getRecentProfessors(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return Center(child: CircularProgressIndicator());
+                        }
 
-                      List<RecentProfessor> recentProfessors =
-                          snapshot.data ?? [];
-                      return mainContent(recentProfessors);
-                    },
-                  ),
+                        List<RecentProfessor> recentProfessors =
+                            snapshot.data ?? [];
+                        return mainContent(recentProfessors);
+                      },
+                    ),
+            ),
           ),
         ],
       ),
@@ -177,7 +190,16 @@ class _StudentHomeState extends State<StudentHome> {
               List<StudentHomeAppointments> appointments = snapshot.data ?? [];
 
               if (appointments.isEmpty) {
-                return _buildEmptyState('No upcoming appointments');
+                return RefreshIndicator(
+                  onRefresh: _reloadHome,
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      const SizedBox(height: 80),
+                      _buildEmptyState('No upcoming appointments'),
+                    ],
+                  ),
+                );
               }
 
               // Sort by start date/time ascending
@@ -187,15 +209,18 @@ class _StudentHomeState extends State<StudentHome> {
                 return da.compareTo(db);
               });
 
-              return ListView.separated(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 8.0,
-                ),
-                itemCount: appointments.length,
-                separatorBuilder: (context, index) =>
-                    const SizedBox(height: 12),
-                itemBuilder: (context, index) {
+              return RefreshIndicator(
+                onRefresh: _reloadHome,
+                child: ListView.separated(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 8.0,
+                  ),
+                  itemCount: appointments.length,
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 12),
+                  itemBuilder: (context, index) {
                   var appointment = appointments[index];
                   // Get initials for avatar
                   String initials = appointment.teacherName
@@ -370,6 +395,7 @@ class _StudentHomeState extends State<StudentHome> {
                     ),
                   );
                 },
+              ),
               );
             },
           ),
@@ -643,17 +669,7 @@ class _StudentHomeState extends State<StudentHome> {
         ),
       ),
 
-      actions: [
-        IconButton(
-          tooltip: 'Refresh',
-          onPressed: () {
-            setState(() {
-              _upcomingFuture =
-                  StudentHomeAppointments.getStudentHomeAppointments();
-            });
-          },
-          icon: const Icon(Icons.refresh, color: Colors.white),
-        ),
+  actions: [
         // Status toggle
         Padding(
           padding: const EdgeInsets.only(right: 8.0),
@@ -817,6 +833,7 @@ class _StudentHomeState extends State<StudentHome> {
 
   Widget mainContent(List<RecentProfessor> recentProfessors) {
     return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.only(bottom: 16),
       child: Column(
         children: [

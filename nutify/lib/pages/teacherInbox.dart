@@ -75,6 +75,20 @@ class _TeacherInboxState extends State<TeacherInbox>
     });
   }
 
+  Future<void> _reloadInbox() async {
+    final f1 = TeacherInboxPending.getTeacherInboxPendings();
+    final f2 = TeacherInboxCancelled.getTeacherInboxCancelleds();
+    final f3 = TeacherInboxMissed.getTeacherInboxMisseds();
+    final f4 = TeacherInboxCompleted.getTeacherInboxCompleteds();
+    setState(() {
+      _pendingFuture = f1;
+      _declinedFuture = f2;
+      _missedFuture = f3;
+      _completedFuture = f4;
+    });
+    await Future.wait([f1, f2, f3, f4]);
+  }
+
   Future<void> _initUserStatus() async {
     setState(() => _statusLoading = true);
     final s = await UserStatusService.fetchStatus();
@@ -115,11 +129,11 @@ class _TeacherInboxState extends State<TeacherInbox>
   @override
   void dispose() {
     _tabController.dispose();
-  _inboxSearchController.dispose();
-  _pendingCtrl.dispose();
-  _declinedCtrl.dispose();
-  _missedCtrl.dispose();
-  _completedCtrl.dispose();
+    _inboxSearchController.dispose();
+    _pendingCtrl.dispose();
+    _declinedCtrl.dispose();
+    _missedCtrl.dispose();
+    _completedCtrl.dispose();
     super.dispose();
   }
 
@@ -183,7 +197,7 @@ class _TeacherInboxState extends State<TeacherInbox>
           fontSize: 14,
           fontWeight: FontWeight.normal,
         ),
-        tabs: [
+        tabs: const [
           Tab(text: 'Pending'),
           Tab(text: 'Declined'),
           Tab(text: 'Missed'),
@@ -217,8 +231,8 @@ class _TeacherInboxState extends State<TeacherInbox>
         
         List<TeacherInboxPending> pendingAppointments = snapshot.data ?? [];
 
-        // Search bar for Pending tab
-        Widget search = Padding(
+  // Search bar for Pending tab
+  Widget search = Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
           child: TextField(
             controller: _pendingCtrl,
@@ -250,7 +264,21 @@ class _TeacherInboxState extends State<TeacherInbox>
 
         if (pendingAppointments.isEmpty) {
           return Column(
-            children: [search, Expanded(child: _buildEmptyState('No pending appointments'))],
+            children: [
+              search,
+              Expanded(
+                child: RefreshIndicator(
+                  onRefresh: _reloadInbox,
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      const SizedBox(height: 120),
+                      _buildEmptyState('No pending appointments'),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           );
         }
 
@@ -258,23 +286,27 @@ class _TeacherInboxState extends State<TeacherInbox>
           children: [
             search,
             Expanded(
-              child: ListView.separated(
-                padding: EdgeInsets.all(16),
-                itemCount: pendingAppointments.length,
-                separatorBuilder: (context, index) => SizedBox(height: 12),
-                itemBuilder: (context, index) {
-                  var appointment = pendingAppointments[index];
-                  return _buildAppointmentCard(
-                    appointment.studentName,
-                    appointment.department,
-                    appointment.scheduleDate,
-                    appointment.scheduleTime,
-                    'pending',
-                    appointment.id,
-                    appointment.appointmentReason,
-                    appointmentRemarks: '',
-                  );
-                },
+              child: RefreshIndicator(
+                onRefresh: _reloadInbox,
+                child: ListView.separated(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: EdgeInsets.all(16),
+                  itemCount: pendingAppointments.length,
+                  separatorBuilder: (context, index) => SizedBox(height: 12),
+                  itemBuilder: (context, index) {
+                    var appointment = pendingAppointments[index];
+                    return _buildAppointmentCard(
+                      appointment.studentName,
+                      appointment.department,
+                      appointment.scheduleDate,
+                      appointment.scheduleTime,
+                      'pending',
+                      appointment.id,
+                      appointment.appointmentReason,
+                      appointmentRemarks: '',
+                    );
+                  },
+                ),
               ),
             ),
           ],
@@ -324,7 +356,21 @@ class _TeacherInboxState extends State<TeacherInbox>
 
         if (declinedAppointments.isEmpty) {
           return Column(
-            children: [search, Expanded(child: _buildEmptyState('No declined appointments'))],
+            children: [
+              search,
+              Expanded(
+                child: RefreshIndicator(
+                  onRefresh: _reloadInbox,
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      const SizedBox(height: 120),
+                      _buildEmptyState('No declined appointments'),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           );
         }
 
@@ -332,23 +378,27 @@ class _TeacherInboxState extends State<TeacherInbox>
           children: [
             search,
             Expanded(
-              child: ListView.separated(
-                padding: EdgeInsets.all(16),
-                itemCount: declinedAppointments.length,
-                separatorBuilder: (context, index) => SizedBox(height: 12),
-                itemBuilder: (context, index) {
-                  var appointment = declinedAppointments[index];
-                  return _buildAppointmentCard(
-                    appointment.studentName,
-                    appointment.department,
-                    appointment.scheduleDate,
-                    appointment.scheduleTime,
-                    'declined',
-                    appointment.id,
-                    appointment.appointmentReason,
-                    appointmentRemarks: appointment.appointmentRemarks,
-                  );
-                },
+              child: RefreshIndicator(
+                onRefresh: _reloadInbox,
+                child: ListView.separated(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: EdgeInsets.all(16),
+                  itemCount: declinedAppointments.length,
+                  separatorBuilder: (context, index) => SizedBox(height: 12),
+                  itemBuilder: (context, index) {
+                    var appointment = declinedAppointments[index];
+                    return _buildAppointmentCard(
+                      appointment.studentName,
+                      appointment.department,
+                      appointment.scheduleDate,
+                      appointment.scheduleTime,
+                      'declined',
+                      appointment.id,
+                      appointment.appointmentReason,
+                      appointmentRemarks: appointment.appointmentRemarks,
+                    );
+                  },
+                ),
               ),
             ),
           ],
@@ -398,7 +448,21 @@ class _TeacherInboxState extends State<TeacherInbox>
 
         if (missedAppointments.isEmpty) {
           return Column(
-            children: [search, Expanded(child: _buildEmptyState('No missed appointments'))],
+            children: [
+              search,
+              Expanded(
+                child: RefreshIndicator(
+                  onRefresh: _reloadInbox,
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      const SizedBox(height: 120),
+                      _buildEmptyState('No missed appointments'),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           );
         }
 
@@ -406,23 +470,27 @@ class _TeacherInboxState extends State<TeacherInbox>
           children: [
             search,
             Expanded(
-              child: ListView.separated(
-                padding: EdgeInsets.all(16),
-                itemCount: missedAppointments.length,
-                separatorBuilder: (context, index) => SizedBox(height: 12),
-                itemBuilder: (context, index) {
-                  var appointment = missedAppointments[index];
-                  return _buildAppointmentCard(
-                    appointment.studentName,
-                    appointment.department,
-                    appointment.scheduleDate,
-                    appointment.scheduleTime,
-                    'missed',
-                    appointment.id,
-                    appointment.appointmentReason,
-                    appointmentRemarks: appointment.appointmentRemarks,
-                  );
-                },
+              child: RefreshIndicator(
+                onRefresh: _reloadInbox,
+                child: ListView.separated(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: EdgeInsets.all(16),
+                  itemCount: missedAppointments.length,
+                  separatorBuilder: (context, index) => SizedBox(height: 12),
+                  itemBuilder: (context, index) {
+                    var appointment = missedAppointments[index];
+                    return _buildAppointmentCard(
+                      appointment.studentName,
+                      appointment.department,
+                      appointment.scheduleDate,
+                      appointment.scheduleTime,
+                      'missed',
+                      appointment.id,
+                      appointment.appointmentReason,
+                      appointmentRemarks: appointment.appointmentRemarks,
+                    );
+                  },
+                ),
               ),
             ),
           ],
@@ -472,7 +540,21 @@ class _TeacherInboxState extends State<TeacherInbox>
 
         if (completedAppointments.isEmpty) {
           return Column(
-            children: [search, Expanded(child: _buildEmptyState('No completed appointments'))],
+            children: [
+              search,
+              Expanded(
+                child: RefreshIndicator(
+                  onRefresh: _reloadInbox,
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      const SizedBox(height: 120),
+                      _buildEmptyState('No completed appointments'),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           );
         }
 
@@ -480,23 +562,27 @@ class _TeacherInboxState extends State<TeacherInbox>
           children: [
             search,
             Expanded(
-              child: ListView.separated(
-                padding: EdgeInsets.all(16),
-                itemCount: completedAppointments.length,
-                separatorBuilder: (context, index) => SizedBox(height: 12),
-                itemBuilder: (context, index) {
-                  var appointment = completedAppointments[index];
-                  return _buildAppointmentCard(
-                    appointment.studentName,
-                    appointment.department,
-                    appointment.scheduleDate,
-                    appointment.scheduleTime,
-                    'completed',
-                    appointment.id,
-                    appointment.appointmentReason,
-                    appointmentRemarks: appointment.appointmentRemarks,
-                  );
-                },
+              child: RefreshIndicator(
+                onRefresh: _reloadInbox,
+                child: ListView.separated(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: EdgeInsets.all(16),
+                  itemCount: completedAppointments.length,
+                  separatorBuilder: (context, index) => SizedBox(height: 12),
+                  itemBuilder: (context, index) {
+                    var appointment = completedAppointments[index];
+                    return _buildAppointmentCard(
+                      appointment.studentName,
+                      appointment.department,
+                      appointment.scheduleDate,
+                      appointment.scheduleTime,
+                      'completed',
+                      appointment.id,
+                      appointment.appointmentReason,
+                      appointmentRemarks: appointment.appointmentRemarks,
+                    );
+                  },
+                ),
               ),
             ),
           ],

@@ -32,6 +32,15 @@ class _TeacherHomeState extends State<TeacherHome> {
     });
   }
   
+  // Async version for pull-to-refresh
+  Future<void> _refreshHomeAsync() async {
+    final fut = TeacherHomeAppointments.getTeacherHomeAppointments();
+    setState(() {
+      _homeFuture = fut;
+    });
+    await fut;
+  }
+  
   @override
   void initState() {
     super.initState();
@@ -195,17 +204,30 @@ class _TeacherHomeState extends State<TeacherHome> {
             const SizedBox(height: 6),
             Expanded(
               child: upcoming.isEmpty
-                  ? const Center(
-                      child: Text(
-                        'No upcoming appointments',
-                        style: TextStyle(fontFamily: 'Arimo', fontSize: 14, color: Colors.grey),
+                  ? RefreshIndicator(
+                      onRefresh: _refreshHomeAsync,
+                      child: ListView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        children: const [
+                          SizedBox(height: 120),
+                          Center(
+                            child: Text(
+                              'No upcoming appointments',
+                              style: TextStyle(fontFamily: 'Arimo', fontSize: 14, color: Colors.grey),
+                            ),
+                          ),
+                        ],
                       ),
                     )
-                  : ListView.separated(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: upcoming.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 12),
-                      itemBuilder: (context, index) => _buildAppointmentCard(upcoming[index]),
+                  : RefreshIndicator(
+                      onRefresh: _refreshHomeAsync,
+                      child: ListView.separated(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.all(16),
+                        itemCount: upcoming.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 12),
+                        itemBuilder: (context, index) => _buildAppointmentCard(upcoming[index]),
+                      ),
                     ),
             ),
             const SizedBox(height: 8),
@@ -223,17 +245,30 @@ class _TeacherHomeState extends State<TeacherHome> {
             const SizedBox(height: 6),
             Expanded(
               child: missed.isEmpty
-                  ? const Center(
-                      child: Text(
-                        'No missed appointments',
-                        style: TextStyle(fontFamily: 'Arimo', fontSize: 14, color: Colors.grey),
+                  ? RefreshIndicator(
+                      onRefresh: _refreshHomeAsync,
+                      child: ListView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        children: const [
+                          SizedBox(height: 120),
+                          Center(
+                            child: Text(
+                              'No missed appointments',
+                              style: TextStyle(fontFamily: 'Arimo', fontSize: 14, color: Colors.grey),
+                            ),
+                          ),
+                        ],
                       ),
                     )
-                  : ListView.separated(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: missed.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 12),
-                      itemBuilder: (context, index) => _buildAppointmentCard(missed[index]),
+                  : RefreshIndicator(
+                      onRefresh: _refreshHomeAsync,
+                      child: ListView.separated(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.all(16),
+                        itemCount: missed.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 12),
+                        itemBuilder: (context, index) => _buildAppointmentCard(missed[index]),
+                      ),
                     ),
             ),
           ],

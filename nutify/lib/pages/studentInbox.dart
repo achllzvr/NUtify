@@ -27,6 +27,16 @@ class _StudentInboxState extends State<StudentInbox>
   String _userStatus = 'online';
   bool _statusLoading = false;
 
+  Future<void> _reloadInbox() async {
+    // Kick all fetchers and then rebuild
+    final f1 = StudentInboxPending.getStudentInboxPendings();
+    final f2 = StudentInboxCancelled.getStudentInboxCancelled();
+    final f3 = StudentInboxMissed.getStudentInboxMissed();
+    final f4 = StudentInboxCompleted.getStudentInboxCompleted();
+    await Future.wait([f1, f2, f3, f4]);
+    if (mounted) setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
@@ -145,17 +155,34 @@ class _StudentInboxState extends State<StudentInbox>
         }
 
         if (pendingAppointments.isEmpty) {
-          return Column(children: [tabSearch, Expanded(child: _buildEmptyState('No pending appointments'))]);
+          return Column(children: [
+            tabSearch,
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: _reloadInbox,
+                child: ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  children: [
+                    const SizedBox(height: 120),
+                    _buildEmptyState('No pending appointments'),
+                  ],
+                ),
+              ),
+            ),
+          ]);
         }
 
         return Column(
           children: [
             tabSearch,
             Expanded(
-              child: ListView.builder(
-                padding: EdgeInsets.all(16),
-                itemCount: pendingAppointments.length,
-                itemBuilder: (context, index) {
+              child: RefreshIndicator(
+                onRefresh: _reloadInbox,
+                child: ListView.builder(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: EdgeInsets.all(16),
+                  itemCount: pendingAppointments.length,
+                  itemBuilder: (context, index) {
             var appointment = pendingAppointments[index];
             return Card(
               margin: EdgeInsets.only(bottom: 12),
@@ -294,7 +321,8 @@ class _StudentInboxState extends State<StudentInbox>
                 ),
               ),
             );
-                },
+                  },
+                ),
               ),
             ),
           ],
@@ -343,17 +371,34 @@ class _StudentInboxState extends State<StudentInbox>
         }
 
         if (cancelledAppointments.isEmpty) {
-          return Column(children: [tabSearch, Expanded(child: _buildEmptyState('No declined appointments'))]);
+          return Column(children: [
+            tabSearch,
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: _reloadInbox,
+                child: ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  children: [
+                    const SizedBox(height: 120),
+                    _buildEmptyState('No declined appointments'),
+                  ],
+                ),
+              ),
+            ),
+          ]);
         }
 
         return Column(
           children: [
             tabSearch,
             Expanded(
-              child: ListView.builder(
-                padding: EdgeInsets.all(16),
-                itemCount: cancelledAppointments.length,
-                itemBuilder: (context, index) {
+              child: RefreshIndicator(
+                onRefresh: _reloadInbox,
+                child: ListView.builder(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: EdgeInsets.all(16),
+                  itemCount: cancelledAppointments.length,
+                  itemBuilder: (context, index) {
             var appointment = cancelledAppointments[index];
             return Card(
               margin: EdgeInsets.only(bottom: 12),
@@ -492,7 +537,8 @@ class _StudentInboxState extends State<StudentInbox>
                 ),
               ),
             );
-                },
+                  },
+                ),
               ),
             ),
           ],
@@ -541,17 +587,34 @@ class _StudentInboxState extends State<StudentInbox>
         }
 
         if (missedAppointments.isEmpty) {
-          return Column(children: [tabSearch, Expanded(child: _buildEmptyState('No missed appointments'))]);
+          return Column(children: [
+            tabSearch,
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: _reloadInbox,
+                child: ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  children: [
+                    const SizedBox(height: 120),
+                    _buildEmptyState('No missed appointments'),
+                  ],
+                ),
+              ),
+            ),
+          ]);
         }
 
         return Column(
           children: [
             tabSearch,
             Expanded(
-              child: ListView.builder(
-                padding: EdgeInsets.all(16),
-                itemCount: missedAppointments.length,
-                itemBuilder: (context, index) {
+              child: RefreshIndicator(
+                onRefresh: _reloadInbox,
+                child: ListView.builder(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: EdgeInsets.all(16),
+                  itemCount: missedAppointments.length,
+                  itemBuilder: (context, index) {
             var appointment = missedAppointments[index];
             return Card(
               margin: EdgeInsets.only(bottom: 12),
@@ -690,7 +753,8 @@ class _StudentInboxState extends State<StudentInbox>
                 ),
               ),
             );
-                },
+                  },
+                ),
               ),
             ),
           ],
@@ -739,17 +803,34 @@ class _StudentInboxState extends State<StudentInbox>
         }
 
         if (completedAppointments.isEmpty) {
-          return Column(children: [tabSearch, Expanded(child: _buildEmptyState('No completed appointments'))]);
+          return Column(children: [
+            tabSearch,
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: _reloadInbox,
+                child: ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  children: [
+                    const SizedBox(height: 120),
+                    _buildEmptyState('No completed appointments'),
+                  ],
+                ),
+              ),
+            ),
+          ]);
         }
 
         return Column(
           children: [
             tabSearch,
             Expanded(
-              child: ListView.builder(
-                padding: EdgeInsets.all(16),
-                itemCount: completedAppointments.length,
-                itemBuilder: (context, index) {
+              child: RefreshIndicator(
+                onRefresh: _reloadInbox,
+                child: ListView.builder(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: EdgeInsets.all(16),
+                  itemCount: completedAppointments.length,
+                  itemBuilder: (context, index) {
             var appointment = completedAppointments[index];
             return Card(
               margin: EdgeInsets.only(bottom: 12),
@@ -888,7 +969,8 @@ class _StudentInboxState extends State<StudentInbox>
                 ),
               ),
             );
-                },
+                  },
+                ),
               ),
             ),
           ],
