@@ -110,15 +110,20 @@ class _TeacherHomeState extends State<TeacherHome> {
         final now = DateTime.now();
         final startOfToday = DateTime(now.year, now.month, now.day);
 
-        // Upcoming: all appointments for today (ignore past vs future time to ensure visibility)
-        final upcomingToday = all.where((a) {
+        // Upcoming: all appointments from today onward (today and future)
+        final upcoming = all.where((a) {
           final start = _parseStartDateTime(a);
           if (start != null) {
-            return start.year == startOfToday.year && start.month == startOfToday.month && start.day == startOfToday.day;
+            return !start.isBefore(startOfToday); // >= startOfToday
           }
           final d = _parseDateOnly(a.scheduleDate);
-          return d != null && d.year == startOfToday.year && d.month == startOfToday.month && d.day == startOfToday.day;
-        }).toList();
+          return d != null && !d.isBefore(startOfToday);
+        }).toList()
+          ..sort((a, b) {
+            final da = _parseStartDateTime(a) ?? _parseDateOnly(a.scheduleDate) ?? DateTime(2100);
+            final db = _parseStartDateTime(b) ?? _parseDateOnly(b.scheduleDate) ?? DateTime(2100);
+            return da.compareTo(db);
+          });
 
         // Missed: strictly before today (yesterday and earlier)
         final missed = all.where((a) {
@@ -128,7 +133,12 @@ class _TeacherHomeState extends State<TeacherHome> {
           }
           final d = _parseDateOnly(a.scheduleDate);
           return d != null && d.isBefore(startOfToday);
-        }).toList();
+        }).toList()
+          ..sort((a, b) {
+            final da = _parseStartDateTime(a) ?? _parseDateOnly(a.scheduleDate) ?? DateTime(1900);
+            final db = _parseStartDateTime(b) ?? _parseDateOnly(b.scheduleDate) ?? DateTime(1900);
+            return db.compareTo(da); // newest missed first
+          });
 
         // Apply query filtering
         bool hasQuery = _homeQuery.trim().isNotEmpty;
@@ -144,7 +154,7 @@ class _TeacherHomeState extends State<TeacherHome> {
               (a.scheduleTime).toLowerCase().contains(q)
             );
           }
-          upcomingToday.retainWhere(matches);
+          upcoming.retainWhere(matches);
           missed.retainWhere(matches);
         }
 
@@ -184,7 +194,7 @@ class _TeacherHomeState extends State<TeacherHome> {
             ),
             const SizedBox(height: 6),
             Expanded(
-              child: upcomingToday.isEmpty
+              child: upcoming.isEmpty
                   ? const Center(
                       child: Text(
                         'No upcoming appointments',
@@ -193,9 +203,9 @@ class _TeacherHomeState extends State<TeacherHome> {
                     )
                   : ListView.separated(
                       padding: const EdgeInsets.all(16),
-                      itemCount: upcomingToday.length,
+                      itemCount: upcoming.length,
                       separatorBuilder: (_, __) => const SizedBox(height: 12),
-                      itemBuilder: (context, index) => _buildAppointmentCard(upcomingToday[index]),
+                      itemBuilder: (context, index) => _buildAppointmentCard(upcoming[index]),
                     ),
             ),
             const SizedBox(height: 8),

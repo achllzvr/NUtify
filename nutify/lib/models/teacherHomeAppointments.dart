@@ -24,12 +24,29 @@ class TeacherHomeAppointments {
   });
 
   factory TeacherHomeAppointments.fromJson(Map<String, dynamic> json) {
+    // Prefer schedule_date/time but gracefully fall back to appointment_date and start/end times
+    final String rawScheduleDate = (json['schedule_date'] ?? json['appointment_date'] ?? '').toString();
+    // schedule_time may be a range already; if missing, compose from start_time/end_time or from appointment_date time
+    String rawScheduleTime = (json['schedule_time'] ?? '').toString();
+    if (rawScheduleTime.isEmpty) {
+      final String start = (json['start_time'] ?? json['startTime'] ?? '').toString();
+      final String end = (json['end_time'] ?? json['endTime'] ?? '').toString();
+      if (start.isNotEmpty && end.isNotEmpty) {
+        rawScheduleTime = '$start - $end';
+      } else if (start.isNotEmpty) {
+        rawScheduleTime = start;
+      } else if (rawScheduleDate.contains(' ')) {
+        // Extract time part from appointment_date if present
+        final parts = rawScheduleDate.split(' ');
+        if (parts.length > 1) rawScheduleTime = parts[1];
+      }
+    }
     return TeacherHomeAppointments(
       id: json['id']?.toString() ?? '',
       studentName: json['student_name']?.toString() ?? '',
       department: json['department']?.toString() ?? '',
-      scheduleDate: json['schedule_date']?.toString() ?? '',
-      scheduleTime: json['schedule_time']?.toString() ?? '',
+      scheduleDate: rawScheduleDate,
+      scheduleTime: rawScheduleTime,
       status: json['status']?.toString() ?? '',
   appointmentReason: json['appointment_reason']?.toString() ?? '',
   appointmentRemarks: json['appointment_remarks']?.toString() ?? '',
@@ -59,13 +76,20 @@ class TeacherHomeAppointments {
       print('Teacher home appointments API response: ${response.body}');
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = json.decode(response.body);
-        
-        if (responseData['status'] == 'success') {
-          final List<dynamic> appointmentsJson = responseData['data'] ?? [];
-          return appointmentsJson.map((json) => TeacherHomeAppointments.fromJson(json)).toList();
+        final dynamic decoded = json.decode(response.body);
+        if (decoded is List) {
+          return decoded.map<TeacherHomeAppointments>((e) => TeacherHomeAppointments.fromJson(e as Map<String, dynamic>)).toList();
+        } else if (decoded is Map<String, dynamic>) {
+          final bool ok = (decoded['status'] == 'success') || (decoded['success'] == true);
+          if (ok) {
+            final List<dynamic> appointmentsJson = (decoded['data'] ?? decoded['appointments'] ?? []) as List<dynamic>;
+            return appointmentsJson.map((j) => TeacherHomeAppointments.fromJson(j as Map<String, dynamic>)).toList();
+          } else {
+            print('API Error: ${decoded['message'] ?? 'Unknown error'}');
+            return [];
+          }
         } else {
-          print('API Error: ${responseData['message']}');
+          print('Unexpected response shape');
           return [];
         }
       } else {
