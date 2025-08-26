@@ -1,4 +1,4 @@
-# nutify
+# NUtify
 
 A new Flutter project.
 
