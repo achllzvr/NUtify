@@ -5,6 +5,7 @@ import 'package:nutify/models/studentInboxPending.dart';
 import 'package:nutify/models/studentInboxCancelled.dart';
 import 'package:nutify/models/studentInboxCompleted.dart';
 import 'package:nutify/models/studentInboxMissed.dart';
+import 'package:nutify/services/user_status_service.dart';
 
 class StudentInbox extends StatefulWidget {
   StudentInbox({super.key});
@@ -16,16 +17,36 @@ class StudentInbox extends StatefulWidget {
 class _StudentInboxState extends State<StudentInbox>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  // Global and per-tab search controllers
+  final TextEditingController _globalCtrl = TextEditingController();
+  final TextEditingController _pendingCtrl = TextEditingController();
+  final TextEditingController _declinedCtrl = TextEditingController();
+  final TextEditingController _missedCtrl = TextEditingController();
+  final TextEditingController _completedCtrl = TextEditingController();
+  String _globalQ = '', _pendingQ = '', _declinedQ = '', _missedQ = '', _completedQ = '';
+  String _userStatus = 'online';
+  bool _statusLoading = false;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
+  _initUserStatus();
+  _globalCtrl.addListener(() { final v = _globalCtrl.text; if (v != _globalQ) setState(() => _globalQ = v); });
+  _pendingCtrl.addListener(() { final v = _pendingCtrl.text; if (v != _pendingQ) setState(() => _pendingQ = v); });
+  _declinedCtrl.addListener(() { final v = _declinedCtrl.text; if (v != _declinedQ) setState(() => _declinedQ = v); });
+  _missedCtrl.addListener(() { final v = _missedCtrl.text; if (v != _missedQ) setState(() => _missedQ = v); });
+  _completedCtrl.addListener(() { final v = _completedCtrl.text; if (v != _completedQ) setState(() => _completedQ = v); });
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
+  _tabController.dispose();
+  _globalCtrl.dispose();
+  _pendingCtrl.dispose();
+  _declinedCtrl.dispose();
+  _missedCtrl.dispose();
+  _completedCtrl.dispose();
     super.dispose();
   }
 
@@ -36,6 +57,26 @@ class _StudentInboxState extends State<StudentInbox>
       appBar: studentAppBar(context),
       body: Column(
         children: [
+          // Global search (all tabs)
+          Container(
+            color: Colors.white,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+              child: TextField(
+                controller: _globalCtrl,
+                decoration: InputDecoration(
+                  hintText: 'Search across all tabs...',
+                  prefixIcon: const Icon(Icons.search),
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+            ),
+          ),
           // Tab Bar
           navigationalTabs(),
           // Tab Bar View
@@ -73,24 +114,48 @@ class _StudentInboxState extends State<StudentInbox>
         
         List<StudentInboxPending> pendingAppointments = snapshot.data ?? [];
 
-        if (pendingAppointments.isEmpty) {
-          return Center(
-            child: Text(
-              'No pending appointments',
-              style: TextStyle(
-                fontFamily: 'Arimo',
-                fontSize: 16,
-                color: Colors.grey.shade600,
-                fontStyle: FontStyle.italic,
+        // Per-tab search bar
+        final tabSearch = Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+          child: TextField(
+            controller: _pendingCtrl,
+            decoration: InputDecoration(
+              hintText: 'Search pending...',
+              prefixIcon: const Icon(Icons.search),
+              filled: true,
+              fillColor: Colors.white,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide.none,
               ),
             ),
-          );
+          ),
+        );
+
+        final q = (_globalQ + ' ' + _pendingQ).trim().toLowerCase();
+        if (q.isNotEmpty) {
+          pendingAppointments = pendingAppointments.where((a) =>
+            a.teacherName.toLowerCase().contains(q) ||
+            a.department.toLowerCase().contains(q) ||
+            a.scheduleDate.toLowerCase().contains(q) ||
+            a.scheduleTime.toLowerCase().contains(q) ||
+            a.appointmentReason.toLowerCase().contains(q) ||
+            a.appointmentRemarks.toLowerCase().contains(q)
+          ).toList();
         }
 
-        return ListView.builder(
-          padding: EdgeInsets.all(16),
-          itemCount: pendingAppointments.length,
-          itemBuilder: (context, index) {
+        if (pendingAppointments.isEmpty) {
+          return Column(children: [tabSearch, Expanded(child: _buildEmptyState('No pending appointments'))]);
+        }
+
+        return Column(
+          children: [
+            tabSearch,
+            Expanded(
+              child: ListView.builder(
+                padding: EdgeInsets.all(16),
+                itemCount: pendingAppointments.length,
+                itemBuilder: (context, index) {
             var appointment = pendingAppointments[index];
             return Card(
               margin: EdgeInsets.only(bottom: 12),
@@ -229,7 +294,10 @@ class _StudentInboxState extends State<StudentInbox>
                 ),
               ),
             );
-          },
+                },
+              ),
+            ),
+          ],
         );
       },
     );
@@ -245,24 +313,47 @@ class _StudentInboxState extends State<StudentInbox>
         
         List<StudentInboxCancelled> cancelledAppointments = snapshot.data ?? [];
 
-        if (cancelledAppointments.isEmpty) {
-          return Center(
-            child: Text(
-              'No cancelled appointments',
-              style: TextStyle(
-                fontFamily: 'Arimo',
-                fontSize: 16,
-                color: Colors.grey.shade600,
-                fontStyle: FontStyle.italic,
+        final tabSearch = Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+          child: TextField(
+            controller: _declinedCtrl,
+            decoration: InputDecoration(
+              hintText: 'Search declined...',
+              prefixIcon: const Icon(Icons.search),
+              filled: true,
+              fillColor: Colors.white,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide.none,
               ),
             ),
-          );
+          ),
+        );
+
+        final q = (_globalQ + ' ' + _declinedQ).trim().toLowerCase();
+        if (q.isNotEmpty) {
+          cancelledAppointments = cancelledAppointments.where((a) =>
+            a.teacherName.toLowerCase().contains(q) ||
+            a.department.toLowerCase().contains(q) ||
+            a.scheduleDate.toLowerCase().contains(q) ||
+            a.scheduleTime.toLowerCase().contains(q) ||
+            a.appointmentReason.toLowerCase().contains(q) ||
+            a.appointmentRemarks.toLowerCase().contains(q)
+          ).toList();
         }
 
-        return ListView.builder(
-          padding: EdgeInsets.all(16),
-          itemCount: cancelledAppointments.length,
-          itemBuilder: (context, index) {
+        if (cancelledAppointments.isEmpty) {
+          return Column(children: [tabSearch, Expanded(child: _buildEmptyState('No declined appointments'))]);
+        }
+
+        return Column(
+          children: [
+            tabSearch,
+            Expanded(
+              child: ListView.builder(
+                padding: EdgeInsets.all(16),
+                itemCount: cancelledAppointments.length,
+                itemBuilder: (context, index) {
             var appointment = cancelledAppointments[index];
             return Card(
               margin: EdgeInsets.only(bottom: 12),
@@ -401,7 +492,10 @@ class _StudentInboxState extends State<StudentInbox>
                 ),
               ),
             );
-          },
+                },
+              ),
+            ),
+          ],
         );
       },
     );
@@ -417,24 +511,47 @@ class _StudentInboxState extends State<StudentInbox>
         
         List<StudentInboxMissed> missedAppointments = snapshot.data ?? [];
 
-        if (missedAppointments.isEmpty) {
-          return Center(
-            child: Text(
-              'No missed appointments',
-              style: TextStyle(
-                fontFamily: 'Arimo',
-                fontSize: 16,
-                color: Colors.grey.shade600,
-                fontStyle: FontStyle.italic,
+        final tabSearch = Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+          child: TextField(
+            controller: _missedCtrl,
+            decoration: InputDecoration(
+              hintText: 'Search missed...',
+              prefixIcon: const Icon(Icons.search),
+              filled: true,
+              fillColor: Colors.white,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide.none,
               ),
             ),
-          );
+          ),
+        );
+
+        final q = (_globalQ + ' ' + _missedQ).trim().toLowerCase();
+        if (q.isNotEmpty) {
+          missedAppointments = missedAppointments.where((a) =>
+            a.teacherName.toLowerCase().contains(q) ||
+            a.department.toLowerCase().contains(q) ||
+            a.scheduleDate.toLowerCase().contains(q) ||
+            a.scheduleTime.toLowerCase().contains(q) ||
+            a.appointmentReason.toLowerCase().contains(q) ||
+            a.appointmentRemarks.toLowerCase().contains(q)
+          ).toList();
         }
 
-        return ListView.builder(
-          padding: EdgeInsets.all(16),
-          itemCount: missedAppointments.length,
-          itemBuilder: (context, index) {
+        if (missedAppointments.isEmpty) {
+          return Column(children: [tabSearch, Expanded(child: _buildEmptyState('No missed appointments'))]);
+        }
+
+        return Column(
+          children: [
+            tabSearch,
+            Expanded(
+              child: ListView.builder(
+                padding: EdgeInsets.all(16),
+                itemCount: missedAppointments.length,
+                itemBuilder: (context, index) {
             var appointment = missedAppointments[index];
             return Card(
               margin: EdgeInsets.only(bottom: 12),
@@ -573,7 +690,10 @@ class _StudentInboxState extends State<StudentInbox>
                 ),
               ),
             );
-          },
+                },
+              ),
+            ),
+          ],
         );
       },
     );
@@ -589,24 +709,47 @@ class _StudentInboxState extends State<StudentInbox>
         
         List<StudentInboxCompleted> completedAppointments = snapshot.data ?? [];
 
-        if (completedAppointments.isEmpty) {
-          return Center(
-            child: Text(
-              'No completed appointments',
-              style: TextStyle(
-                fontFamily: 'Arimo',
-                fontSize: 16,
-                color: Colors.grey.shade600,
-                fontStyle: FontStyle.italic,
+        final tabSearch = Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+          child: TextField(
+            controller: _completedCtrl,
+            decoration: InputDecoration(
+              hintText: 'Search completed...',
+              prefixIcon: const Icon(Icons.search),
+              filled: true,
+              fillColor: Colors.white,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide.none,
               ),
             ),
-          );
+          ),
+        );
+
+        final q = (_globalQ + ' ' + _completedQ).trim().toLowerCase();
+        if (q.isNotEmpty) {
+          completedAppointments = completedAppointments.where((a) =>
+            a.teacherName.toLowerCase().contains(q) ||
+            a.department.toLowerCase().contains(q) ||
+            a.scheduleDate.toLowerCase().contains(q) ||
+            a.scheduleTime.toLowerCase().contains(q) ||
+            a.appointmentReason.toLowerCase().contains(q) ||
+            a.appointmentRemarks.toLowerCase().contains(q)
+          ).toList();
         }
 
-        return ListView.builder(
-          padding: EdgeInsets.all(16),
-          itemCount: completedAppointments.length,
-          itemBuilder: (context, index) {
+        if (completedAppointments.isEmpty) {
+          return Column(children: [tabSearch, Expanded(child: _buildEmptyState('No completed appointments'))]);
+        }
+
+        return Column(
+          children: [
+            tabSearch,
+            Expanded(
+              child: ListView.builder(
+                padding: EdgeInsets.all(16),
+                itemCount: completedAppointments.length,
+                itemBuilder: (context, index) {
             var appointment = completedAppointments[index];
             return Card(
               margin: EdgeInsets.only(bottom: 12),
@@ -745,7 +888,10 @@ class _StudentInboxState extends State<StudentInbox>
                 ),
               ),
             );
-          },
+                },
+              ),
+            ),
+          ],
         );
       },
     );
@@ -811,7 +957,7 @@ class _StudentInboxState extends State<StudentInbox>
       title: Container(
         margin: const EdgeInsets.only(left: 10.0),
         child: const Text(
-          'Student Inbox',
+          'Inbox',
           style: TextStyle(
             fontFamily: 'Arimo',
             fontSize: 24,
@@ -835,6 +981,47 @@ class _StudentInboxState extends State<StudentInbox>
       ),
 
       actions: [
+        // Presence toggle
+        Padding(
+          padding: const EdgeInsets.only(right: 8.0),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(20),
+            onTap: _cycleStatus,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.white24),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _statusLoading
+                      ? SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Colors.white)))
+                      : Icon(
+                          _userStatus == 'online'
+                              ? Icons.circle
+                              : _userStatus == 'busy'
+                                  ? Icons.do_not_disturb_on
+                                  : Icons.circle_outlined,
+                          size: 16,
+                          color: _userStatus == 'online'
+                              ? Colors.limeAccent
+                              : _userStatus == 'busy'
+                                  ? Colors.orangeAccent
+                                  : Colors.white70,
+                        ),
+                  const SizedBox(width: 6),
+                  Text(
+                    _userStatus[0].toUpperCase() + _userStatus.substring(1),
+                    style: const TextStyle(fontFamily: 'Arimo', color: Colors.white, fontSize: 13),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
         GestureDetector(
           onTap: () {
             // Check if already on StudentProfile page
@@ -936,6 +1123,48 @@ class _StudentInboxState extends State<StudentInbox>
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  // Shared helpers
+  Future<void> _initUserStatus() async {
+    setState(() => _statusLoading = true);
+    final s = await UserStatusService.fetchStatus();
+    setState(() {
+      if (s != null) _userStatus = s;
+      _statusLoading = false;
+    });
+  }
+
+  Future<void> _cycleStatus() async {
+    if (_statusLoading) return;
+    final order = ['online', 'busy', 'offline'];
+    final idx = order.indexOf(_userStatus);
+    final next = order[(idx + 1) % order.length];
+    setState(() => _statusLoading = true);
+    final ok = await UserStatusService.updateStatus(next);
+    setState(() {
+      if (ok) _userStatus = next;
+      _statusLoading = false;
+    });
+    if (!ok && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update status', style: TextStyle(fontFamily: 'Arimo', color: Colors.white)), backgroundColor: Colors.red),
+      );
+    }
+  }
+
+  Widget _buildEmptyState(String message) {
+    return Center(
+      child: Text(
+        message,
+        style: TextStyle(
+          fontFamily: 'Arimo',
+          fontSize: 16,
+          color: Colors.grey.shade600,
+          fontStyle: FontStyle.italic,
         ),
       ),
     );

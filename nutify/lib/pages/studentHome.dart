@@ -8,6 +8,9 @@ import 'package:nutify/models/studentSearch.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:nutify/services/user_status_service.dart';
+import 'package:intl/intl.dart';
+import 'package:nutify/pages/_upcoming_search_page.dart';
 
 class StudentHome extends StatefulWidget {
   StudentHome({super.key});
@@ -18,15 +21,48 @@ class StudentHome extends StatefulWidget {
 
 class _StudentHomeState extends State<StudentHome> {
   final TextEditingController _searchController = TextEditingController();
+  final TextEditingController _upcomingSearchCtrl = TextEditingController();
   List<StudentSearch> _searchResults = [];
   List<StudentSearch> _allProfessors = [];
   bool _isSearching = false;
   bool _isLoadingProfessors = true;
+  Future<List<StudentHomeAppointments>>? _upcomingFuture;
+  String _userStatus = 'online';
+  bool _statusLoading = false;
 
   @override
   void initState() {
     super.initState();
     _loadProfessors();
+    _upcomingFuture = StudentHomeAppointments.getStudentHomeAppointments();
+    _initUserStatus();
+  }
+
+  Future<void> _initUserStatus() async {
+    setState(() => _statusLoading = true);
+    final s = await UserStatusService.fetchStatus();
+    setState(() {
+      if (s != null) _userStatus = s;
+      _statusLoading = false;
+    });
+  }
+
+  Future<void> _cycleStatus() async {
+    if (_statusLoading) return;
+    final order = ['online', 'busy', 'offline'];
+    final idx = order.indexOf(_userStatus);
+    final next = order[(idx + 1) % order.length];
+    setState(() => _statusLoading = true);
+    final ok = await UserStatusService.updateStatus(next);
+    setState(() {
+      if (ok) _userStatus = next;
+      _statusLoading = false;
+    });
+    if (!ok && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update status', style: TextStyle(fontFamily: 'Arimo', color: Colors.white)), backgroundColor: Colors.red),
+      );
+    }
   }
 
   Future<void> _loadProfessors() async {
@@ -47,6 +83,7 @@ class _StudentHomeState extends State<StudentHome> {
   @override
   void dispose() {
     _searchController.dispose();
+  _upcomingSearchCtrl.dispose();
     super.dispose();
   }
 
@@ -100,20 +137,31 @@ class _StudentHomeState extends State<StudentHome> {
       children: [
         SizedBox(height: 10),
         Padding(
-          padding: const EdgeInsets.only(left: 20.0),
-          child: Text(
-            'Your Upcoming Appointments...',
-            style: TextStyle(
-              fontFamily: 'Arimo',
-              fontSize: 12,
-              color: Colors.black87,
-            ),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Your Upcoming Appointments...',
+                style: TextStyle(
+                  fontFamily: 'Arimo',
+                  fontSize: 12,
+                  color: Colors.black87,
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.search, color: Color(0xFF35408E)),
+                tooltip: 'Search upcoming',
+                onPressed: _openUpcomingSearch,
+              ),
+            ],
           ),
         ),
-        SizedBox(height: 5),
-        Expanded(
+        const SizedBox(height: 5),
+        SizedBox(
+          height: 280,
           child: FutureBuilder<List<StudentHomeAppointments>>(
-            future: StudentHomeAppointments.getStudentHomeAppointments(),
+            future: _upcomingFuture,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return Center(child: CircularProgressIndicator());
@@ -122,22 +170,20 @@ class _StudentHomeState extends State<StudentHome> {
               List<StudentHomeAppointments> appointments = snapshot.data ?? [];
               
               if (appointments.isEmpty) {
-                return Center(
-                  child: Text(
-                    'No upcoming appointments',
-                    style: TextStyle(
-                      fontFamily: 'Arimo',
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
-                  ),
-                );
+                return _buildEmptyState('No upcoming appointments');
               }
               
+              // Sort by start date/time ascending
+              appointments.sort((a, b) {
+                final da = _parseStartDateTime(a) ?? DateTime(2100);
+                final db = _parseStartDateTime(b) ?? DateTime(2100);
+                return da.compareTo(db);
+              });
+
               return ListView.separated(
-                padding: EdgeInsets.all(20.0),
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                 itemCount: appointments.length,
-                separatorBuilder: (context, index) => SizedBox(height: 15),
+                separatorBuilder: (context, index) => const SizedBox(height: 12),
                 itemBuilder: (context, index) {
                   var appointment = appointments[index];
                   // Get initials for avatar
@@ -220,7 +266,7 @@ class _StudentHomeState extends State<StudentHome> {
                                       color: Colors.grey[600],
                                     ),
                                   ),
-                                  if (appointment.appointmentReason != null && appointment.appointmentReason!.isNotEmpty) ...[
+                                  if (appointment.appointmentReason.isNotEmpty) ...[
                                     SizedBox(height: 4),
                                     Text(
                                       'Reason: ${appointment.appointmentReason}',
@@ -302,6 +348,64 @@ class _StudentHomeState extends State<StudentHome> {
           ),
         ),
       ],
+    );
+  }
+
+  void _openUpcomingSearch() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+  builder: (_) => UpcomingSearchPage(
+          initialFuture: _upcomingFuture,
+        ),
+      ),
+    );
+  }
+
+  // Date/time parsers used for sorting and potential filters
+  DateTime? _parseStartDateTime(StudentHomeAppointments a) {
+    try {
+      DateTime date;
+      try {
+        date = DateTime.parse(a.scheduleDate);
+      } catch (_) {
+        // Try 'MMMM d, y' or 'MMMM d'
+        try {
+          date = DateFormat('MMMM d, y').parseStrict(a.scheduleDate);
+        } catch (_) {
+          final now = DateTime.now();
+          final md = DateFormat('MMMM d').parseStrict(a.scheduleDate);
+          date = DateTime(now.year, md.month, md.day);
+        }
+      }
+      String startStr = a.scheduleTime.contains('-')
+          ? a.scheduleTime.split('-')[0].trim()
+          : a.scheduleTime.trim();
+      for (final fmt in ['HH:mm:ss', 'HH:mm', 'h:mm a', 'hh:mm a']) {
+        try {
+          final t = DateFormat(fmt).parseStrict(startStr);
+          return DateTime(date.year, date.month, date.day, t.hour, t.minute, t.second);
+        } catch (_) {}
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Widget _buildEmptyState(String message) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.inbox_outlined, size: 64, color: Colors.grey.shade400),
+          const SizedBox(height: 10),
+          Text(
+            message,
+            style: TextStyle(fontFamily: 'Arimo', fontSize: 14, color: Colors.grey.shade600, fontStyle: FontStyle.italic),
+          ),
+        ],
+      ),
     );
   }
 
@@ -473,7 +577,7 @@ class _StudentHomeState extends State<StudentHome> {
       title: Container(
         margin: const EdgeInsets.only(left: 10.0),
         child: const Text(
-          'Student Home',
+          'Home',
           style: TextStyle(
             fontFamily: 'Arimo',
             fontSize: 24,
@@ -497,6 +601,56 @@ class _StudentHomeState extends State<StudentHome> {
       ),
 
       actions: [
+        IconButton(
+          tooltip: 'Refresh',
+          onPressed: () {
+            setState(() {
+              _upcomingFuture = StudentHomeAppointments.getStudentHomeAppointments();
+            });
+          },
+          icon: const Icon(Icons.refresh, color: Colors.white),
+        ),
+        // Status toggle
+        Padding(
+          padding: const EdgeInsets.only(right: 8.0),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(20),
+            onTap: _cycleStatus,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.white24),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _statusLoading
+                      ? SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Colors.white)))
+                      : Icon(
+                          _userStatus == 'online'
+                              ? Icons.circle
+                              : _userStatus == 'busy'
+                                  ? Icons.do_not_disturb_on
+                                  : Icons.circle_outlined,
+                          size: 16,
+                          color: _userStatus == 'online'
+                              ? Colors.limeAccent
+                              : _userStatus == 'busy'
+                                  ? Colors.orangeAccent
+                                  : Colors.white70,
+                        ),
+                  const SizedBox(width: 6),
+                  Text(
+                    _userStatus[0].toUpperCase() + _userStatus.substring(1),
+                    style: const TextStyle(fontFamily: 'Arimo', color: Colors.white, fontSize: 13),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
         // Profile button
         GestureDetector(
           onTap: () {
@@ -608,7 +762,8 @@ class _StudentHomeState extends State<StudentHome> {
     return Column(
       children: [
         mostRecentProfessors(recentProfessors),
-        Expanded(child: upcomingAppointments()),
+  // Upcoming preview list (fixed height); full-screen search available via icon
+  upcomingAppointments(),
       ],
     );
   }
