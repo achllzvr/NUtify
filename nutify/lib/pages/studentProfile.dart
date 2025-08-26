@@ -261,7 +261,7 @@ class _StudentProfileState extends State<StudentProfile> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               IconButton(
-                icon: const Icon(Icons.home, color: Color(0xFFFFD418)),
+                icon: const Icon(Icons.home, color: Colors.white),
                 onPressed: () {
                   // Check if already on StudentHome page
                   if (ModalRoute.of(context)?.settings.name == '/studentHome') {
@@ -288,7 +288,7 @@ class _StudentProfileState extends State<StudentProfile> {
                 },
               ),
               IconButton(
-                icon: const Icon(Icons.inbox, color: Color(0xFFFFD418)),
+                icon: const Icon(Icons.inbox, color: Colors.white),
                 onPressed: () {
                   // Check if already on StudentInbox page
                   if (ModalRoute.of(context)?.settings.name ==

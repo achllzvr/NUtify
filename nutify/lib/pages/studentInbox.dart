@@ -1066,7 +1066,7 @@ class _StudentInboxState extends State<StudentInbox>
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               IconButton(
-                icon: const Icon(Icons.home, color: Color(0xFFFFD418)),
+                icon: const Icon(Icons.home, color: Colors.white),
                 onPressed: () {
                   // Check if already on StudentHome page
                   if (ModalRoute.of(context)?.settings.name == '/studentHome') {

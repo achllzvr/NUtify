@@ -60,7 +60,13 @@ class _StudentHomeState extends State<StudentHome> {
     });
     if (!ok && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to update status', style: TextStyle(fontFamily: 'Arimo', color: Colors.white)), backgroundColor: Colors.red),
+        SnackBar(
+          content: Text(
+            'Failed to update status',
+            style: TextStyle(fontFamily: 'Arimo', color: Colors.white),
+          ),
+          backgroundColor: Colors.red,
+        ),
       );
     }
   }
@@ -83,7 +89,7 @@ class _StudentHomeState extends State<StudentHome> {
   @override
   void dispose() {
     _searchController.dispose();
-  _upcomingSearchCtrl.dispose();
+    _upcomingSearchCtrl.dispose();
     super.dispose();
   }
 
@@ -120,8 +126,9 @@ class _StudentHomeState extends State<StudentHome> {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return Center(child: CircularProgressIndicator());
                       }
-                      
-                      List<RecentProfessor> recentProfessors = snapshot.data ?? [];
+
+                      List<RecentProfessor> recentProfessors =
+                          snapshot.data ?? [];
                       return mainContent(recentProfessors);
                     },
                   ),
@@ -166,13 +173,13 @@ class _StudentHomeState extends State<StudentHome> {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return Center(child: CircularProgressIndicator());
               }
-              
+
               List<StudentHomeAppointments> appointments = snapshot.data ?? [];
-              
+
               if (appointments.isEmpty) {
                 return _buildEmptyState('No upcoming appointments');
               }
-              
+
               // Sort by start date/time ascending
               appointments.sort((a, b) {
                 final da = _parseStartDateTime(a) ?? DateTime(2100);
@@ -181,25 +188,36 @@ class _StudentHomeState extends State<StudentHome> {
               });
 
               return ListView.separated(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 8.0,
+                ),
                 itemCount: appointments.length,
-                separatorBuilder: (context, index) => const SizedBox(height: 12),
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: 12),
                 itemBuilder: (context, index) {
                   var appointment = appointments[index];
                   // Get initials for avatar
-                  String initials = appointment.teacherName.split(' ').map((name) => name.isNotEmpty ? name[0] : '').take(2).join('').toUpperCase();
-                  
+                  String initials = appointment.teacherName
+                      .split(' ')
+                      .map((name) => name.isNotEmpty ? name[0] : '')
+                      .take(2)
+                      .join('')
+                      .toUpperCase();
+
                   // Generate color based on professor name
                   List<Color> avatarColors = [
                     Color(0xFF81C784), // Light green
-                    Color(0xFFFFB74D), // Light orange  
+                    Color(0xFFFFB74D), // Light orange
                     Color(0xFF9575CD), // Light purple
                     Color(0xFF4FC3F7), // Light blue
                     Color(0xFFFFD54F), // Light yellow
                     Color(0xFFFF8A65), // Light coral
                   ];
-                  Color avatarColor = avatarColors[appointment.teacherName.hashCode % avatarColors.length];
-                  
+                  Color avatarColor =
+                      avatarColors[appointment.teacherName.hashCode %
+                          avatarColors.length];
+
                   return Container(
                     padding: EdgeInsets.all(20),
                     decoration: BoxDecoration(
@@ -266,7 +284,9 @@ class _StudentHomeState extends State<StudentHome> {
                                       color: Colors.grey[600],
                                     ),
                                   ),
-                                  if (appointment.appointmentReason.isNotEmpty) ...[
+                                  if (appointment
+                                      .appointmentReason
+                                      .isNotEmpty) ...[
                                     SizedBox(height: 4),
                                     Text(
                                       'Reason: ${appointment.appointmentReason}',
@@ -278,7 +298,9 @@ class _StudentHomeState extends State<StudentHome> {
                                       ),
                                     ),
                                   ],
-                                  if (appointment.appointmentRemarks.isNotEmpty) ...[
+                                  if (appointment
+                                      .appointmentRemarks
+                                      .isNotEmpty) ...[
                                     SizedBox(height: 4),
                                     Text(
                                       'Remarks: ${appointment.appointmentRemarks}',
@@ -300,7 +322,10 @@ class _StudentHomeState extends State<StudentHome> {
                           child: Container(
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
-                                colors: [Color(0xFFFFB000), Color(0xFFFF8F00)], // Darker Yellow/Orange
+                                colors: [
+                                  Color(0xFFFFB000),
+                                  Color(0xFFFF8F00),
+                                ], // Darker Yellow/Orange
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                               ),
@@ -315,7 +340,9 @@ class _StudentHomeState extends State<StudentHome> {
                             ),
                             child: ElevatedButton(
                               onPressed: () {
-                                print('Viewing Details of Appointment: ${appointment.id}');
+                                print(
+                                  'Viewing Details of Appointment: ${appointment.id}',
+                                );
                                 // TODO: Navigate to appointment details
                               },
                               style: ElevatedButton.styleFrom(
@@ -355,9 +382,7 @@ class _StudentHomeState extends State<StudentHome> {
     Navigator.of(context).push(
       MaterialPageRoute(
         fullscreenDialog: true,
-  builder: (_) => UpcomingSearchPage(
-          initialFuture: _upcomingFuture,
-        ),
+        builder: (_) => UpcomingSearchPage(initialFuture: _upcomingFuture),
       ),
     );
   }
@@ -384,7 +409,14 @@ class _StudentHomeState extends State<StudentHome> {
       for (final fmt in ['HH:mm:ss', 'HH:mm', 'h:mm a', 'hh:mm a']) {
         try {
           final t = DateFormat(fmt).parseStrict(startStr);
-          return DateTime(date.year, date.month, date.day, t.hour, t.minute, t.second);
+          return DateTime(
+            date.year,
+            date.month,
+            date.day,
+            t.hour,
+            t.minute,
+            t.second,
+          );
         } catch (_) {}
       }
       return null;
@@ -402,7 +434,12 @@ class _StudentHomeState extends State<StudentHome> {
           const SizedBox(height: 10),
           Text(
             message,
-            style: TextStyle(fontFamily: 'Arimo', fontSize: 14, color: Colors.grey.shade600, fontStyle: FontStyle.italic),
+            style: TextStyle(
+              fontFamily: 'Arimo',
+              fontSize: 14,
+              color: Colors.grey.shade600,
+              fontStyle: FontStyle.italic,
+            ),
           ),
         ],
       ),
@@ -457,10 +494,17 @@ class _StudentHomeState extends State<StudentHome> {
                         String professorName = recentProfessors[index].name;
                         int? idInt = int.tryParse(professorId);
                         if (idInt != null) {
-                          showAppointmentRequestModal(context, professorName, idInt);
+                          showAppointmentRequestModal(
+                            context,
+                            professorName,
+                            idInt,
+                          );
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Invalid professor ID'), duration: Duration(seconds: 2)),
+                            SnackBar(
+                              content: Text('Invalid professor ID'),
+                              duration: Duration(seconds: 2),
+                            ),
                           );
                         }
                       },
@@ -468,7 +512,10 @@ class _StudentHomeState extends State<StudentHome> {
                         width: 140, // Made wider
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [const Color(0xFF35408E), const Color(0xFF1A2049)],
+                            colors: [
+                              const Color(0xFF35408E),
+                              const Color(0xFF1A2049),
+                            ],
                             begin: const FractionalOffset(0.0, 0.0),
                             end: const FractionalOffset(0.0, 1.0),
                             stops: [0.0, 1.0],
@@ -568,10 +615,6 @@ class _StudentHomeState extends State<StudentHome> {
     );
   }
 
-
-
-
-
   AppBar studentAppBar(BuildContext context) {
     return AppBar(
       title: Container(
@@ -605,7 +648,8 @@ class _StudentHomeState extends State<StudentHome> {
           tooltip: 'Refresh',
           onPressed: () {
             setState(() {
-              _upcomingFuture = StudentHomeAppointments.getStudentHomeAppointments();
+              _upcomingFuture =
+                  StudentHomeAppointments.getStudentHomeAppointments();
             });
           },
           icon: const Icon(Icons.refresh, color: Colors.white),
@@ -627,24 +671,37 @@ class _StudentHomeState extends State<StudentHome> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   _statusLoading
-                      ? SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Colors.white)))
+                      ? SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
+                          ),
+                        )
                       : Icon(
                           _userStatus == 'online'
                               ? Icons.circle
                               : _userStatus == 'busy'
-                                  ? Icons.do_not_disturb_on
-                                  : Icons.circle_outlined,
+                              ? Icons.do_not_disturb_on
+                              : Icons.circle_outlined,
                           size: 16,
                           color: _userStatus == 'online'
                               ? Colors.limeAccent
                               : _userStatus == 'busy'
-                                  ? Colors.orangeAccent
-                                  : Colors.white70,
+                              ? Colors.orangeAccent
+                              : Colors.white70,
                         ),
                   const SizedBox(width: 6),
                   Text(
                     _userStatus[0].toUpperCase() + _userStatus.substring(1),
-                    style: const TextStyle(fontFamily: 'Arimo', color: Colors.white, fontSize: 13),
+                    style: const TextStyle(
+                      fontFamily: 'Arimo',
+                      color: Colors.white,
+                      fontSize: 13,
+                    ),
                   ),
                 ],
               ),
@@ -724,7 +781,7 @@ class _StudentHomeState extends State<StudentHome> {
                 },
               ),
               IconButton(
-                icon: const Icon(Icons.inbox, color: Color(0xFFFFD418)),
+                icon: const Icon(Icons.inbox, color: Colors.white),
                 onPressed: () {
                   // Check if already on StudentInbox page
                   if (ModalRoute.of(context)?.settings.name ==
@@ -759,12 +816,15 @@ class _StudentHomeState extends State<StudentHome> {
   }
 
   Widget mainContent(List<RecentProfessor> recentProfessors) {
-    return Column(
-      children: [
-        mostRecentProfessors(recentProfessors),
-  // Upcoming preview list (fixed height); full-screen search available via icon
-  upcomingAppointments(),
-      ],
+    return SingleChildScrollView(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Column(
+        children: [
+          mostRecentProfessors(recentProfessors),
+          // Upcoming preview list (fixed height); full-screen search available via icon
+          upcomingAppointments(),
+        ],
+      ),
     );
   }
 
@@ -772,7 +832,7 @@ class _StudentHomeState extends State<StudentHome> {
     if (_isLoadingProfessors) {
       return Center(child: CircularProgressIndicator());
     }
-    
+
     if (_searchResults.isEmpty) {
       return Center(
         child: Column(
@@ -810,7 +870,12 @@ class _StudentHomeState extends State<StudentHome> {
       itemBuilder: (context, index) {
         var professor = _searchResults[index];
         // Get initials for avatar
-        String initials = professor.name.split(' ').map((name) => name.isNotEmpty ? name[0] : '').take(2).join('').toUpperCase();
+        String initials = professor.name
+            .split(' ')
+            .map((name) => name.isNotEmpty ? name[0] : '')
+            .take(2)
+            .join('')
+            .toUpperCase();
         return Container(
           padding: EdgeInsets.all(20),
           decoration: BoxDecoration(
@@ -841,7 +906,10 @@ class _StudentHomeState extends State<StudentHome> {
                     height: 50,
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [const Color(0xFF35408E), const Color(0xFF1A2049)],
+                        colors: [
+                          const Color(0xFF35408E),
+                          const Color(0xFF1A2049),
+                        ],
                         begin: const FractionalOffset(0.0, 0.0),
                         end: const FractionalOffset(0.0, 1.0),
                         stops: [0.0, 1.0],
@@ -895,7 +963,10 @@ class _StudentHomeState extends State<StudentHome> {
                 child: Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [const Color(0xFF35408E), const Color(0xFF1A2049)],
+                      colors: [
+                        const Color(0xFF35408E),
+                        const Color(0xFF1A2049),
+                      ],
                       begin: const FractionalOffset(0.0, 0.0),
                       end: const FractionalOffset(0.0, 1.0),
                       stops: [0.0, 1.0],
@@ -910,10 +981,17 @@ class _StudentHomeState extends State<StudentHome> {
                       String professorName = professor.name;
                       int? idInt = int.tryParse(professorId);
                       if (idInt != null) {
-                        showAppointmentRequestModal(context, professorName, idInt);
+                        showAppointmentRequestModal(
+                          context,
+                          professorName,
+                          idInt,
+                        );
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Invalid professor ID'), duration: Duration(seconds: 2)),
+                          SnackBar(
+                            content: Text('Invalid professor ID'),
+                            duration: Duration(seconds: 2),
+                          ),
                         );
                       }
                     },
@@ -946,13 +1024,19 @@ class _StudentHomeState extends State<StudentHome> {
 }
 
 // Appointment Request Modal
-void showAppointmentRequestModal(BuildContext context, String facultyName, int facultyId) async {
+void showAppointmentRequestModal(
+  BuildContext context,
+  String facultyName,
+  int facultyId,
+) async {
   print('[DEBUG] POSTING to fetchFacultySchedules with facultyId: $facultyId');
   List<Map<String, dynamic>> schedules = await fetchFacultySchedules(facultyId);
   print('[DEBUG] Schedules returned:');
   print(schedules);
   // Only consider schedules with status 'available'
-  List<Map<String, dynamic>> availableSchedules = schedules.where((s) => (s['status'] ?? '').toLowerCase() == 'available').toList();
+  List<Map<String, dynamic>> availableSchedules = schedules
+      .where((s) => (s['status'] ?? '').toLowerCase() == 'available')
+      .toList();
   print('[DEBUG] Available schedules:');
   print(availableSchedules);
 
@@ -961,7 +1045,13 @@ void showAppointmentRequestModal(BuildContext context, String facultyName, int f
 
   // Define the order of days for sorting
   const List<String> dayOrder = [
-    'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+    'Sunday',
   ];
 
   // Deduplicate and sort days based on dayOrder
@@ -1014,456 +1104,633 @@ void showAppointmentRequestModal(BuildContext context, String facultyName, int f
       return StatefulBuilder(
         builder: (sbContext, setState) {
           // Filter available schedules for the selected day (exact match)
-          List<Map<String, dynamic>> availableTimes = availableSchedules.where((s) {
+          List<Map<String, dynamic>> availableTimes = availableSchedules.where((
+            s,
+          ) {
             String day = (s['day_of_week'] ?? s['day'] ?? '').toString();
             return day == selectedDay;
           }).toList();
 
           // Button enabled only if a day is selected, there are available times, a schedule is selected,
           // a valid date matching the selected day is chosen, and a reason is provided
-          bool isScheduleButtonEnabled = 
-            selectedDay.isNotEmpty &&
-            availableTimes.isNotEmpty &&
-            selectedIndex != null &&
-            selectedDate != null &&
-            reasonController.text.trim().isNotEmpty;
+          bool isScheduleButtonEnabled =
+              selectedDay.isNotEmpty &&
+              availableTimes.isNotEmpty &&
+              selectedIndex != null &&
+              selectedDate != null &&
+              reasonController.text.trim().isNotEmpty;
 
           return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          child: Container(
-            padding: EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Colors.white,
+            shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.15),
-                  spreadRadius: 3,
-                  blurRadius: 20,
-                  offset: Offset(0, 8),
-                ),
-              ],
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                  // Title
-                  RichText(
-                    text: TextSpan(
-                      children: [
-                        TextSpan(
-                          text: "$facultyName",
-                          style: TextStyle(
-                            fontFamily: 'Arimo',
-                            fontWeight: FontWeight.bold,
-                            fontStyle: FontStyle.italic,
-                            fontSize: 22,
-                            color: Colors.black,
-                          ),
-                        ),
-                        TextSpan(
-                          text: "'s available schedules",
-                          style: TextStyle(
-                            fontFamily: 'Arimo',
-                            fontWeight: FontWeight.normal,
-                            fontSize: 22,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ],
-                    ),
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            insetPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 24,
+            ),
+            child: AnimatedPadding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(rootContext).viewInsets.bottom,
+              ),
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOut,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(rootContext).size.height * 0.9,
+                ),
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(rootContext).viewInsets.bottom + 12,
                   ),
-                  SizedBox(height: 24),
-                  // Day Dropdown
-                  Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Color(0xFFF5F5F5),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey.shade300),
-                    ),
-                    child: DropdownButtonHideUnderline(
-                      child: Theme(
-                        data: Theme.of(context).copyWith(
-                          canvasColor: Colors.white,
-                        ),
-                        child: DropdownButton<String>(
-                          value: selectedDay,
-                          isExpanded: true,
-                          icon: Icon(Icons.arrow_drop_down),
-                          style: TextStyle(
-                            fontFamily: 'Arimo',
-                            fontSize: 18,
-                            color: Colors.black,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    clipBehavior: Clip.antiAlias,
+                    child: Container(
+                      padding: EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.15),
+                            spreadRadius: 3,
+                            blurRadius: 20,
+                            offset: Offset(0, 8),
                           ),
-                          items: days.map((day) {
-                            return DropdownMenuItem<String>(
-                              value: day,
-                              child: Text(day),
-                            );
-                          }).toList(),
-                          onChanged: (val) {
-                            setState(() {
-                              selectedDay = val!;
-                              selectedIndex = null; // reset selected schedule for new day
-                              selectedDate = null; // reset date since day changed
-                            });
-                          },
-                        ),
+                        ],
                       ),
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  // Schedules available for the day
-                  Text(
-                    'Schedules available for the day:',
-                    style: TextStyle(
-                      fontFamily: 'Arimo',
-                      fontSize: 16,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Container(
-                    constraints: BoxConstraints(maxHeight: 220),
-                    child: availableTimes.isEmpty
-                        ? Center(
-                            child: Text(
-                              'No available schedules for this day.',
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          // Title
+                          RichText(
+                            text: TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: "$facultyName",
+                                  style: TextStyle(
+                                    fontFamily: 'Arimo',
+                                    fontWeight: FontWeight.bold,
+                                    fontStyle: FontStyle.italic,
+                                    fontSize: 22,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: "'s available schedules",
+                                  style: TextStyle(
+                                    fontFamily: 'Arimo',
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 22,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 24),
+                          // Day Dropdown
+                          Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Color(0xFFF5F5F5),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.grey.shade300),
+                            ),
+                            child: DropdownButtonHideUnderline(
+                              child: Theme(
+                                data: Theme.of(
+                                  context,
+                                ).copyWith(canvasColor: Colors.white),
+                                child: DropdownButton<String>(
+                                  value: selectedDay,
+                                  isExpanded: true,
+                                  icon: Icon(Icons.arrow_drop_down),
+                                  style: TextStyle(
+                                    fontFamily: 'Arimo',
+                                    fontSize: 18,
+                                    color: Colors.black,
+                                  ),
+                                  items: days.map((day) {
+                                    return DropdownMenuItem<String>(
+                                      value: day,
+                                      child: Text(day),
+                                    );
+                                  }).toList(),
+                                  onChanged: (val) {
+                                    setState(() {
+                                      selectedDay = val!;
+                                      selectedIndex =
+                                          null; // reset selected schedule for new day
+                                      selectedDate =
+                                          null; // reset date since day changed
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 16),
+                          // Schedules available for the day
+                          Text(
+                            'Schedules available for the day:',
+                            style: TextStyle(
+                              fontFamily: 'Arimo',
+                              fontSize: 16,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          Container(
+                            constraints: BoxConstraints(maxHeight: 220),
+                            child: availableTimes.isEmpty
+                                ? Center(
+                                    child: Text(
+                                      'No available schedules for this day.',
+                                      style: TextStyle(
+                                        fontFamily: 'Arimo',
+                                        fontSize: 15,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  )
+                                : ListView.separated(
+                                    shrinkWrap: true,
+                                    itemCount: availableTimes.length,
+                                    separatorBuilder: (context, idx) =>
+                                        SizedBox(height: 12),
+                                    itemBuilder: (context, idx) {
+                                      var sched = availableTimes[idx];
+                                      String start = formatTime(
+                                        sched['start_time'] ??
+                                            sched['startTime'],
+                                      );
+                                      String end = formatTime(
+                                        sched['end_time'] ?? sched['endTime'],
+                                      );
+                                      bool isSelected = selectedIndex == idx;
+                                      return GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            selectedIndex = idx;
+                                          });
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                            vertical: 18,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: isSelected
+                                                ? Color(0xFFFFF8E1)
+                                                : Color(0xFFF5F5F5),
+                                            borderRadius: BorderRadius.circular(
+                                              14,
+                                            ),
+                                            border: Border.all(
+                                              color: isSelected
+                                                  ? Color(0xFFFFD418)
+                                                  : Colors.transparent,
+                                              width: 2,
+                                            ),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withOpacity(
+                                                  0.08,
+                                                ),
+                                                blurRadius: 8,
+                                                offset: Offset(0, 3),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              '$start - $end',
+                                              style: TextStyle(
+                                                fontFamily: 'Arimo',
+                                                fontSize: 20,
+                                                color: Color(0xFF283593),
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                          ),
+
+                          SizedBox(height: 16),
+                          // NEW: Appointment Date selector (only dates matching selectedDay are enabled)
+                          Text(
+                            'Select Appointment Date:',
+                            style: TextStyle(
+                              fontFamily: 'Arimo',
+                              fontSize: 16,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 14,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Color(0xFFF5F5F5),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: Colors.grey.shade300,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    selectedDate == null
+                                        ? 'No date selected'
+                                        : '${selectedDate!.year.toString().padLeft(4, '0')}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.day.toString().padLeft(2, '0')}',
+                                    style: TextStyle(
+                                      fontFamily: 'Arimo',
+                                      fontSize: 15,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 10),
+                              ElevatedButton.icon(
+                                onPressed: selectedDay.isEmpty
+                                    ? null
+                                    : () async {
+                                        print('[DEBUG] Opening date picker');
+                                        final now = DateTime.now();
+                                        final first = DateTime(
+                                          now.year,
+                                          now.month,
+                                          now.day,
+                                        );
+                                        final last = DateTime(
+                                          now.year + 1,
+                                          now.month,
+                                          now.day,
+                                        );
+                                        final targetWeekday =
+                                            _weekdayFromDayName(selectedDay);
+
+                                        // Ensure initialDate satisfies selectableDayPredicate even if selectedDate is set
+                                        DateTime _nextMatchingWeekday(
+                                          DateTime start,
+                                          int weekday,
+                                        ) {
+                                          final int delta =
+                                              (weekday - start.weekday) % 7;
+                                          return start.add(
+                                            Duration(days: delta),
+                                          );
+                                        }
+
+                                        DateTime _prevMatchingWeekday(
+                                          DateTime start,
+                                          int weekday,
+                                        ) {
+                                          final int delta =
+                                              (start.weekday - weekday) % 7;
+                                          return start.subtract(
+                                            Duration(days: delta),
+                                          );
+                                        }
+
+                                        DateTime baseInitial =
+                                            selectedDate ?? first;
+                                        if (baseInitial.isBefore(first))
+                                          baseInitial = first;
+                                        if (baseInitial.isAfter(last))
+                                          baseInitial = last;
+                                        DateTime initial = _nextMatchingWeekday(
+                                          baseInitial,
+                                          targetWeekday,
+                                        );
+                                        if (initial.isAfter(last)) {
+                                          initial = _prevMatchingWeekday(
+                                            last,
+                                            targetWeekday,
+                                          );
+                                        }
+
+                                        final picked = await showDatePicker(
+                                          context: rootContext,
+                                          useRootNavigator: true,
+                                          initialDate: initial,
+                                          firstDate: first,
+                                          lastDate: last,
+                                          initialEntryMode:
+                                              DatePickerEntryMode.calendarOnly,
+                                          selectableDayPredicate: (DateTime day) {
+                                            // Only allow dates whose weekday matches selectedDay
+                                            return day.weekday == targetWeekday;
+                                          },
+                                          builder: (ctx, child) {
+                                            final theme = Theme.of(rootContext);
+                                            return Theme(
+                                              data: theme.copyWith(
+                                                colorScheme:
+                                                    const ColorScheme.light(
+                                                      primary: Color(
+                                                        0xFF35408E,
+                                                      ),
+                                                      secondary: Color(
+                                                        0xFFFFD418,
+                                                      ),
+                                                      onPrimary: Colors.white,
+                                                      onSurface: Color(
+                                                        0xFF1A2049,
+                                                      ),
+                                                    ),
+                                                textButtonTheme:
+                                                    TextButtonThemeData(
+                                                      style:
+                                                          TextButton.styleFrom(
+                                                            foregroundColor:
+                                                                const Color(
+                                                                  0xFF35408E,
+                                                                ),
+                                                          ),
+                                                    ),
+                                              ),
+                                              child: child!,
+                                            );
+                                          },
+                                        );
+                                        if (picked != null) {
+                                          setState(() => selectedDate = picked);
+                                        }
+                                      },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFFFFD418),
+                                  foregroundColor: Colors.black,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 14,
+                                    vertical: 12,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  elevation: 0,
+                                ),
+                                icon: const Icon(Icons.event),
+                                label: const Text(
+                                  'Pick date',
+                                  style: TextStyle(
+                                    fontFamily: 'Arimo',
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          SizedBox(height: 16),
+                          // Reason for Appointment Text Field
+                          Text(
+                            'Reason for Appointment:',
+                            style: TextStyle(
+                              fontFamily: 'Arimo',
+                              fontSize: 16,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Color(0xFFF5F5F5),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.grey.shade300),
+                            ),
+                            child: TextField(
+                              controller: reasonController,
+                              scrollPadding: EdgeInsets.only(
+                                bottom:
+                                    MediaQuery.of(
+                                      rootContext,
+                                    ).viewInsets.bottom +
+                                    100,
+                              ),
+                              maxLines: 2,
+                              minLines: 1,
+                              onChanged: (val) {
+                                setState(() {}); // Update button enabled state
+                              },
+                              decoration: InputDecoration(
+                                hintText: 'Enter your reason...',
+                                hintStyle: TextStyle(
+                                  fontFamily: 'Arimo',
+                                  color: Colors.grey,
+                                  fontSize: 15,
+                                ),
+                                border: InputBorder.none,
+                                isDense: true,
+                                contentPadding: EdgeInsets.zero,
+                              ),
                               style: TextStyle(
                                 fontFamily: 'Arimo',
                                 fontSize: 15,
-                                color: Colors.grey[600],
+                                color: Colors.black,
                               ),
                             ),
-                          )
-                        : ListView.separated(
-                            shrinkWrap: true,
-                            itemCount: availableTimes.length,
-                            separatorBuilder: (context, idx) => SizedBox(height: 12),
-                            itemBuilder: (context, idx) {
-                              var sched = availableTimes[idx];
-                              String start = formatTime(sched['start_time'] ?? sched['startTime']);
-                              String end = formatTime(sched['end_time'] ?? sched['endTime']);
-                              bool isSelected = selectedIndex == idx;
-                              return GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    selectedIndex = idx;
-                                  });
-                                },
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(vertical: 18),
-                                  decoration: BoxDecoration(
-                                    color: isSelected ? Color(0xFFFFF8E1) : Color(0xFFF5F5F5),
-                                    borderRadius: BorderRadius.circular(14),
-                                    border: Border.all(
-                                      color: isSelected ? Color(0xFFFFD418) : Colors.transparent,
-                                      width: 2,
+                          ),
+                          SizedBox(height: 24),
+                          // Action Buttons
+                          Row(
+                            children: [
+                              // Cancel Button
+                              Expanded(
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    // Use the dialog's context to pop the route to avoid deactivated ancestor errors
+                                    Navigator.of(dialogContext).pop();
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.grey.shade300,
+                                    foregroundColor: Colors.black,
+                                    padding: EdgeInsets.symmetric(vertical: 16),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
                                     ),
+                                    elevation: 0,
+                                  ),
+                                  child: Text(
+                                    'Cancel',
+                                    style: TextStyle(
+                                      fontFamily: 'Arimo',
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 16),
+                              // Schedule Button
+                              Expanded(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    gradient: isScheduleButtonEnabled
+                                        ? LinearGradient(
+                                            colors: [
+                                              Color(0xFFFFD54F),
+                                              Color(0xFFFFB300),
+                                            ],
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                          )
+                                        : LinearGradient(
+                                            colors: [
+                                              Colors.grey.shade300,
+                                              Colors.grey.shade400,
+                                            ],
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                          ),
+                                    borderRadius: BorderRadius.circular(12),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.08),
+                                        color: isScheduleButtonEnabled
+                                            ? Color(
+                                                0xFFFFB000,
+                                              ).withOpacity(0.25)
+                                            : Colors.grey.withOpacity(0.15),
                                         blurRadius: 8,
-                                        offset: Offset(0, 3),
+                                        offset: Offset(0, 4),
                                       ),
                                     ],
                                   ),
-                                  child: Center(
+                                  child: ElevatedButton(
+                                    onPressed: isScheduleButtonEnabled
+                                        ? () async {
+                                            final prefs =
+                                                await SharedPreferences.getInstance();
+                                            final String? studentIdStr = prefs
+                                                .getString('userId');
+                                            if (studentIdStr == null) {
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    'User ID not found. Please log in again.',
+                                                  ),
+                                                ),
+                                              );
+                                              return;
+                                            }
+                                            final int studentId =
+                                                int.tryParse(studentIdStr) ?? 0;
+                                            if (studentId == 0) {
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    'Invalid user ID. Please log in again.',
+                                                  ),
+                                                ),
+                                              );
+                                              return;
+                                            }
+                                            int scheduleId =
+                                                availableTimes[selectedIndex!]['schedule_id'];
+                                            String reason = reasonController
+                                                .text
+                                                .trim();
+                                            final String appointmentDate =
+                                                '${selectedDate!.year.toString().padLeft(4, '0')}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.day.toString().padLeft(2, '0')}';
+
+                                            if (scheduleId > 0 &&
+                                                reason.isNotEmpty) {
+                                              var result =
+                                                  await postSetAppointment(
+                                                    studentId: studentId,
+                                                    teacherId: facultyId,
+                                                    scheduleId: scheduleId,
+                                                    reason: reason,
+                                                    appointmentDate:
+                                                        appointmentDate, // NEW
+                                                  );
+                                              if (result['error'] == true) {
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                      result['message'],
+                                                    ),
+                                                  ),
+                                                );
+                                              } else {
+                                                // Close dialog on success using the dialog context
+                                                Navigator.of(
+                                                  dialogContext,
+                                                ).pop();
+                                                showRequestSnackBar(
+                                                  rootContext,
+                                                  'Appointment request sent successfully!',
+                                                );
+                                              }
+                                            } else {
+                                              showRequestSnackBarError(
+                                                context,
+                                                'There was an error. Appointment could not be scheduled.',
+                                              );
+                                            }
+                                          }
+                                        : null,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.transparent,
+                                      shadowColor: Colors.transparent,
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: 16,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      elevation: 0,
+                                      disabledBackgroundColor:
+                                          Colors.transparent,
+                                      disabledForegroundColor: Colors.white
+                                          .withOpacity(0.5),
+                                    ),
                                     child: Text(
-                                      '$start - $end',
+                                      'Schedule',
                                       style: TextStyle(
                                         fontFamily: 'Arimo',
-                                        fontSize: 20,
-                                        color: Color(0xFF283593),
-                                        fontWeight: FontWeight.w500,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: isScheduleButtonEnabled
+                                            ? Colors.white
+                                            : Colors.grey.shade400,
                                       ),
                                     ),
                                   ),
                                 ),
-                              );
-                            },
-                          ),
-                  ),
-
-                  SizedBox(height: 16),
-                  // NEW: Appointment Date selector (only dates matching selectedDay are enabled)
-                  Text(
-                    'Select Appointment Date:',
-                    style: TextStyle(
-                      fontFamily: 'Arimo',
-                      fontSize: 16,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                          decoration: BoxDecoration(
-                            color: Color(0xFFF5F5F5),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.grey.shade300),
-                          ),
-                          child: Text(
-                            selectedDate == null
-                                ? 'No date selected'
-                                : '${selectedDate!.year.toString().padLeft(4, '0')}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.day.toString().padLeft(2, '0')}',
-                            style: TextStyle(
-                              fontFamily: 'Arimo',
-                              fontSize: 15,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 10),
-                      ElevatedButton.icon(
-                        onPressed: selectedDay.isEmpty
-                            ? null
-                            : () async {
-                                print('[DEBUG] Opening date picker');
-                                final now = DateTime.now();
-                                final first = DateTime(now.year, now.month, now.day);
-                                final last = DateTime(now.year + 1, now.month, now.day);
-                                final targetWeekday = _weekdayFromDayName(selectedDay);
-
-                                // Ensure initialDate satisfies selectableDayPredicate
-                                DateTime _nextMatchingWeekday(DateTime start, int weekday) {
-                                  final int delta = (weekday - start.weekday) % 7;
-                                  return start.add(Duration(days: delta));
-                                }
-                                final DateTime initial = selectedDate ?? _nextMatchingWeekday(first, targetWeekday);
-
-                                final picked = await showDatePicker(
-                                  context: rootContext,
-                                  useRootNavigator: true,
-                                  initialDate: initial,
-                                  firstDate: first,
-                                  lastDate: last,
-                                  initialEntryMode: DatePickerEntryMode.calendarOnly,
-                                  selectableDayPredicate: (DateTime day) {
-                                    // Only allow dates whose weekday matches selectedDay
-                                    return day.weekday == targetWeekday;
-                                  },
-                                  builder: (ctx, child) {
-                                    final theme = Theme.of(rootContext);
-                                    return Theme(
-                                      data: theme.copyWith(
-                                        colorScheme: const ColorScheme.light(
-                                          primary: Color(0xFF35408E),
-                                          secondary: Color(0xFFFFD418),
-                                          onPrimary: Colors.white,
-                                          onSurface: Color(0xFF1A2049),
-                                        ),
-                                        textButtonTheme: TextButtonThemeData(
-                                          style: TextButton.styleFrom(
-                                            foregroundColor: const Color(0xFF35408E),
-                                          ),
-                                        ),
-                                      ),
-                                      child: child!,
-                                    );
-                                  },
-                                );
-                                if (picked != null) {
-                                  setState(() => selectedDate = picked);
-                                }
-                              },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFFFD418),
-                          foregroundColor: Colors.black,
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                          elevation: 0,
-                        ),
-                        icon: const Icon(Icons.event),
-                        label: const Text(
-                          'Pick date',
-                          style: TextStyle(fontFamily: 'Arimo', fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  SizedBox(height: 16),
-                  // Reason for Appointment Text Field
-                  Text(
-                    'Reason for Appointment:',
-                    style: TextStyle(
-                      fontFamily: 'Arimo',
-                      fontSize: 16,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Color(0xFFF5F5F5),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey.shade300),
-                    ),
-                    child: TextField(
-                      controller: reasonController,
-                      maxLines: 2,
-                      minLines: 1,
-                      onChanged: (val) {
-                        setState(() {}); // Update button enabled state
-                      },
-                      decoration: InputDecoration(
-                        hintText: 'Enter your reason...',
-                        hintStyle: TextStyle(
-                          fontFamily: 'Arimo',
-                          color: Colors.grey,
-                          fontSize: 15,
-                        ),
-                        border: InputBorder.none,
-                        isDense: true,
-                        contentPadding: EdgeInsets.zero,
-                      ),
-                      style: TextStyle(
-                        fontFamily: 'Arimo',
-                        fontSize: 15,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 24),
-                  // Action Buttons
-                  Row(
-                    children: [
-                      // Cancel Button
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            // Use the dialog's context to pop the route to avoid deactivated ancestor errors
-                            Navigator.of(dialogContext).pop();
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.grey.shade300,
-                            foregroundColor: Colors.black,
-                            padding: EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 0,
-                          ),
-                          child: Text(
-                            'Cancel',
-                            style: TextStyle(
-                              fontFamily: 'Arimo',
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 16),
-                      // Schedule Button
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            gradient: isScheduleButtonEnabled
-                                ? LinearGradient(
-                                    colors: [Color(0xFFFFD54F), Color(0xFFFFB300)],
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                  )
-                                : LinearGradient(
-                                    colors: [Colors.grey.shade300, Colors.grey.shade400],
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                  ),
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: isScheduleButtonEnabled
-                                    ? Color(0xFFFFB000).withOpacity(0.25)
-                                    : Colors.grey.withOpacity(0.15),
-                                blurRadius: 8,
-                                offset: Offset(0, 4),
                               ),
                             ],
                           ),
-                          child: ElevatedButton(
-                            onPressed: isScheduleButtonEnabled
-                                ? () async {
-                                    final prefs = await SharedPreferences.getInstance();
-                                    final String? studentIdStr = prefs.getString('userId');
-                                    if (studentIdStr == null) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text('User ID not found. Please log in again.')),
-                                      );
-                                      return;
-                                    }
-                                    final int studentId = int.tryParse(studentIdStr) ?? 0;
-                                    if (studentId == 0) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text('Invalid user ID. Please log in again.')),
-                                      );
-                                      return;
-                                    }
-                                    int scheduleId = availableTimes[selectedIndex!]['schedule_id'];
-                                    String reason = reasonController.text.trim();
-                                    final String appointmentDate = '${selectedDate!.year.toString().padLeft(4, '0')}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.day.toString().padLeft(2, '0')}';
-
-                                    if (scheduleId > 0 && reason.isNotEmpty) {
-                                      var result = await postSetAppointment(
-                                        studentId: studentId,
-                                        teacherId: facultyId,
-                                        scheduleId: scheduleId,
-                                        reason: reason,
-                                        appointmentDate: appointmentDate, // NEW
-                                      );
-                                      if (result['error'] == true) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(content: Text(result['message'])),
-                                        );
-                                      } else {
-                                        // Close dialog on success using the dialog context
-                                        Navigator.of(dialogContext).pop();
-                                        showRequestSnackBar(rootContext, 'Appointment request sent successfully!');
-                                      }
-                                    } else {
-                                      showRequestSnackBarError(context, 'There was an error. Appointment could not be scheduled.');
-                                    }
-                                  } : null,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.transparent,
-                              shadowColor: Colors.transparent,
-                              padding: EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              elevation: 0,
-                              disabledBackgroundColor: Colors.transparent,
-                              disabledForegroundColor: Colors.white.withOpacity(0.5),
-                            ),
-                            child: Text(
-                              'Schedule',
-                              style: TextStyle(
-                                fontFamily: 'Arimo',
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: isScheduleButtonEnabled ? Colors.white : Colors.grey.shade400,
-                              ),
-                            ),
-                          ),
-                        ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ],
+                ),
               ),
             ),
           );
@@ -1475,7 +1742,8 @@ void showAppointmentRequestModal(BuildContext context, String facultyName, int f
 
 Future<List<Map<String, dynamic>>> fetchFacultySchedules(int facultyId) async {
   // Calls the backend API to fetch schedules for a teacher (facultyId)
-  const String apiUrl = 'https://nutify.site/api.php?action=studentFetchTeacherSched';
+  const String apiUrl =
+      'https://nutify.site/api.php?action=studentFetchTeacherSched';
   try {
     final response = await http.post(
       Uri.parse(apiUrl),
@@ -1525,11 +1793,13 @@ Future<Map<String, dynamic>> postSetAppointment({
   required String reason,
   required String appointmentDate, // NEW param
 }) async {
-  const String apiUrl = 'https://nutify.site/api.php?action=studentSetAppointment';
+  const String apiUrl =
+      'https://nutify.site/api.php?action=studentSetAppointment';
   try {
     // Include created_at from the app (current timestamp in MySQL DATETIME format)
     final now = DateTime.now();
-    final createdAt = '${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')} '
+    final createdAt =
+        '${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')} '
         '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}';
 
     final response = await http.post(
@@ -1543,7 +1813,8 @@ Future<Map<String, dynamic>> postSetAppointment({
         'teacherID': teacherId.toString(),
         'schedule_id': scheduleId.toString(),
         'appointment_reason': reason,
-        'appointment_date': appointmentDate, // NEW field sent to backend (YYYY-MM-DD)
+        'appointment_date':
+            appointmentDate, // NEW field sent to backend (YYYY-MM-DD)
         'created_at': createdAt, // NEW: creation timestamp from app
       },
     );
@@ -1552,14 +1823,11 @@ Future<Map<String, dynamic>> postSetAppointment({
     } else {
       return {
         'error': true,
-        'message': 'Failed to set appointment: ${response.statusCode}'
+        'message': 'Failed to set appointment: ${response.statusCode}',
       };
     }
   } catch (e) {
-    return {
-      'error': true,
-      'message': 'Error: $e'
-    };
+    return {'error': true, 'message': 'Error: $e'};
   }
 }
 
@@ -1568,10 +1836,7 @@ void showRequestSnackBar(BuildContext context, String message) {
     SnackBar(
       content: Text(
         message,
-        style: TextStyle(
-          fontFamily: 'Arimo',
-          color: Colors.white,
-        ),
+        style: TextStyle(fontFamily: 'Arimo', color: Colors.white),
       ),
       duration: Duration(seconds: 2),
       backgroundColor: Color(0xFF00FD0F),
@@ -1584,10 +1849,7 @@ void showRequestSnackBarError(BuildContext context, String message) {
     SnackBar(
       content: Text(
         message,
-        style: TextStyle(
-          fontFamily: 'Arimo',
-          color: Colors.white,
-        ),
+        style: TextStyle(fontFamily: 'Arimo', color: Colors.white),
       ),
       duration: Duration(seconds: 2),
       backgroundColor: Color(0xFFDF0000),
