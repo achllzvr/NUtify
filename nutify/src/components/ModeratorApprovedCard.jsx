@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 
 // Dummy data for approval history cards
 const approvedHistory = [
@@ -13,6 +13,8 @@ const approvedHistory = [
     status: 'approved'
   }
 ];
+
+const ITEMS_PER_PAGE = 10;
 
 const ModeratorApprovedHistory = () => {
   const [holdStatus, setHoldStatus] = useState(
@@ -38,6 +40,20 @@ const ModeratorApprovedHistory = () => {
   const departments = ['SAHS', 'SACE', 'SABM', 'SCS'];
   const yearLevels = ['1', '2', '3', '4'];
   const academicYears = ['2023-2024', '2024-2025', '2025-2026'];
+
+  // Pagination state
+  const [page, setPage] = useState(1);
+
+  // Filtered/paginated items (if you add filters, apply them here)
+  const paginatedItems = useMemo(() => {
+    // No filters applied, just paginate
+    return approvedHistory.slice(
+      (page - 1) * ITEMS_PER_PAGE,
+      page * ITEMS_PER_PAGE
+    );
+  }, [page]);
+
+  const totalPages = Math.max(1, Math.ceil(approvedHistory.length / ITEMS_PER_PAGE));
 
   return (
     <div className="moderator-history-main-content">
@@ -185,7 +201,7 @@ const ModeratorApprovedHistory = () => {
         <div className="moderator-history-left-column">
           <div className="moderator-history-section">
             <div className="moderator-history-card-list">
-              {approvedHistory.map((item, idx) => (
+              {paginatedItems.map((item, idx) => (
                 <div key={item.id} className="moderator-history-item">
                   <div className="moderator-history-appointment-avatar">
                     {item.avatar ? (
@@ -241,14 +257,63 @@ const ModeratorApprovedHistory = () => {
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                     <button
-                      onClick={() => handleToggleHold(idx)}
-                      className={`moderator-history-btn ${holdStatus[idx] ? 'primary' : 'secondary'}`}
+                      onClick={() => handleToggleHold(idx + (page - 1) * ITEMS_PER_PAGE)}
+                      className={`moderator-history-btn ${holdStatus[idx + (page - 1) * ITEMS_PER_PAGE] ? 'primary' : 'secondary'}`}
                     >
-                      {holdStatus[idx] ? 'Hold' : 'Unhold'}
+                      {holdStatus[idx + (page - 1) * ITEMS_PER_PAGE] ? 'Hold' : 'Unhold'}
                     </button>
                   </div>
                 </div>
               ))}
+            </div>
+            {/* Pagination controls */}
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '12px', gap: '10px' }}>
+              <button
+                onClick={() => setPage(prev => Math.max(prev - 1, 1))}
+                disabled={page === 1}
+                style={{
+                  padding: '6px 14px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  background: '#f0f0f0',
+                  color: '#7f8c8d',
+                  cursor: page === 1 ? 'not-allowed' : 'pointer',
+                  fontWeight: 500,
+                  boxShadow: '4px 4px 8px #e0e0e0, -4px -4px 8px #fff'
+                }}
+              >
+                Prev
+              </button>
+              <span style={{
+                fontWeight: 500,
+                fontSize: '15px',
+                color: '#7f8c8d',
+                background: '#f0f0f0',
+                borderRadius: '8px',
+                padding: '6px 14px',
+                border: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                boxShadow: '4px 4px 8px #e0e0e0, -4px -4px 8px #fff'
+              }}>
+                Page {page} of {totalPages}
+              </span>
+              <button
+                onClick={() => setPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={page === totalPages}
+                style={{
+                  padding: '6px 14px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  background: '#f0f0f0',
+                  color: '#7f8c8d',
+                  cursor: page === totalPages ? 'not-allowed' : 'pointer',
+                  fontWeight: 500,
+                  boxShadow: '4px 4px 8px #e0e0e0, -4px -4px 8px #fff'
+                }}
+              >
+                Next
+              </button>
             </div>
           </div>
         </div>
