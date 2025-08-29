@@ -66,12 +66,6 @@ const ModeratorApprovedHistory = () => {
             margin-bottom: 2.2em;
             flex-wrap: wrap;
           }
-          @media (max-width: 768px) {
-            .mod-approved-filters-row {
-              flex-direction: column;
-              gap: 14px;
-            }
-          }
           .mod-approved-filter-group {
             display: flex;
             flex-direction: column;
