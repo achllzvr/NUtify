@@ -1,6 +1,7 @@
 import React from 'react';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
+import ModeratorApprovedHistory from '../components/ModeratorApprovedCard';
 
 const ModeratorApproved = () => (
   <div style={{ display: 'flex' }}>
@@ -14,7 +15,10 @@ const ModeratorApproved = () => (
         onSearchChange={() => {}}
         onSearch={() => {}}
       />
-      {/* Page content goes here */}
+      {/* Card Section */}
+      <div style={{ marginBottom: '5em' }}>
+        <ModeratorApprovedHistory />
+      </div>
     </div>
   </div>
 );
