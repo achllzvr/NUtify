@@ -132,6 +132,18 @@ const ModeratorApprovedHistory = () => {
             background: #e0e0e0;
             box-shadow: inset 20px 20px 60px #cccccc, inset -20px -20px 60px #fff;
           }
+          .moderator-history-section {
+            background: #f0f0f0;
+            border-radius: 20px;
+            padding: 15px 25px 25px 25px;
+            box-shadow: 20px 20px 40px rgba(0, 0, 0, 0.1),
+              -20px -20px 40px rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+            height: 697px; /* lowered from 780px */
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+          }
         `}
       </style>
       <div className="moderator-history-content-container">
