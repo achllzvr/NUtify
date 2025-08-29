@@ -4,14 +4,13 @@ import Sidebar from '../components/Sidebar';
 import ModeratorApprovedHistory from '../components/ModeratorApprovedCard';
 
 const ModeratorApproved = () => {
-  // Add search state
   const [searchValue, setSearchValue] = useState('');
+  const [activeSearch, setActiveSearch] = useState('');
 
-  // Handler for search input change
   const handleSearchChange = value => setSearchValue(value);
 
-  // Handler for search action (optional: could trigger filtering, but filtering will be live)
-  const handleSearch = () => {};
+  // Only update activeSearch when search is triggered
+  const handleSearch = () => setActiveSearch(searchValue);
 
   return (
     <div style={{ display: 'flex' }}>
@@ -27,7 +26,7 @@ const ModeratorApproved = () => {
         />
         {/* Card Section */}
         <div style={{ marginBottom: '5em' }}>
-          <ModeratorApprovedHistory searchValue={searchValue} />
+          <ModeratorApprovedHistory searchValue={activeSearch} />
         </div>
       </div>
     </div>
