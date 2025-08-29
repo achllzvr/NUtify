@@ -4,6 +4,7 @@ import userID from "../assets/icons/credit-card.svg";
 import lockIcon from "../assets/icons/lock.svg";
 import eyeIcon from "../assets/icons/eye.svg";
 import eyeOffIcon from "../assets/icons/eye-off.svg";
+import { loginModerator } from "../api/auth";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -26,10 +27,28 @@ const Login = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // For demo purposes, redirect to moderator home only
-    navigate("/moderator/home");
+    setError("");
+    setSubmitting(true);
+    try {
+      const res = await loginModerator({ idNumber: formData.idNumber, password: formData.password });
+      // Expect { status: 'ok', user, csrfToken? }
+      if (res && (res.status === 'ok' || res.success)) {
+        if (res.csrfToken) localStorage.setItem('csrfToken', res.csrfToken);
+        // Navigate to moderator home
+        navigate("/moderator/home");
+      } else {
+        throw new Error(res?.message || 'Login failed');
+      }
+    } catch (err) {
+      setError(err.message || 'Login failed');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -40,6 +59,9 @@ const Login = () => {
           <p className="login-subtitle">Stay connected. Stay updated.</p>
 
           <form onSubmit={handleSubmit}>
+            {error && (
+              <div style={{ color: '#b00020', marginBottom: '8px', fontWeight: 600, textAlign: 'center' }}>{error}</div>
+            )}
             <div className="input-group">
               <img src={userID} alt="User" className="input-icon" />
               <input
@@ -96,8 +118,8 @@ const Login = () => {
               </Link>
             </div>
 
-            <button type="submit" className="login-button">
-              Login
+            <button type="submit" className="login-button" disabled={submitting}>
+              {submitting ? 'Logging in…' : 'Login'}
             </button>
 
             <div className="signup-link">

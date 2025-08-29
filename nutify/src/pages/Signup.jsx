@@ -6,6 +6,7 @@ import lockIcon from '../assets/icons/lock.svg';
 import eyeIcon from '../assets/icons/eye.svg';
 import eyeOffIcon from '../assets/icons/eye-off.svg';
 import mailIcon from '../assets/icons/mail.svg';
+import { signupUser } from '../api/auth';
 
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -36,13 +37,38 @@ const Signup = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    setSuccess('');
     if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match!');
+      setError('Passwords do not match!');
       return;
     }
-    navigate('/login');
+    setSubmitting(true);
+    try {
+      const res = await signupUser({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        idNumber: formData.idNumber,
+        password: formData.password,
+      });
+      if (res && (res.status === 'ok' || res.success)) {
+        setSuccess('Account created. You can now log in.');
+        setTimeout(() => navigate('/login'), 800);
+      } else {
+        throw new Error(res?.message || 'Signup failed');
+      }
+    } catch (err) {
+      setError(err.message || 'Signup failed');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -53,6 +79,12 @@ const Signup = () => {
           <p className="login-subtitle">Join us today. Stay connected.</p>
 
           <form onSubmit={handleSubmit}>
+            {error && (
+              <div style={{ color: '#b00020', marginBottom: '8px', fontWeight: 600, textAlign: 'center' }}>{error}</div>
+            )}
+            {success && (
+              <div style={{ color: '#2c7a7b', marginBottom: '8px', fontWeight: 600, textAlign: 'center' }}>{success}</div>
+            )}
             <div className="name-row" style={{ display: 'flex', gap: '16px', marginBottom: '5px' }}>
               <div className="input-group">
                 <img src={userIcon} alt="First Name" className="input-icon" />
@@ -145,7 +177,9 @@ const Signup = () => {
               />
             </div>
 
-            <button type="submit" className="login-button">Sign Up</button>
+            <button type="submit" className="login-button" disabled={submitting}>
+              {submitting ? 'Creating…' : 'Sign Up'}
+            </button>
 
             <div className="signup-link">
               Already have an account? <Link to="/login">Login</Link>

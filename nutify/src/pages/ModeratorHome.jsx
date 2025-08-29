@@ -25,7 +25,7 @@ function mapReason(reason) {
 }
 const getReasonText = (reason) =>
   mapReason(reason) === 'Other'
-    ? (<em>*Unspecified Reason. Please consult with appointee.</em>)
+    ? (<em>*Unspecified/ Hidden Reason. Please consult with appointee.</em>)
     : mapReason(reason);
 
 const truncateReason = (reason, maxLength = 40) => {
