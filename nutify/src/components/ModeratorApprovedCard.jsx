@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 
 // Dummy data for approval history cards
 const approvedHistory = [
@@ -58,7 +58,7 @@ const ITEMS_PER_PAGE = 10;
 
 const holdStatuses = ['Hold', 'Unhold'];
 
-const ModeratorApprovedHistory = () => {
+const ModeratorApprovedHistory = ({ searchValue }) => {
   const [holdStatus, setHoldStatus] = useState(
     approvedHistory.map(() => true) // true = Hold, false = Unhold
   );
@@ -88,8 +88,44 @@ const ModeratorApprovedHistory = () => {
   // Pagination state
   const [page, setPage] = useState(1);
 
+  // Automatically set dropdowns to match the first search result
+  useEffect(() => {
+    if (searchValue) {
+      const match = approvedHistory.find(item =>
+        item.name.toLowerCase().includes(searchValue.toLowerCase())
+      );
+      if (match) {
+        setFilters({
+          accountType: match.accountType,
+          department: match.department,
+          yearLevel: match.yearLevel,
+          academicYear: match.academicYear,
+          holdStatus: holdStatus[approvedHistory.indexOf(match)] ? 'Hold' : 'Unhold'
+        });
+      }
+    } else {
+      // Reset dropdowns to default when search is empty
+      setFilters({
+        accountType: '',
+        department: '',
+        yearLevel: '',
+        academicYear: '',
+        holdStatus: ''
+      });
+    }
+  // Only update filters when searchValue changes
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchValue]);
+
   // Filtered/paginated items (apply filters here)
   const filteredItems = useMemo(() => {
+    // If searching, ignore dropdown filters and show all matches
+    if (searchValue) {
+      return approvedHistory.filter(item =>
+        item.name.toLowerCase().includes(searchValue.toLowerCase())
+      );
+    }
+    // Otherwise, use dropdown filters
     return approvedHistory.filter(item => {
       return (
         (!filters.accountType || item.accountType === filters.accountType) &&
@@ -99,7 +135,7 @@ const ModeratorApprovedHistory = () => {
         (!filters.holdStatus || (filters.holdStatus === 'Hold' ? holdStatus[approvedHistory.indexOf(item)] : !holdStatus[approvedHistory.indexOf(item)]))
       );
     });
-  }, [filters, holdStatus]);
+  }, [filters, holdStatus, searchValue]);
 
   const paginatedItems = useMemo(() => {
     return filteredItems.slice(
@@ -277,8 +313,8 @@ const ModeratorApprovedHistory = () => {
         <div className="moderator-history-left-column">
           <div className="moderator-history-section">
             <div className="moderator-history-card-list">
-              {/* Only show cards if any filter is selected */}
-              {Object.values(filters).some(val => val) ? (
+              {/* Show cards if searchValue or any filter is selected */}
+              {(searchValue || Object.values(filters).some(val => val)) ? (
                 paginatedItems.map((item, idx) => {
                   const fullIdx = approvedHistory.indexOf(item);
                   return (
@@ -396,4 +432,3 @@ const ModeratorApprovedHistory = () => {
 };
 
 export default ModeratorApprovedHistory;
- 
