@@ -6,6 +6,7 @@ import menuIcon from '../assets/icons/menu.svg';
 import homeIcon from '../assets/icons/home.svg';
 import inboxIcon from '../assets/icons/inbox.svg';
 import settingsIcon from '../assets/icons/settings.svg';
+import userIcon from '../assets/icons/user.svg'; // Add this import
 
 const getInitialSidebarState = () => {
   if (typeof window !== 'undefined') {
@@ -140,6 +141,15 @@ const Sidebar = ({ userType, userName, userRole, userAvatar }) => {
           >
             <img src={homeIcon} alt="Home" className="icon" />
             <span className="nav-text">Home</span>
+          </div>
+          {/* New Page Icon */}
+          <div
+            key={`approved-${isActive(`/${userType}/approved`)}`}
+            className={getSidebarIconClass(`/${userType}/approved`)}
+            onClick={() => handleNavigation(`/${userType}/approved`)}
+          >
+            <img src={userIcon} alt="Page" className="icon" />
+            <span className="nav-text">Page</span>
           </div>
           <div
             key={`history-${isActive(`/${userType}/history`)}`}

@@ -16,8 +16,7 @@ import LandingPage from './pages/LandingPage';
 // Moderator Pages
 import ModeratorHome from './pages/ModeratorHome';
 import ModeratorHistory from './pages/ModeratorHistory';
-
-
+import ModeratorApproved from './pages/ModeratorApproved'; // Add this import
 
 // Component that uses the page title hook
 function AppContent() {
@@ -37,8 +36,8 @@ function AppContent() {
 
         {/* Moderator Routes */}
         <Route path="/moderator/home" element={<ModeratorHome />} />
+        <Route path="/moderator/approved" element={<ModeratorApproved />} /> {/* Add this route */}
         <Route path="/moderator/history" element={<ModeratorHistory />} />
-
         
       </Routes>
     </div>
