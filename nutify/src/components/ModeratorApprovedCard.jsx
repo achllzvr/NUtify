@@ -16,6 +16,8 @@ const approvedHistory = [
 
 const ITEMS_PER_PAGE = 10;
 
+const holdStatuses = ['Hold', 'Unhold'];
+
 const ModeratorApprovedHistory = () => {
   const [holdStatus, setHoldStatus] = useState(
     approvedHistory.map(() => true) // true = Hold, false = Unhold
@@ -32,7 +34,8 @@ const ModeratorApprovedHistory = () => {
     accountType: '',
     department: '',
     yearLevel: '',
-    academicYear: ''
+    academicYear: '',
+    holdStatus: ''
   });
 
   // Dropdown options (dummy, replace with real if needed)
@@ -138,18 +141,30 @@ const ModeratorApprovedHistory = () => {
             flex-direction: column;
             width: 100%;
           }
+          @media (max-width: 768px) {
+            .mod-approved-filters-row {
+              flex-direction: column;
+              gap: 12px;
+            }
+            .mod-approved-filter-group {
+              min-width: 0;
+              width: 100%;
+              flex: unset;
+            }
+          }
         `}
       </style>
       <div className="moderator-history-content-container">
         {/* Filter dropdowns */}
         <div className="mod-approved-filters-row">
+          {/* Account Type */}
           <div className="mod-approved-filter-group">
             <select
               className="mod-approved-filter-select"
               value={filters.accountType}
               onChange={e => setFilters(f => ({ ...f, accountType: e.target.value }))}
             >
-              <option value="" disabled>Account Type</option>
+              <option value="" disabled>Select Account Type</option>
               {accountTypes.map(type => (
                 <option key={type} value={type}>{type}</option>
               ))}
@@ -158,13 +173,30 @@ const ModeratorApprovedHistory = () => {
               <path d="M6 8l4 4 4-4" stroke="#b0b0b0" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
+          {/* Academic Year */}
+          <div className="mod-approved-filter-group">
+            <select
+              className="mod-approved-filter-select"
+              value={filters.academicYear}
+              onChange={e => setFilters(f => ({ ...f, academicYear: e.target.value }))}
+            >
+              <option value="" disabled>Select Academic Year</option>
+              {academicYears.map(ay => (
+                <option key={ay} value={ay}>{ay}</option>
+              ))}
+            </select>
+            <svg className="mod-approved-filter-arrow" viewBox="0 0 20 20">
+              <path d="M6 8l4 4 4-4" stroke="#b0b0b0" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          {/* Department */}
           <div className="mod-approved-filter-group">
             <select
               className="mod-approved-filter-select"
               value={filters.department}
               onChange={e => setFilters(f => ({ ...f, department: e.target.value }))}
             >
-              <option value="" disabled>Department</option>
+              <option value="" disabled>Select Department</option>
               {departments.map(dept => (
                 <option key={dept} value={dept}>{dept}</option>
               ))}
@@ -173,13 +205,14 @@ const ModeratorApprovedHistory = () => {
               <path d="M6 8l4 4 4-4" stroke="#b0b0b0" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
+          {/* Year Level */}
           <div className="mod-approved-filter-group">
             <select
               className="mod-approved-filter-select"
               value={filters.yearLevel}
               onChange={e => setFilters(f => ({ ...f, yearLevel: e.target.value }))}
             >
-              <option value="" disabled>Year Level</option>
+              <option value="" disabled>Select Year Level</option>
               {yearLevels.map(yl => (
                 <option key={yl} value={yl}>{yl}</option>
               ))}
@@ -188,15 +221,16 @@ const ModeratorApprovedHistory = () => {
               <path d="M6 8l4 4 4-4" stroke="#b0b0b0" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
+          {/* Hold Status */}
           <div className="mod-approved-filter-group">
             <select
               className="mod-approved-filter-select"
-              value={filters.academicYear}
-              onChange={e => setFilters(f => ({ ...f, academicYear: e.target.value }))}
+              value={filters.holdStatus}
+              onChange={e => setFilters(f => ({ ...f, holdStatus: e.target.value }))}
             >
-              <option value="" disabled>Academic Year</option>
-              {academicYears.map(ay => (
-                <option key={ay} value={ay}>{ay}</option>
+              <option value="" disabled>Select Hold Status</option>
+              {holdStatuses.map(status => (
+                <option key={status} value={status}>{status}</option>
               ))}
             </select>
             <svg className="mod-approved-filter-arrow" viewBox="0 0 20 20">
