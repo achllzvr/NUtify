@@ -11,6 +11,46 @@ const approvedHistory = [
     academicYear: '2024-2025',
     avatar: '',
     status: 'approved'
+  },
+  {
+    id: 2,
+    name: 'Alice Johnson',
+    accountType: 'Student',
+    department: 'SCS',
+    yearLevel: '3',
+    academicYear: '2023-2024',
+    avatar: '',
+    status: 'approved'
+  },
+  {
+    id: 3,
+    name: 'Bob Smith',
+    accountType: 'Staff',
+    department: 'SABM',
+    yearLevel: '1',
+    academicYear: '2025-2026',
+    avatar: '',
+    status: 'approved'
+  },
+  {
+    id: 4,
+    name: 'Carol Lee',
+    accountType: 'Faculty',
+    department: 'SACE',
+    yearLevel: '4',
+    academicYear: '2024-2025',
+    avatar: '',
+    status: 'approved'
+  },
+  {
+    id: 5,
+    name: 'David Kim',
+    accountType: 'Student',
+    department: 'SAHS',
+    yearLevel: '2',
+    academicYear: '2023-2024',
+    avatar: '',
+    status: 'approved'
   }
 ];
 
@@ -27,6 +67,7 @@ const ModeratorApprovedHistory = () => {
     setHoldStatus(prev =>
       prev.map((status, i) => (i === idx ? !status : status))
     );
+    console.log('Toggled index:', idx, 'New status:', !holdStatus[idx]);
   };
 
   // Dropdown state
@@ -47,16 +88,27 @@ const ModeratorApprovedHistory = () => {
   // Pagination state
   const [page, setPage] = useState(1);
 
-  // Filtered/paginated items (if you add filters, apply them here)
+  // Filtered/paginated items (apply filters here)
+  const filteredItems = useMemo(() => {
+    return approvedHistory.filter(item => {
+      return (
+        (!filters.accountType || item.accountType === filters.accountType) &&
+        (!filters.department || item.department === filters.department) &&
+        (!filters.yearLevel || item.yearLevel === filters.yearLevel) &&
+        (!filters.academicYear || item.academicYear === filters.academicYear) &&
+        (!filters.holdStatus || (filters.holdStatus === 'Hold' ? holdStatus[approvedHistory.indexOf(item)] : !holdStatus[approvedHistory.indexOf(item)]))
+      );
+    });
+  }, [filters, holdStatus]);
+
   const paginatedItems = useMemo(() => {
-    // No filters applied, just paginate
-    return approvedHistory.slice(
+    return filteredItems.slice(
       (page - 1) * ITEMS_PER_PAGE,
       page * ITEMS_PER_PAGE
     );
-  }, [page]);
+  }, [filteredItems, page]);
 
-  const totalPages = Math.max(1, Math.ceil(approvedHistory.length / ITEMS_PER_PAGE));
+  const totalPages = Math.max(1, Math.ceil(filteredItems.length / ITEMS_PER_PAGE));
 
   return (
     <div className="moderator-history-main-content">
@@ -141,23 +193,11 @@ const ModeratorApprovedHistory = () => {
             flex-direction: column;
             width: 100%;
           }
-          @media (max-width: 768px) {
-            .mod-approved-filters-row {
-              flex-direction: column;
-              gap: 12px;
-            }
-            .mod-approved-filter-group {
-              min-width: 0;
-              width: 100%;
-              flex: unset;
-            }
-          }
         `}
       </style>
       <div className="moderator-history-content-container">
         {/* Filter dropdowns */}
         <div className="mod-approved-filters-row">
-          {/* Account Type */}
           <div className="mod-approved-filter-group">
             <select
               className="mod-approved-filter-select"
@@ -173,23 +213,6 @@ const ModeratorApprovedHistory = () => {
               <path d="M6 8l4 4 4-4" stroke="#b0b0b0" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
-          {/* Academic Year */}
-          <div className="mod-approved-filter-group">
-            <select
-              className="mod-approved-filter-select"
-              value={filters.academicYear}
-              onChange={e => setFilters(f => ({ ...f, academicYear: e.target.value }))}
-            >
-              <option value="" disabled>Select Academic Year</option>
-              {academicYears.map(ay => (
-                <option key={ay} value={ay}>{ay}</option>
-              ))}
-            </select>
-            <svg className="mod-approved-filter-arrow" viewBox="0 0 20 20">
-              <path d="M6 8l4 4 4-4" stroke="#b0b0b0" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </div>
-          {/* Department */}
           <div className="mod-approved-filter-group">
             <select
               className="mod-approved-filter-select"
@@ -205,7 +228,6 @@ const ModeratorApprovedHistory = () => {
               <path d="M6 8l4 4 4-4" stroke="#b0b0b0" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
-          {/* Year Level */}
           <div className="mod-approved-filter-group">
             <select
               className="mod-approved-filter-select"
@@ -221,7 +243,21 @@ const ModeratorApprovedHistory = () => {
               <path d="M6 8l4 4 4-4" stroke="#b0b0b0" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
-          {/* Hold Status */}
+          <div className="mod-approved-filter-group">
+            <select
+              className="mod-approved-filter-select"
+              value={filters.academicYear}
+              onChange={e => setFilters(f => ({ ...f, academicYear: e.target.value }))}
+            >
+              <option value="" disabled>Select Academic Year</option>
+              {academicYears.map(ay => (
+                <option key={ay} value={ay}>{ay}</option>
+              ))}
+            </select>
+            <svg className="mod-approved-filter-arrow" viewBox="0 0 20 20">
+              <path d="M6 8l4 4 4-4" stroke="#b0b0b0" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
           <div className="mod-approved-filter-group">
             <select
               className="mod-approved-filter-select"
@@ -241,36 +277,38 @@ const ModeratorApprovedHistory = () => {
         <div className="moderator-history-left-column">
           <div className="moderator-history-section">
             <div className="moderator-history-card-list">
-              {paginatedItems.map((item, idx) => (
-                <div key={item.id} className="moderator-history-item">
-                  <div className="moderator-history-appointment-avatar">
-                    {item.avatar ? (
-                      <img src={item.avatar} alt={item.name} className="moderator-history-avatar-img" />
-                    ) : (
-                      <div className="moderator-history-avatar-img" style={{
-                        background: '#e0e0e0',
-                        width: '70px',
-                        height: '70px',
-                        borderRadius: '50%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontWeight: 'bold',
-                        color: '#666'
-                      }}>
-                        {item.name.split(' ').map(n => n[0]).join('').substring(0, 2)}
+              {/* Only show cards if any filter is selected */}
+              {Object.values(filters).some(val => val) ? (
+                paginatedItems.map((item, idx) => {
+                  const fullIdx = approvedHistory.indexOf(item);
+                  return (
+                    <div key={item.id} className="moderator-history-item">
+                      <div className="moderator-history-appointment-avatar">
+                        {item.avatar ? (
+                          <img src={item.avatar} alt={item.name} className="moderator-history-avatar-img" />
+                        ) : (
+                          <div className="moderator-history-avatar-img" style={{
+                            background: '#e0e0e0',
+                            width: '70px',
+                            height: '70px',
+                            borderRadius: '50%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontWeight: 'bold',
+                            color: '#666'
+                          }}>
+                            {item.name.split(' ').map(n => n[0]).join('').substring(0, 2)}
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                  <div className="moderator-history-appointment-info">
-                    <div
-                      className="moderator-history-appointment-name"
-                      style={{ color: '#424A57', fontSize: '1.5rem', fontWeight: 950 }}
-                    >
-                      {item.name}
-                    </div>
-                    {item.id === 1 ? (
-                      <>
+                      <div className="moderator-history-appointment-info">
+                        <div
+                          className="moderator-history-appointment-name"
+                          style={{ color: '#424A57', fontSize: '1.5rem', fontWeight: 950 }}
+                        >
+                          {item.name}
+                        </div>
                         <div className="moderator-history-appointment-details" style={{ fontSize: '0.95rem' }}>
                           <span style={{ color: '#424A57', fontWeight: 600 }}>Account Type:</span>
                           <span style={{ color: '#757575', marginLeft: 8 }}>{item.accountType}</span>
@@ -287,24 +325,19 @@ const ModeratorApprovedHistory = () => {
                           <span style={{ color: '#424A57', fontWeight: 600 }}>Academic Year:</span>
                           <span style={{ color: '#757575', marginLeft: 8 }}>{item.academicYear}</span>
                         </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="moderator-history-appointment-details">{item.details}</div>
-                        <div className="moderator-history-appointment-time">{item.time}</div>
-                      </>
-                    )}
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                    <button
-                      onClick={() => handleToggleHold(idx + (page - 1) * ITEMS_PER_PAGE)}
-                      className={`moderator-history-btn ${holdStatus[idx + (page - 1) * ITEMS_PER_PAGE] ? 'primary' : 'secondary'}`}
-                    >
-                      {holdStatus[idx + (page - 1) * ITEMS_PER_PAGE] ? 'Hold' : 'Unhold'}
-                    </button>
-                  </div>
-                </div>
-              ))}
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <button
+                          onClick={() => handleToggleHold(fullIdx)}
+                          className={`moderator-history-btn ${holdStatus[fullIdx] ? 'primary' : 'secondary'}`}
+                        >
+                          {holdStatus[fullIdx] ? 'Hold' : 'Unhold'}
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : null}
             </div>
             {/* Pagination controls */}
             <div style={{ display: 'flex', justifyContent: 'center', marginTop: '12px', gap: '10px' }}>
@@ -363,3 +396,4 @@ const ModeratorApprovedHistory = () => {
 };
 
 export default ModeratorApprovedHistory;
+ 
