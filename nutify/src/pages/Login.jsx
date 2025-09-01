@@ -39,6 +39,8 @@ const Login = () => {
       // Expect { status: 'ok', user, csrfToken? }
       if (res && (res.status === 'ok' || res.success)) {
         if (res.csrfToken) localStorage.setItem('csrfToken', res.csrfToken);
+        // Mark client as logged in (used by ProtectedRoute for instant gating)
+        localStorage.setItem('isLoggedIn', '1');
         // Navigate to moderator home
         navigate("/moderator/home");
       } else {

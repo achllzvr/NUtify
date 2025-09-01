@@ -16,6 +16,7 @@ import LandingPage from './pages/LandingPage';
 // Moderator Pages
 import ModeratorHome from './pages/ModeratorHome';
 import ModeratorHistory from './pages/ModeratorHistory';
+import ProtectedRoute from './components/ProtectedRoute';
 import ModeratorApproved from './pages/ModeratorApproved'; // Add this import
 
 // Component that uses the page title hook
@@ -34,10 +35,27 @@ function AppContent() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
 
-        {/* Moderator Routes */}
-        <Route path="/moderator/home" element={<ModeratorHome />} />
+        {/* Moderator Routes (protected) */}
+        <Route
+          path="/moderator/home"
+          element={
+            <ProtectedRoute>
+              <ModeratorHome />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/moderator/approved" element={<ModeratorApproved />} /> {/* Add this route */}
-        <Route path="/moderator/history" element={<ModeratorHistory />} />
+        <Route
+          path="/moderator/history"
+          element={
+            <ProtectedRoute>
+              <ModeratorHistory />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Fallback: redirect unknown paths to landing or login */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
         
       </Routes>
     </div>
