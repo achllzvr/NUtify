@@ -15,6 +15,7 @@ import messageCircleIcon from '../assets/icons/message-circle.svg';
 import calendarIcon from '../assets/icons/calendar.svg';
 import folderIcon from '../assets/icons/folder.svg';
 import archiveIcon from '../assets/icons/archive.svg';
+import { useAuth } from "../auth/AuthProvider";
 
 // Reason options and mapping
 const REASON_OPTIONS = ['Consultation', 'Meeting', 'Project', 'Other'];
@@ -35,7 +36,8 @@ const truncateReason = (reason, maxLength = 40) => {
 
 const ModeratorHome = () => {
   // TODO(session): Replace hardcoded moderator ID with authenticated session user_id
-  const MODERATOR_ID = 57;
+  const { user } = useAuth();
+  const MODERATOR_ID = user?.id ?? null;
   // State variables
   const [selectedFaculty, setSelectedFaculty] = useState(null);
   const [selectedSchedule, setSelectedSchedule] = useState(null);

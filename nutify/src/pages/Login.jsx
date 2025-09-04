@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../auth/AuthProvider";
 import userID from "../assets/icons/credit-card.svg";
 import lockIcon from "../assets/icons/lock.svg";
 import eyeIcon from "../assets/icons/eye.svg";
 import eyeOffIcon from "../assets/icons/eye-off.svg";
 
 const Login = () => {
+  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     idNumber: "",
@@ -26,10 +28,25 @@ const Login = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // For demo purposes, redirect to moderator home only
-    navigate("/moderator/home");
+
+    // Replace this with your real API call.
+    // const res = await fetch("/api/auth/login", { ... });
+    // const { token, user } = await res.json();
+    const token = "fake-jwt-token";
+    const user = {
+      // Fill with whatever your backend returns
+      id: undefined, // set if you have it
+      idNumber: formData.idNumber,
+      role: "moderator",
+      name: "Moderator",
+    };
+
+    login(token, user);
+
+    // Optional: keep your current UX flow
+    navigate("/moderator/home", { replace: true });
   };
 
   return (

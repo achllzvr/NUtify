@@ -1,73 +1,55 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import React from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
-import './styles/global.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import "./styles/global.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 
-// Custom hook for page titles
-import usePageTitle from './hooks/usePageTitle';
+import usePageTitle from "./hooks/usePageTitle";
 
-// Auth Pages
-import Login from './pages/Login';
-import Signup from './pages/Signup';
-import ForgotPassword from './pages/ForgotPassword';
-import LandingPage from './pages/LandingPage';
+// Auth context/guards
+import { AuthProvider } from "./auth/AuthProvider";
+import ProtectedRoute from "./auth/ProtectedRoute";
+import RedirectIfAuth from "./auth/RedirectIfAuth";
 
-// Moderator Pages
-import ModeratorHome from './pages/ModeratorHome';
-import ModeratorHistory from './pages/ModeratorHistory';
-import ProtectedRoute from './components/ProtectedRoute';
-import ModeratorApproved from './pages/ModeratorApproved'; // Add this import
+// Pages
+import LandingPage from "./pages/LandingPage.jsx";
+import Login from "./pages/Login.jsx";
+import Signup from "./pages/Signup.jsx";
+import ForgotPassword from "./pages/ForgotPassword.jsx";
+import ModeratorHome from "./pages/ModeratorHome.jsx";
+import ModeratorHistory from "./pages/ModeratorHistory.jsx";
+import ModeratorApproved from "./pages/ModeratorApproved.jsx";
 
-// Component that uses the page title hook
-function AppContent() {
-  // This hook will automatically update the page title based on the current route
+export default function App() {
+  // keep dynamic titles
   usePageTitle();
 
   return (
-    <div className="App">
-      <Routes>
-        {/* Default route shows landing page */}
-        <Route path="/" element={<LandingPage />} />
-        
-        {/* Auth Routes */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Public landing */}
+          <Route path="/" element={<LandingPage />} />
 
-        {/* Moderator Routes (protected) */}
-        <Route
-          path="/moderator/home"
-          element={
-            <ProtectedRoute>
-              <ModeratorHome />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/moderator/approved" element={<ModeratorApproved />} /> {/* Add this route */}
-        <Route
-          path="/moderator/history"
-          element={
-            <ProtectedRoute>
-              <ModeratorHistory />
-            </ProtectedRoute>
-          }
-        />
+          {/* Keep logged-in users out of auth pages */}
+          <Route element={<RedirectIfAuth />}>
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+          </Route>
 
-        {/* Fallback: redirect unknown paths to landing or login */}
-        <Route path="*" element={<Navigate to="/login" replace />} />
-        
-      </Routes>
-    </div>
+          {/* Moderator protected area */}
+          <Route element={<ProtectedRoute requiredRoles={["moderator"]} />}>
+            <Route path="/moderator/home" element={<ModeratorHome />} />
+            <Route path="/moderator/history" element={<ModeratorHistory />} />
+            <Route path="/moderator/approved" element={<ModeratorApproved />} />
+          </Route>
+
+          {/* Fallbacks */}
+          <Route path="/moderator" element={<Navigate to="/moderator/home" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
-
-function App() {
-  return (
-    <Router>
-      <AppContent />
-    </Router>
-  );
-}
-
-export default App;
