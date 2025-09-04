@@ -12,18 +12,15 @@ async function handleResponse(res) {
 
 export async function apiGet(action, params = {}) {
   const usp = new URLSearchParams({ action, ...params });
-  const res = await fetch(`${API_URL}?${usp.toString()}`, { method: 'GET', credentials: 'include' });
+  const res = await fetch(`${API_URL}?${usp.toString()}`, { method: 'GET' });
   return handleResponse(res);
 }
 
 export async function apiPost(action, body, options = {}) {
   const headers = options.headers || { 'Content-Type': 'application/json' };
-  const csrf = localStorage.getItem('csrfToken');
-  if (csrf && !headers['X-CSRF-Token']) headers['X-CSRF-Token'] = csrf;
   const res = await fetch(`${API_URL}?action=${encodeURIComponent(action)}`, {
     method: 'POST',
     headers,
-    credentials: 'include',
     body: headers['Content-Type'] === 'application/json' ? JSON.stringify(body) : body,
   });
   return handleResponse(res);
