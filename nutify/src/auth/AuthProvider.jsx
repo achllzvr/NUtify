@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { getToken, getUser, setToken, setUser, clearAllAuth } from "./authStorage";
+import { apiPost } from "../api/http";
 
 const AuthContext = createContext(null);
 
@@ -26,7 +27,18 @@ export function AuthProvider({ children }) {
     setUsr(newUser);
   };
 
-  const logout = () => {
+  const logout = async () => {
+    // Optional: inform backend
+    try {
+      await apiPost("logout", {});
+    } catch {
+      // no-op
+    }
+    // Clear legacy flags (if any linger)
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("csrfToken");
+
+    // Clear canonical auth
     clearAllAuth();
     setTok(null);
     setUsr(null);
@@ -34,7 +46,6 @@ export function AuthProvider({ children }) {
 
   const isAuthenticated = !!token;
 
-  // If you have more roles, add mappings here.
   const getHomePath = () => {
     if (!user) return "/login";
     switch (user.role) {

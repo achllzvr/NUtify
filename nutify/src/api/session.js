@@ -1,13 +1,16 @@
-import { apiPost } from './http';
+import { apiPost } from "./http";
+import { getToken, clearAllAuth } from "../auth/authStorage";
 
 export function isAuthenticated() {
-  return localStorage.getItem('isLoggedIn') === '1';
+  return !!getToken();
 }
 
 export async function doLogout() {
   try {
-    await apiPost('logout', {});
+    await apiPost("logout", {});
   } catch {}
-  localStorage.removeItem('isLoggedIn');
-  localStorage.removeItem('csrfToken');
+  // Clear both canonical and any legacy flags
+  clearAllAuth();
+  localStorage.removeItem("isLoggedIn");
+  localStorage.removeItem("csrfToken");
 }

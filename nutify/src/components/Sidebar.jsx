@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../auth/AuthProvider';
 import logo from '../assets/images/NUtifywhite.png';
 import chevronLeftIcon from '../assets/icons/chevron-left.svg';
 import menuIcon from '../assets/icons/menu.svg';
@@ -23,6 +24,7 @@ const Sidebar = ({ userType, userName, userRole, userAvatar }) => {
   const [shouldAnimate, setShouldAnimate] = useState(false); // controls CSS transition
   const navigate = useNavigate();
   const location = useLocation();
+  const { logout } = useAuth();
 
   // After first mount, enable animation for subsequent toggles
   useEffect(() => {
@@ -50,7 +52,7 @@ const Sidebar = ({ userType, userName, userRole, userAvatar }) => {
     navigate(path);
   };
 
-  const handleSettingsAction = (action) => {
+  const handleSettingsAction = async (action) => {
     setShowSettingsDropdown(false);
     switch (action) {
       case 'profile':
@@ -60,7 +62,11 @@ const Sidebar = ({ userType, userName, userRole, userAvatar }) => {
         navigate('/forgot-password');
         break;
       case 'logout':
-        navigate('/login');
+        try {
+          await logout();
+        } finally {
+          navigate('/login', { replace: true });
+        }
         break;
       default:
         break;
