@@ -155,7 +155,7 @@ const Sidebar = ({ userType, userName, userRole, userAvatar }) => {
             onClick={() => handleNavigation(`/${userType}/approved`)}
           >
             <img src={userIcon} alt="Page" className="icon" />
-            <span className="nav-text">Page</span>
+            <span className="nav-text">Approvals</span>
           </div>
           <div
             key={`history-${isActive(`/${userType}/history`)}`}
