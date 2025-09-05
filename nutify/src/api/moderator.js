@@ -16,6 +16,11 @@ export async function getAccountsOnHold() {
   return apiPost('getAccountsOnHold', {});
 }
 
+// Fetch approved users (verified and/or on-hold accounts depending on backend definition)
+export async function getApprovedUsers(params = {}) {
+  return apiPost('getApprovedUsers', params);
+}
+
 // Fetch pending users for approval (if needed)
 export async function getPendingUsers() {
   return apiPost('getPendingUsers', {});
@@ -77,4 +82,11 @@ export async function fetchIdByName(name) {
 // role: 'teacher' | 'student', q: search string
 export async function searchUsers(role, q) {
   return apiPost('searchUsers', { q, role });
+}
+
+// Toggle a user's hold status by mapping to verification codes
+// hold=true => is_verified = 2 (on hold), hold=false => is_verified = 1 (verified)
+export async function toggleUserHold(user_id, hold) {
+  const is_verified = hold ? 2 : 1;
+  return updateUserVerification(user_id, is_verified);
 }
