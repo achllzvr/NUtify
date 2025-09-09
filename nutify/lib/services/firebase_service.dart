@@ -4,7 +4,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/material.dart';
+import 'dart:async';
 import '../firebase_options.dart';
+import 'package:nutify/pages/studentHome.dart';
+import 'package:nutify/pages/teacherHome.dart';
+import 'package:nutify/pages/studentInbox.dart';
+import 'package:nutify/pages/teacherInbox.dart';
 
 class FirebaseService {
   static final FirebaseService _instance = FirebaseService._internal();
@@ -13,6 +19,14 @@ class FirebaseService {
 
   FirebaseMessaging? _messaging;
   bool _tokenAcquisitionInProgress = false;
+  GlobalKey<NavigatorState>? _navKey;
+  bool _popupShowing = false;
+  RemoteMessage? _queuedMessage;
+
+  // Stream to broadcast in-app notification events to the UI layer
+  final StreamController<InAppNotice> _inAppStreamController =
+      StreamController<InAppNotice>.broadcast();
+  Stream<InAppNotice> get inAppNotifications => _inAppStreamController.stream;
 
   // Initialize Firebase and FCM
   Future<void> initialize() async {
@@ -27,6 +41,13 @@ class FirebaseService {
 
       // Request notification permissions (especially important for iOS)
       await requestNotificationPermissions();
+
+      // Ensure iOS shows alerts in foreground (optional; we'll also show custom in-app popup)
+      await _messaging!.setForegroundNotificationPresentationOptions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
 
       // Configure FCM
       await configureFCM();
@@ -65,14 +86,29 @@ class FirebaseService {
     // Handle background messages
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-    // Handle foreground messages
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+  // Handle foreground messages
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       print('Got a message whilst in the foreground!');
       print('Message data: ${message.data}');
 
       if (message.notification != null) {
         print('Message notification: ${message.notification!.body}');
-        _showNotification(message);
+      }
+      _showNotification(message); // print diagnostics
+
+      // Resolve title/body for popup and emit through the stream
+      final title = message.notification?.title?.trim();
+      final body = message.notification?.body?.trim();
+      final resolvedTitle = (title?.isNotEmpty == true)
+          ? title!
+          : (message.data['title']?.toString() ?? '');
+      final resolvedBody = (body?.isNotEmpty == true)
+          ? body!
+          : (message.data['body']?.toString() ?? '');
+      if (resolvedTitle.isNotEmpty || resolvedBody.isNotEmpty) {
+        _inAppStreamController.add(
+          InAppNotice(title: resolvedTitle, body: resolvedBody, data: message.data),
+        );
       }
     });
 
@@ -81,9 +117,47 @@ class FirebaseService {
       print('A new onMessageOpenedApp event was published!');
       print('Message data: ${message.data}');
 
-      // Handle navigation based on notification data
-      _handleNotificationTap(message);
+      // Navigate based on status/type to Home for accepted, Inbox otherwise
+      final ctx = _navKey?.currentContext;
+      if (ctx != null) {
+        final title = message.notification?.title?.trim();
+        final body = message.notification?.body?.trim();
+        final resolvedTitle = (title?.isNotEmpty == true)
+            ? title!
+            : (message.data['title']?.toString() ?? '');
+        final resolvedBody = (body?.isNotEmpty == true)
+            ? body!
+            : (message.data['body']?.toString() ?? '');
+        navigateForNotification(ctx, resolvedTitle, resolvedBody, message.data);
+      } else {
+        print('No context available in onMessageOpenedApp');
+      }
     });
+
+    // Handle cold-start (terminated) notification tap
+    try {
+      final initialMessage = await _messaging!.getInitialMessage();
+      if (initialMessage != null) {
+        print('App opened from terminated by notification');
+        final ctx = _navKey?.currentContext;
+        if (ctx != null) {
+          final title = initialMessage.notification?.title?.trim();
+          final body = initialMessage.notification?.body?.trim();
+          final resolvedTitle = (title?.isNotEmpty == true)
+              ? title!
+              : (initialMessage.data['title']?.toString() ?? '');
+          final resolvedBody = (body?.isNotEmpty == true)
+              ? body!
+              : (initialMessage.data['body']?.toString() ?? '');
+          // Use microtask to ensure Navigator is ready post-runApp
+          Future.microtask(() => navigateForNotification(ctx, resolvedTitle, resolvedBody, initialMessage.data));
+        } else {
+          print('No context available for initialMessage');
+        }
+      }
+    } catch (e) {
+      print('Error handling initialMessage: $e');
+    }
 
     // Listen for token refresh
     _messaging!.onTokenRefresh.listen((String token) {
@@ -380,6 +454,270 @@ class FirebaseService {
     // In a real app, you might want to show an in-app notification or update the UI
   }
 
+  // Attach navigator key from app to present UI from service
+  void attachNavigatorKey(GlobalKey<NavigatorState> key) {
+    _navKey = key;
+  }
+
+  // In-app popup using bottom sheet styled like the app
+  void _showInAppPopup(RemoteMessage message) {
+    try {
+      final ctx = _getNavigatorContext();
+      if (ctx == null) {
+        print('No navigator context available for in-app popup; will retry...');
+        _queuedMessage = message;
+        _retryShowPopup(message, attempts: 10, intervalMs: 200);
+        return;
+      }
+
+      final title = message.notification?.title?.trim();
+      final body = message.notification?.body?.trim();
+      final resolvedTitle = (title?.isNotEmpty == true)
+          ? title!
+          : (message.data['title']?.toString() ?? 'Notification');
+      final resolvedBody = (body?.isNotEmpty == true)
+          ? body!
+          : (message.data['body']?.toString() ?? '');
+
+      if ((resolvedTitle.isEmpty) && (resolvedBody.isEmpty)) {
+        // Nothing meaningful to show
+        return;
+      }
+
+      if (_popupShowing) {
+        // Avoid stacking multiple popups; could implement a queue if needed
+        return;
+      }
+      _popupShowing = true;
+
+  final bool isFrontDesk = resolvedBody.trim() == 'You are being called to the front desk.';
+
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+        showModalBottomSheet(
+          context: ctx,
+          isScrollControlled: false,
+          useRootNavigator: true,
+          backgroundColor: Colors.white,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+          ),
+          builder: (_) {
+            return SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                  // Handle
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: LinearGradient(
+                            colors: [Color(0xFF35408E), Color(0xFF1A2049)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                        ),
+                        child: const Icon(Icons.notifications, color: Colors.white),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          resolvedTitle,
+                          style: const TextStyle(
+                            fontFamily: 'Arimo',
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF2C3E50),
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => Navigator.of(ctx, rootNavigator: true).pop(),
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  if (resolvedBody.isNotEmpty)
+                    Text(
+                      resolvedBody,
+                      style: const TextStyle(
+                        fontFamily: 'Arimo',
+                        fontSize: 14,
+                        color: Color(0xFF2C3E50),
+                      ),
+                    ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      if (!isFrontDesk)
+                        Expanded(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFF35408E), Color(0xFF1A2049)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              borderRadius: BorderRadius.circular(10),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF35408E).withOpacity(0.25),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: () async {
+                                  Navigator.of(ctx, rootNavigator: true).pop();
+                                  await navigateForNotification(ctx, resolvedTitle, resolvedBody, message.data);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  foregroundColor: Colors.white,
+                                  elevation: 0,
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Open',
+                                  style: TextStyle(
+                                    fontFamily: 'Arimo',
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      if (!isFrontDesk) const SizedBox(width: 10),
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade200,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: () => Navigator.of(ctx, rootNavigator: true).pop(),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.transparent,
+                                foregroundColor: Colors.black87,
+                                elevation: 0,
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: Text(
+                                isFrontDesk ? 'Okay' : 'Dismiss',
+                                style: const TextStyle(
+                                  fontFamily: 'Arimo',
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+        ).whenComplete(() {
+          _popupShowing = false;
+        });
+      });
+    } catch (e) {
+      print('Error showing in-app popup: $e');
+      _popupShowing = false;
+    }
+  }
+
+  BuildContext? _getNavigatorContext() {
+    // Try multiple ways to get a viable context
+    return _navKey?.currentContext ?? _navKey?.currentState?.overlay?.context ?? _navKey?.currentState?.context;
+  }
+
+  void _retryShowPopup(RemoteMessage message, {int attempts = 10, int intervalMs = 200}) async {
+    for (int i = 0; i < attempts; i++) {
+      await Future.delayed(Duration(milliseconds: intervalMs));
+      final ctx = _getNavigatorContext();
+      if (ctx != null) {
+        print('Context acquired on retry ${i + 1}; showing popup');
+        _showInAppPopup(message);
+        _queuedMessage = null;
+        return;
+      }
+    }
+    print('Failed to acquire context after $attempts attempts; giving up on popup');
+  }
+
+  Future<void> navigateForNotification(BuildContext ctx, String title, String body, Map<String, dynamic> data) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final userType = prefs.getString('userType') ?? '';
+
+      bool isAccepted = false;
+      final statusData = (data['status']?.toString() ?? '').toLowerCase();
+      if (statusData == 'accepted') {
+        isAccepted = true;
+      } else {
+        final t = title.toLowerCase();
+        final b = body.toLowerCase();
+        if (t.contains('accepted') || b.contains('accepted')) {
+          isAccepted = true;
+        }
+      }
+
+      Widget destination;
+      if (isAccepted) {
+        destination = (userType == 'teacher') ? TeacherHome() : StudentHome();
+      } else {
+        destination = (userType == 'teacher') ? TeacherInbox() : StudentInbox();
+      }
+
+  Navigator.of(ctx).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => destination),
+        (route) => false,
+      );
+    } catch (e) {
+      print('Error handling Open action: $e');
+      // Fallback: simple snackbar
+      try {
+        ScaffoldMessenger.of(ctx).showSnackBar(
+          const SnackBar(content: Text('Unable to open page for notification')),
+        );
+      } catch (_) {}
+    }
+  }
+
   // Handle notification tap
   void _handleNotificationTap(RemoteMessage message) {
     print('User tapped notification');
@@ -422,4 +760,11 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   if (message.notification != null) {
     print('Background message notification: ${message.notification!.body}');
   }
+}
+
+class InAppNotice {
+  final String title;
+  final String body;
+  final Map<String, dynamic> data;
+  InAppNotice({required this.title, required this.body, required this.data});
 }
