@@ -293,8 +293,15 @@ class _StudentInboxState extends State<StudentInbox>
                         ),
                         child: ElevatedButton(
                           onPressed: () {
-                            print(
-                              'View Details clicked for pending appointment ID: ${appointment.id}',
+                            _showStudentAppointmentDetails(
+                              status: 'pending',
+                              appointmentId: appointment.id,
+                              name: appointment.teacherName,
+                              department: appointment.department,
+                              date: appointment.scheduleDate,
+                              time: appointment.scheduleTime,
+                              reason: appointment.appointmentReason,
+                              remarks: appointment.appointmentRemarks,
                             );
                           },
                           style: ElevatedButton.styleFrom(
@@ -509,8 +516,15 @@ class _StudentInboxState extends State<StudentInbox>
                         ),
                         child: ElevatedButton(
                           onPressed: () {
-                            print(
-                              'View Details clicked for cancelled appointment ID: ${appointment.id}',
+                            _showStudentAppointmentDetails(
+                              status: 'declined',
+                              appointmentId: appointment.id,
+                              name: appointment.teacherName,
+                              department: appointment.department,
+                              date: appointment.scheduleDate,
+                              time: appointment.scheduleTime,
+                              reason: appointment.appointmentReason,
+                              remarks: appointment.appointmentRemarks,
                             );
                           },
                           style: ElevatedButton.styleFrom(
@@ -725,8 +739,15 @@ class _StudentInboxState extends State<StudentInbox>
                         ),
                         child: ElevatedButton(
                           onPressed: () {
-                            print(
-                              'View Details clicked for missed appointment ID: ${appointment.id}',
+                            _showStudentAppointmentDetails(
+                              status: 'missed',
+                              appointmentId: appointment.id,
+                              name: appointment.teacherName,
+                              department: appointment.department,
+                              date: appointment.scheduleDate,
+                              time: appointment.scheduleTime,
+                              reason: appointment.appointmentReason,
+                              remarks: appointment.appointmentRemarks,
                             );
                           },
                           style: ElevatedButton.styleFrom(
@@ -941,8 +962,15 @@ class _StudentInboxState extends State<StudentInbox>
                         ),
                         child: ElevatedButton(
                           onPressed: () {
-                            print(
-                              'View Details clicked for completed appointment ID: ${appointment.id}',
+                            _showStudentAppointmentDetails(
+                              status: 'completed',
+                              appointmentId: appointment.id,
+                              name: appointment.teacherName,
+                              department: appointment.department,
+                              date: appointment.scheduleDate,
+                              time: appointment.scheduleTime,
+                              reason: appointment.appointmentReason,
+                              remarks: appointment.appointmentRemarks,
                             );
                           },
                           style: ElevatedButton.styleFrom(
@@ -1248,6 +1276,177 @@ class _StudentInboxState extends State<StudentInbox>
           color: Colors.grey.shade600,
           fontStyle: FontStyle.italic,
         ),
+      ),
+    );
+  }
+
+  void _showStudentAppointmentDetails({
+    required String status,
+    required String appointmentId,
+    required String name,
+    required String department,
+    required String date,
+    required String time,
+    String? reason,
+    String? remarks,
+  }) {
+    final colors = _getDarkerStatusColors(status);
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => SafeArea(
+        child: Padding(
+          padding: EdgeInsets.only(
+            left: 20,
+            right: 20,
+            top: 16,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Drag handle
+              Center(
+                child: Container(
+                  width: 42,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Container(
+                    width: 46,
+                    height: 46,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(colors: colors),
+                    ),
+                    child: const Icon(Icons.info, color: Colors.white),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Appointment Details',
+                      style: TextStyle(fontFamily: 'Arimo', fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              // Status chip
+              Row(
+                children: [
+                  SizedBox(
+                    width: 120,
+                    child: Text('Status',
+                        style: TextStyle(
+                          fontFamily: 'Arimo',
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey.shade700,
+                        )),
+                  ),
+                  const SizedBox(width: 10),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: colors[0].withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: colors[0].withOpacity(0.35)),
+                    ),
+                    child: Text(
+                      status[0].toUpperCase() + status.substring(1),
+                      style: TextStyle(
+                        fontFamily: 'Arimo',
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: colors[0],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              _kv('Appointment ID', appointmentId),
+              _kv('Professor', name),
+              _kv('Department', department),
+              _kv('Date', date),
+              _kv('Time', time),
+              if (reason != null && reason.trim().isNotEmpty) _kv('Reason', reason.trim()),
+              if (remarks != null && remarks.trim().isNotEmpty) _kv('Remarks', remarks.trim()),
+              const SizedBox(height: 8),
+              Container(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF35408E), Color(0xFF1A2049)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF35408E).withOpacity(0.35),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      elevation: 0,
+                    ),
+                    child: const Text('Close', style: TextStyle(fontFamily: 'Arimo', fontWeight: FontWeight.w600)),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _kv(String k, String v) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 120,
+            child: Text(k,
+                style: TextStyle(
+                  fontFamily: 'Arimo',
+                  fontWeight: FontWeight.w600,
+          color: Colors.grey.shade700,
+                )),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              v,
+        style: const TextStyle(fontFamily: 'Arimo', fontSize: 14, color: Color(0xFF2C3E50)),
+            ),
+          ),
+        ],
       ),
     );
   }
