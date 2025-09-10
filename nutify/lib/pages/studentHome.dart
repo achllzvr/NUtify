@@ -1286,55 +1286,92 @@ void showAppointmentRequestModal(
                                     itemBuilder: (context, idx) {
                                       var sched = availableTimes[idx];
                                       String start = formatTime(
-                                        sched['start_time'] ??
-                                            sched['startTime'],
+                                        sched['start_time'] ?? sched['startTime'],
                                       );
                                       String end = formatTime(
                                         sched['end_time'] ?? sched['endTime'],
                                       );
                                       bool isSelected = selectedIndex == idx;
-                                      return GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            selectedIndex = idx;
-                                          });
-                                        },
-                                        child: Container(
-                                          padding: EdgeInsets.symmetric(
-                                            vertical: 18,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: isSelected
-                                                ? Color(0xFFFFF8E1)
-                                                : Color(0xFFF5F5F5),
-                                            borderRadius: BorderRadius.circular(
-                                              14,
+                                      final bool isCapacityMode = sched['is_capacity_mode'] == true;
+                                      final int remaining = sched['remaining'] ?? 0;
+                                      final int? capacity = sched['capacity'] == null ? null : int.tryParse(sched['capacity'].toString());
+                                      final int? booked = sched['booked_count'] == null ? null : int.tryParse(sched['booked_count'].toString());
+                                      final bool isFull = sched['is_full'] == true;
+                                      final bool disabled = isFull; // can't select full slot
+                                      return Opacity(
+                                        opacity: disabled ? 0.55 : 1,
+                                        child: GestureDetector(
+                                          onTap: disabled
+                                              ? null
+                                              : () {
+                                                  setState(() {
+                                                    selectedIndex = idx;
+                                                  });
+                                                },
+                                          child: Container(
+                                            padding: EdgeInsets.symmetric(
+                                              vertical: 14,
+                                              horizontal: 18,
                                             ),
-                                            border: Border.all(
-                                              color: isSelected
-                                                  ? Color(0xFFFFD418)
-                                                  : Colors.transparent,
-                                              width: 2,
-                                            ),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.black.withOpacity(
-                                                  0.08,
+                                            decoration: BoxDecoration(
+                                              color: isSelected ? Color(0xFFFFF8E1) : Color(0xFFF5F5F5),
+                                              borderRadius: BorderRadius.circular(14),
+                                              border: Border.all(
+                                                color: isSelected ? Color(0xFFFFD418) : Colors.transparent,
+                                                width: 2,
+                                              ),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.black.withOpacity(0.08),
+                                                  blurRadius: 8,
+                                                  offset: Offset(0, 3),
                                                 ),
-                                                blurRadius: 8,
-                                                offset: Offset(0, 3),
-                                              ),
-                                            ],
-                                          ),
-                                          child: Center(
-                                            child: Text(
-                                              '$start - $end',
-                                              style: TextStyle(
-                                                fontFamily: 'Arimo',
-                                                fontSize: 20,
-                                                color: Color(0xFF283593),
-                                                fontWeight: FontWeight.w500,
-                                              ),
+                                              ],
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Text(
+                                                        '$start - $end',
+                                                        style: TextStyle(
+                                                          fontFamily: 'Arimo',
+                                                          fontSize: 18,
+                                                          color: Color(0xFF283593),
+                                                          fontWeight: FontWeight.w600,
+                                                        ),
+                                                      ),
+                                                      if (isCapacityMode) ...[
+                                                        SizedBox(height: 4),
+                                                        Row(
+                                                          children: [
+                                                            _capacityPill(
+                                                              label: isFull ? 'Full' : 'Remaining: $remaining',
+                                                              color: isFull ? Colors.red.shade400 : Color(0xFF283593),
+                                                              bg: isFull ? Colors.red.shade50 : Color(0xFFE8EAF6),
+                                                            ),
+                                                            SizedBox(width: 6),
+                                                            if (capacity != null && booked != null)
+                                                              _capacityPill(
+                                                                label: '${booked}/${capacity} booked',
+                                                                color: Colors.grey.shade700,
+                                                                bg: Colors.grey.shade200,
+                                                              ),
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    ],
+                                                  ),
+                                                ),
+                                                if (isSelected && !disabled)
+                                                  Icon(
+                                                    Icons.check_circle,
+                                                    color: Color(0xFFFFB300),
+                                                    size: 24,
+                                                  ),
+                                              ],
                                             ),
                                           ),
                                         ),
@@ -1770,11 +1807,9 @@ Future<List<Map<String, dynamic>>> fetchFacultySchedules(int facultyId) async {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       if (data is List) {
-        // Each item should have day_of_week, start_time, end_time, status, schedule_id, etc.
-        return List<Map<String, dynamic>>.from(data);
+        return List<Map<String, dynamic>>.from(data.map((e) => _augmentSchedule(e))); 
       } else if (data is Map && data.containsKey('schedules')) {
-        // Some APIs wrap in a 'schedules' key
-        return List<Map<String, dynamic>>.from(data['schedules']);
+        return List<Map<String, dynamic>>.from((data['schedules'] as List).map((e) => _augmentSchedule(e)));
       } else {
         return [];
       }
@@ -1786,6 +1821,41 @@ Future<List<Map<String, dynamic>>> fetchFacultySchedules(int facultyId) async {
     print('Error fetching faculty schedules: $e');
     return [];
   }
+}
+
+Map<String, dynamic> _augmentSchedule(dynamic raw) {
+  final map = Map<String, dynamic>.from(raw as Map);
+  final cap = map['capacity'];
+  final booked = map['booked_count'];
+  int? capacity = cap == null ? null : int.tryParse(cap.toString());
+  int? bookedCount = booked == null ? null : int.tryParse(booked.toString());
+  bool isCapacityMode = (capacity ?? 0) > 0;
+  int remaining = isCapacityMode ? (capacity! - (bookedCount ?? 0)) : 0;
+  map['is_capacity_mode'] = isCapacityMode;
+  map['remaining'] = remaining;
+  map['is_full'] = isCapacityMode && remaining <= 0 && (map['day_of_week']?.toString().toUpperCase() != 'OTS');
+  return map;
+}
+
+Widget _capacityPill({required String label, required Color color, required Color bg}) {
+  return Container(
+    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+    decoration: BoxDecoration(
+      color: bg,
+      borderRadius: BorderRadius.circular(20),
+      border: Border.all(color: color.withOpacity(0.25)),
+    ),
+    child: Text(
+      label,
+      style: TextStyle(
+        fontFamily: 'Arimo',
+        fontSize: 11,
+        fontWeight: FontWeight.w600,
+        color: color,
+        letterSpacing: 0.2,
+      ),
+    ),
+  );
 }
 
 // Helper: format time (HH:mm or HH:mm:ss to h:mm)
@@ -1836,7 +1906,12 @@ Future<Map<String, dynamic>> postSetAppointment({
       },
     );
     if (response.statusCode == 200) {
-      return jsonDecode(response.body) as Map<String, dynamic>;
+      final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+      // Intercept capacity race condition message
+      if (decoded['error'] == true && (decoded['message'] ?? '').toString().toLowerCase().contains('schedule is full')) {
+        decoded['capacity_full'] = true;
+      }
+      return decoded;
     } else {
       return {
         'error': true,

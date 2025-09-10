@@ -10,6 +10,8 @@ class StudentInboxMissed {
   final String scheduleTime;
   final String appointmentReason;
   final String appointmentRemarks;
+  final int? capacity;
+  final int? bookedCount;
 
   StudentInboxMissed({
     required this.id,
@@ -19,6 +21,8 @@ class StudentInboxMissed {
     required this.scheduleTime,
   required this.appointmentReason,
   required this.appointmentRemarks,
+    this.capacity,
+    this.bookedCount,
   });
 
   factory StudentInboxMissed.fromJson(Map<String, dynamic> json) {
@@ -29,8 +33,16 @@ class StudentInboxMissed {
       scheduleDate: json['schedule_date']?.toString() ?? '',
       scheduleTime: json['schedule_time']?.toString() ?? '',
   appointmentReason: json['appointment_reason']?.toString() ?? '',
-  appointmentRemarks: json['appointment_remarks']?.toString() ?? '',
+      appointmentRemarks: json['appointment_remarks']?.toString() ?? '',
+      capacity: _parseNullableInt(json['capacity']),
+      bookedCount: _parseNullableInt(json['booked_count']),
     );
+  }
+
+  static int? _parseNullableInt(dynamic v) {
+    if (v == null) return null;
+    if (v is int) return v;
+    return int.tryParse(v.toString());
   }
 
   static Future<List<StudentInboxMissed>> getStudentInboxMissed() async {

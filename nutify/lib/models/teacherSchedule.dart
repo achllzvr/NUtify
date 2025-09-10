@@ -9,6 +9,8 @@ class TeacherSchedule {
   final String startTime;
   final String endTime;
   final String status;
+  final int? capacity; // optional (null if backend not migrated)
+  final int? bookedCount; // optional
   // Additional fields for 12-hour format display
   final String startTime12h;
   final String endTime12h;
@@ -20,6 +22,8 @@ class TeacherSchedule {
     required this.startTime,
     required this.endTime,
     required this.status,
+  this.capacity,
+  this.bookedCount,
     required this.startTime12h,
     required this.endTime12h,
   });
@@ -32,6 +36,8 @@ class TeacherSchedule {
       startTime: json['start_time'] ?? '',
       endTime: json['end_time'] ?? '',
       status: json['status'] ?? 'available',
+  capacity: json['capacity'] != null ? int.tryParse(json['capacity'].toString()) : null,
+  bookedCount: json['booked_count'] != null ? int.tryParse(json['booked_count'].toString()) : null,
       startTime12h: json['start_time_12h'] ?? _convertTo12Hour(json['start_time'] ?? ''),
       endTime12h: json['end_time_12h'] ?? _convertTo12Hour(json['end_time'] ?? ''),
     );
@@ -45,10 +51,16 @@ class TeacherSchedule {
       'start_time': startTime,
       'end_time': endTime,
       'status': status,
+    'capacity': capacity,
+    'booked_count': bookedCount,
       'start_time_12h': startTime12h,
       'end_time_12h': endTime12h,
     };
   }
+
+  bool get isCapacityMode => (capacity ?? 0) > 0;
+  int get remaining => isCapacityMode ? (capacity! - (bookedCount ?? 0)) : 0;
+  bool get isFull => isCapacityMode && remaining <= 0 && dayOfWeek.toUpperCase() != 'OTS';
 
   // Helper method to convert 24-hour time to 12-hour format on client side
   static String _convertTo12Hour(String time24) {
@@ -161,6 +173,7 @@ class TeacherSchedule {
     required String dayOfWeek,
     required String startTime,
     required String endTime,
+  int? capacity,
   }) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -179,6 +192,7 @@ class TeacherSchedule {
           'day_of_week': dayOfWeek,
           'start_time': startTime,
           'end_time': endTime,
+          if (capacity != null) 'capacity': capacity,
         }),
       );
 
@@ -204,6 +218,7 @@ class TeacherSchedule {
     required String dayOfWeek,
     required String startTime,
     required String endTime,
+  int? capacity,
   }) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -223,6 +238,7 @@ class TeacherSchedule {
           'day_of_week': dayOfWeek,
           'start_time': startTime,
           'end_time': endTime,
+          if (capacity != null) 'capacity': capacity,
         }),
       );
 

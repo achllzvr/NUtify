@@ -304,6 +304,8 @@ class _TeacherInboxState extends State<TeacherInbox>
                       appointment.id,
                       appointment.appointmentReason,
                       appointmentRemarks: '',
+                      capacity: (appointment as dynamic).capacity,
+                      bookedCount: (appointment as dynamic).bookedCount,
                     );
                   },
                 ),
@@ -396,6 +398,8 @@ class _TeacherInboxState extends State<TeacherInbox>
                       appointment.id,
                       appointment.appointmentReason,
                       appointmentRemarks: appointment.appointmentRemarks,
+                      capacity: (appointment as dynamic).capacity,
+                      bookedCount: (appointment as dynamic).bookedCount,
                     );
                   },
                 ),
@@ -488,6 +492,8 @@ class _TeacherInboxState extends State<TeacherInbox>
                       appointment.id,
                       appointment.appointmentReason,
                       appointmentRemarks: appointment.appointmentRemarks,
+                      capacity: (appointment as dynamic).capacity,
+                      bookedCount: (appointment as dynamic).bookedCount,
                     );
                   },
                 ),
@@ -580,6 +586,8 @@ class _TeacherInboxState extends State<TeacherInbox>
                       appointment.id,
                       appointment.appointmentReason,
                       appointmentRemarks: appointment.appointmentRemarks,
+                      capacity: (appointment as dynamic).capacity,
+                      bookedCount: (appointment as dynamic).bookedCount,
                     );
                   },
                 ),
@@ -821,7 +829,9 @@ class _TeacherInboxState extends State<TeacherInbox>
     String status,
     String appointmentId,
     String? appointmentReason,
-    {String? appointmentRemarks}
+    {String? appointmentRemarks,
+     int? capacity,
+     int? bookedCount}
   ) {
   // Get initials for avatar
   String initials = studentName
@@ -868,6 +878,8 @@ class _TeacherInboxState extends State<TeacherInbox>
           time: scheduleTime,
           reason: appointmentReason,
           remarks: appointmentRemarks,
+          capacity: capacity,
+          bookedCount: bookedCount,
         );
       },
       child: Card(
@@ -1077,6 +1089,8 @@ class _TeacherInboxState extends State<TeacherInbox>
                               time: scheduleTime,
                               reason: appointmentReason,
                               remarks: appointmentRemarks,
+                              capacity: capacity,
+                              bookedCount: bookedCount,
                             );
                           },
                           style: ElevatedButton.styleFrom(
@@ -1554,6 +1568,8 @@ extension on _TeacherInboxState {
     required String time,
     String? reason,
     String? remarks,
+    int? capacity,
+    int? bookedCount,
   }) {
     final colors = _getDarkerStatusColors(status);
     showModalBottomSheet(
@@ -1649,6 +1665,11 @@ extension on _TeacherInboxState {
               _kv('Date', date),
               _kv('Time', time),
               if (reason != null && reason.trim().isNotEmpty) _kv('Reason', reason.trim()),
+              if (capacity != null && capacity > 0) ...[
+                _kv('Capacity', capacity.toString()),
+                if (bookedCount != null) _kv('Booked', bookedCount.toString()),
+                if (bookedCount != null) _kv('Remaining', (capacity - bookedCount).clamp(0, capacity).toString()),
+              ],
               if (remarks != null && remarks.trim().isNotEmpty) _kv('Remarks', remarks.trim()),
               const SizedBox(height: 8),
               Container(

@@ -111,23 +111,21 @@ class _TeacherEditSchedState extends State<TeacherEditSched>
           itemBuilder: (context, index) {
             var schedule = schedules[index];
             return _buildScheduleCard(
-              schedule.startTime12h,  // Use 12-hour format for display
-              schedule.endTime12h,    // Use 12-hour format for display
-              schedule.status,
-              schedule.scheduleId,
+              schedule: schedule,
             );
           },
         );
       },
     );
   }
-
-  Widget _buildScheduleCard(
-    String startTime,
-    String endTime,
-    String status,
-    String scheduleId,
-  ) {
+  Widget _buildScheduleCard({required TeacherSchedule schedule}) {
+    final startTime = schedule.startTime12h;
+    final endTime = schedule.endTime12h;
+    final status = schedule.status;
+    final scheduleId = schedule.scheduleId;
+    final isCapacity = schedule.isCapacityMode;
+    final remaining = schedule.remaining;
+    final isFull = schedule.isFull;
     // Get status-specific colors and icon
     Color statusColor;
     IconData statusIcon;
@@ -150,7 +148,7 @@ class _TeacherEditSchedState extends State<TeacherEditSched>
         statusText = 'Unknown';
     }
 
-    final isBooked = status.toLowerCase() == 'booked';
+  final isBooked = status.toLowerCase() == 'booked' || isFull;
     return Card(
       margin: EdgeInsets.only(bottom: 12),
       elevation: 2,
@@ -190,23 +188,45 @@ class _TeacherEditSchedState extends State<TeacherEditSched>
                       ),
                     ),
                     SizedBox(height: 8),
-                    Row(
+                    Wrap(
+                      spacing: 8,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
-                        Icon(
-                          statusIcon,
-                          color: statusColor,
-                          size: 16,
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(statusIcon, color: statusColor, size: 16),
+                            SizedBox(width: 6),
+                            Text(
+                              statusText,
+                              style: TextStyle(
+                                fontFamily: 'Arimo',
+                                fontSize: 14,
+                                color: statusColor,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
                         ),
-                        SizedBox(width: 6),
-                        Text(
-                          statusText,
-                          style: TextStyle(
-                            fontFamily: 'Arimo',
-                            fontSize: 14,
-                            color: statusColor,
-                            fontWeight: FontWeight.w600,
+                        if (isCapacity) _buildCapacityChip(schedule),
+                        if (isFull)
+                          Container(
+                            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.red.shade50,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: Colors.red.shade300),
+                            ),
+                            child: Text(
+                              'Full',
+                              style: TextStyle(
+                                fontFamily: 'Arimo',
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.red.shade600,
+                              ),
+                            ),
                           ),
-                        ),
                       ],
                     ),
                   ],
@@ -233,7 +253,7 @@ class _TeacherEditSchedState extends State<TeacherEditSched>
                               );
                             }
                           : () {
-                              _showEditScheduleDialog(scheduleId, startTime, endTime);
+                              _showEditScheduleDialog(schedule: schedule);
                             },
                       icon: Icon(
                         Icons.edit_outlined,
@@ -285,6 +305,30 @@ class _TeacherEditSchedState extends State<TeacherEditSched>
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCapacityChip(TeacherSchedule schedule) {
+    final booked = schedule.bookedCount ?? 0;
+    final cap = schedule.capacity ?? 0;
+    final remaining = schedule.remaining;
+    final color = schedule.isFull ? Colors.red.shade600 : Color(0xFF35408E);
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withOpacity(0.4)),
+      ),
+      child: Text(
+        '${booked}/${cap}${remaining >= 0 ? ' (${remaining} left)' : ''}',
+        style: TextStyle(
+          fontFamily: 'Arimo',
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: color,
         ),
       ),
     );
@@ -343,6 +387,7 @@ class _TeacherEditSchedState extends State<TeacherEditSched>
     TimeOfDay? startTime;
     TimeOfDay? endTime;
     bool isLoading = false;
+    int capacity = 1;
 
     showDialog(
       context: context,
@@ -357,7 +402,7 @@ class _TeacherEditSchedState extends State<TeacherEditSched>
               final end = Duration(hours: endTime!.hour, minutes: endTime!.minute);
               return end > start && end.inMinutes - start.inMinutes >= 1;
             }
-            Future<void> addSchedule() async {
+    Future<void> addSchedule() async {
               setState(() { isLoading = true; });
               try {
                 // Format times as HH:mm (24-hour)
@@ -366,6 +411,7 @@ class _TeacherEditSchedState extends State<TeacherEditSched>
                   dayOfWeek: selectedDay!,
                   startTime: formatTime(startTime!),
                   endTime: formatTime(endTime!),
+      capacity: capacity,
                 );
                 setState(() { isLoading = false; });
                 Navigator.of(context).pop();
@@ -431,6 +477,48 @@ class _TeacherEditSchedState extends State<TeacherEditSched>
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF35408E),
                       ),
+                    ),
+                    SizedBox(height: 16),
+                    // Capacity input
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Capacity', style: TextStyle(fontFamily: 'Arimo', fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF35408E))),
+                              SizedBox(height: 6),
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Color(0xFFF5F5F5),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: Colors.grey.shade300),
+                                ),
+                                child: Row(
+                                  children: [
+                                    IconButton(
+                                      icon: Icon(Icons.remove_circle_outline, color: capacity > 1 ? Color(0xFF35408E) : Colors.grey),
+                                      onPressed: capacity > 1 ? () => setState(() { capacity--; }) : null,
+                                    ),
+                                    Expanded(
+                                      child: Center(
+                                        child: Text(
+                                          capacity.toString(),
+                                          style: TextStyle(fontFamily: 'Arimo', fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF35408E)),
+                                        ),
+                                      ),
+                                    ),
+                                    IconButton(
+                                      icon: Icon(Icons.add_circle_outline, color: Color(0xFF35408E)),
+                                      onPressed: () => setState(() { capacity++; }),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                     SizedBox(height: 24),
                     // Day Dropdown
@@ -736,7 +824,11 @@ class _TeacherEditSchedState extends State<TeacherEditSched>
     );
   }
 
-  void _showEditScheduleDialog(String scheduleId, String startTime, String endTime) {
+  void _showEditScheduleDialog({required TeacherSchedule schedule}) {
+    final scheduleId = schedule.scheduleId;
+    final startTime = schedule.startTime12h;
+    final endTime = schedule.endTime12h;
+    int capacity = schedule.capacity ?? 1;
 
     // Find the day_of_week for this scheduleId by searching all tabs' schedules
     String? dayOfWeekForSchedule;
@@ -757,8 +849,8 @@ class _TeacherEditSchedState extends State<TeacherEditSched>
       break;
     }
     // Parse the initial start and end time (12h format) to TimeOfDay
-    TimeOfDay? initialStartTime;
-    TimeOfDay? initialEndTime;
+  TimeOfDay? initialStartTime;
+  TimeOfDay? initialEndTime;
     try {
       final startParts = startTime.split(' ');
       final endParts = endTime.split(' ');
@@ -779,8 +871,9 @@ class _TeacherEditSchedState extends State<TeacherEditSched>
       initialEndTime = null;
     }
 
-    TimeOfDay? editedStartTime = initialStartTime;
-    TimeOfDay? editedEndTime = initialEndTime;
+  TimeOfDay? editedStartTime = initialStartTime;
+  TimeOfDay? editedEndTime = initialEndTime;
+  int editedCapacity = capacity;
     bool isLoading = false;
 
     showDialog(
@@ -799,7 +892,7 @@ class _TeacherEditSchedState extends State<TeacherEditSched>
               // Must be at least 1 minute apart and must be different from initial
               return end > start && (end.inMinutes - start.inMinutes >= 1) && (start != initialStart || end != initialEnd);
             }
-            Future<void> saveSchedule() async {
+    Future<void> saveSchedule() async {
               setState(() { isLoading = true; });
               try {
                 String formatTime(TimeOfDay t) => t.hour.toString().padLeft(2, '0') + ':' + t.minute.toString().padLeft(2, '0');
@@ -808,6 +901,7 @@ class _TeacherEditSchedState extends State<TeacherEditSched>
                   dayOfWeek: dayOfWeekForSchedule ?? '',
                   startTime: formatTime(editedStartTime!),
                   endTime: formatTime(editedEndTime!),
+      capacity: editedCapacity,
                 );
                 setState(() { isLoading = false; });
                 Navigator.of(context).pop();
@@ -870,6 +964,56 @@ class _TeacherEditSchedState extends State<TeacherEditSched>
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF35408E),
                       ),
+                    ),
+                    SizedBox(height: 16),
+                    // Capacity edit
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Capacity', style: TextStyle(fontFamily: 'Arimo', fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF35408E))),
+                              SizedBox(height: 6),
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Color(0xFFF5F5F5),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: Colors.grey.shade300),
+                                ),
+                                child: Row(
+                                  children: [
+                                    IconButton(
+                                      icon: Icon(Icons.remove_circle_outline, color: editedCapacity > (schedule.bookedCount ?? 0) ? Color(0xFF35408E) : Colors.grey),
+                                      onPressed: editedCapacity > (schedule.bookedCount ?? 0) ? () => setState(() { editedCapacity--; }) : null,
+                                    ),
+                                    Expanded(
+                                      child: Center(
+                                        child: Text(
+                                          editedCapacity.toString(),
+                                          style: TextStyle(fontFamily: 'Arimo', fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF35408E)),
+                                        ),
+                                      ),
+                                    ),
+                                    IconButton(
+                                      icon: Icon(Icons.add_circle_outline, color: Color(0xFF35408E)),
+                                      onPressed: () => setState(() { editedCapacity++; }),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              if ((schedule.bookedCount ?? 0) > 0)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6.0),
+                                  child: Text(
+                                    'Currently booked: ${schedule.bookedCount}. Capacity cannot go below this.',
+                                    style: TextStyle(fontFamily: 'Arimo', fontSize: 12, color: Colors.grey.shade600),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                     SizedBox(height: 24),
                     // Start Time Field
