@@ -8,22 +8,30 @@ const ModeratorApproved = () => {
   const [activeSearch, setActiveSearch] = useState('');
 
   const handleSearchChange = value => setSearchValue(value);
-
-  // Only update activeSearch when search is triggered
+  
   const handleSearch = () => setActiveSearch(searchValue);
 
   return (
-    <div style={{ display: 'flex' }}>
-      <Sidebar userType="moderator" userName="Moderator" userRole="Moderator" />
-      <div style={{ flex: 1 }}>
-        <Header
-          title="Hello, Moderator!"
-          subtitle="Manage your appointments and consultations in one place"
-          searchPlaceholder="Search User"
-          searchValue={searchValue}
-          onSearchChange={handleSearchChange}
-          onSearch={handleSearch}
-        />
+    <div>
+      {/* Sidebar */}
+      <Sidebar
+        userType="moderator"
+        userName="Moderator"
+        userRole="Moderator"
+        userAvatar={null}
+      />
+
+      {/* Header */}
+      <Header
+        title="Hello, Moderator!"
+        subtitle="Manage your appointments and consultations in one place"
+        searchPlaceholder="Search Entries"
+        searchValue={searchValue}
+        onSearchChange={handleSearchChange}
+        onSearch={handleSearch}
+      />
+
+      <div>
         {/* Card Section */}
         <div style={{ marginBottom: '5em' }}>
           <ModeratorApprovedHistory searchValue={activeSearch} />

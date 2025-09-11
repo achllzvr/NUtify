@@ -1,0 +1,220 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap');
+
+.footer-section {
+  background: #fff;
+  width: 100vw;
+  padding-top: 2em;
+  padding-bottom: 4em;
+  padding-left: 3em;
+  box-sizing: border-box;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.footer-title {
+  font-family: "Montserrat", Arial, sans-serif;
+  font-weight: 800;
+  font-size: clamp(1.4rem, 4vw, 3.3em);
+  margin: 0 0 10px 0;
+  letter-spacing: -0.5px;
+  color: #000;
+}
+
+.footer-desc {
+  font-family: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: clamp(0.9rem, 1vw + 0.6rem, 1.05em);
+  color: #000;
+  margin: 0;
+  line-height: 1.6;
+  max-width: 600px;
+  white-space: normal;
+  word-break: break-word;
+  transition: font-size 0.2s;
+}
+
+.footer-download-buttons {
+  margin-top: 24px;
+  margin-bottom: -1.2em;
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+  flex-direction: row !important;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.footer-cta-btn {
+  height: 52px;
+  padding: 0 22px;
+  font-size: 1.05rem;
+  border-radius: 14px;
+}
+.footer-store-btn-android { height: 64px !important; }
+.footer-store-btn-ios { height: 66px; }
+
+.footer-cta-btn {
+  width: auto !important;
+  min-width: max-content;
+  white-space: nowrap;
+  padding: 0 18px;
+  height: 40px;
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: 500 0.95rem "Inter", "Helvetica Neue", Arial, sans-serif;
+  letter-spacing: 0.2px;
+  color: #000;
+  background: transparent;
+  border: 1px solid #000;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.25s ease-in-out, background-color 0.25s ease-in-out, border-color 0.25s ease-in-out, color 0.25s ease-in-out, box-shadow 0.25s ease-in-out;
+}
+.footer-cta-btn:hover {
+  transform: translateY(-1px);
+  background-color: #f8f8f8;
+}
+.footer-cta-btn:active {
+  transform: translateY(0);
+}
+.footer-cta-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0,0,0,0.08);
+}
+
+.footer-cta-btn {
+  -webkit-tap-highlight-color: transparent;
+}
+.footer-cta-btn:active,
+.footer-cta-btn:focus,
+.footer-cta-btn:focus-visible {
+  border-color: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+.footer-cta-btn--android:active,
+.footer-cta-btn--android:focus,
+.footer-cta-btn--android:focus-visible {
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.footer-cta-btn--android {
+  background-color: #323B80;
+  border-color: #323B80;
+  color: #fff;
+}
+.footer-cta-btn--android:hover {
+  background-color: #2b336f;
+  border-color: #2b336f;
+}
+.footer-cta-btn--android:focus {
+  box-shadow: 0 0 0 3px rgba(50, 59, 128, 0.25);
+}
+
+.footer-cta-btn--ios {
+  background-color: #f3f3f3;
+  border-color: #dcdcdc;
+  color: #8a8a8a;
+  cursor: not-allowed;
+  opacity: 0.85;
+  transform: none;
+  pointer-events: none;
+}
+.footer-cta-btn--ios:hover,
+.footer-cta-btn--ios:active,
+.footer-cta-btn--ios:focus {
+  transform: none !important;
+  background-color: #f3f3f3 !important;
+  border-color: #dcdcdc !important;
+  box-shadow: none !important;
+}
+
+
+.footer-store-btn-android,
+.footer-store-btn-ios {
+  display: inline-block;
+  transition: transform 0.25s ease-in-out, box-shadow 0.25s ease-in-out, filter 0.25s ease-in-out;
+}
+.footer-store-btn-android:hover,
+.footer-store-btn-ios:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+
+@media (max-width: 900px) {
+  .footer-download-buttons {
+    margin-bottom: .1em;
+    flex-direction: column !important;
+    align-items: stretch;
+    gap: 14px;
+    overflow: visible;
+  }
+  .footer-cta-btn {
+    height: 44px;
+    padding: 0 16px;
+    font-size: 0.95rem;
+    width: 100% !important;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+  .footer-store-btn-android { height: 50px !important; }
+  .footer-store-btn-ios { height: 52px; }
+}
+
+@media (max-width: 768px) {
+  .footer-desc {
+    font-size: 0.95em;
+    max-width: 90vw;
+  }
+  .footer-title {
+    font-size: 1.8em;
+  }
+  .footer-download-buttons {
+    gap: 20px;
+  }
+  .footer-store-btn-android {
+    height: 48px !important;
+  }
+  .footer-store-btn-ios {
+    height: 51px;
+  }
+}
+
+@media (max-width: 600px) {
+  .footer-section {
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    padding-top: 1em;
+    padding-bottom: 1.5em;
+  }
+  .footer-title {
+    font-size: 1.0em;
+    margin-bottom: 6px;
+  }
+  .footer-desc {
+    font-size: 0.82em;
+    max-width: 98vw;
+  }
+  .footer-download-buttons { flex-direction: column !important; gap: 12px; }
+  .footer-cta-btn { height: 40px; padding: 0 14px; font-size: 0.9rem; max-width: 360px; }
+  .footer-store-btn-android { height: 46px !important; }
+  .footer-store-btn-ios { height: 48px; }
+}
+
+@media (min-width: 901px) {
+  .footer-download-buttons { flex-direction: row !important; gap: 24px; }
+  .footer-cta-btn { height: 52px; padding: 0 22px; font-size: 1.05rem; border-radius: 14px; width: auto !important; max-width: none; }
+  .footer-store-btn-android { height: 64px !important; }
+  .footer-store-btn-ios { height: 66px; }
+}
+

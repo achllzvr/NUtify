@@ -18,8 +18,8 @@ const Header = ({ title, subtitle, searchPlaceholder, searchValue, onSearchChang
             onChange={e => onSearchChange(e.target.value)}
             style={{ paddingLeft: '55px', borderRadius: '15px' }}
             onKeyDown={e => {
-              if (e.key === 'Enter') {
-                onSearch();
+              if (e.key === 'Enter' && onSearch) {
+                onSearch(searchValue);
               }
             }}
           />
@@ -28,7 +28,7 @@ const Header = ({ title, subtitle, searchPlaceholder, searchValue, onSearchChang
             alt="Search"
             className="search-icon-end"
             style={{ left: 18, width: 22, height: 22, cursor: 'pointer', position: 'absolute', top: '50%', transform: 'translateY(-50%)' }}
-            onClick={onSearch}
+            onClick={() => onSearch && onSearch(searchValue)}
           />
         </div>
       </div>

@@ -40,10 +40,14 @@ function AppContent() {
         <Route path="/moderator/home" element={<ModeratorHome />} />
         <Route path="/moderator/history" element={<ModeratorHistory />} />
         <Route path="/moderator/approved" element={<ModeratorApproved />} />
+         <Route path="/admin/home" element={<ModeratorHome />} />
+        <Route path="/admin/history" element={<ModeratorHistory />} />
+        <Route path="/admin/approved" element={<ModeratorApproved />} />
       </Route>
 
       {/* Fallbacks */}
-      <Route path="/moderator" element={<Navigate to="/moderator/home" replace />} />
+        <Route path="/moderator" element={<Navigate to="/moderator/home" replace />} />
+      <Route path="/admin" element={<Navigate to="/admin/home" replace />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

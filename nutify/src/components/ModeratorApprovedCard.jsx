@@ -94,20 +94,15 @@ const ModeratorApprovedHistory = ({ searchValue }) => {
   // Pagination state
   const [page, setPage] = useState(1);
 
-  // If searchValue matches a person, optionally align filters
+  // If searchValue matches a person, optionally switch to their tab
   useEffect(() => {
     if (searchValue) {
       const match = items.find(item =>
         (item.name || '').toLowerCase().includes(searchValue.toLowerCase())
       );
-      if (match) {
-        setFilters(f => ({
-          ...f,
-          accountType: match.accountType || f.accountType,
-          department: match.department || f.department,
-          yearLevel: match.yearLevel || f.yearLevel,
-          academicYear: match.academicYear || f.academicYear,
-        }));
+      if (match && match.accountType && TABS.includes(match.accountType)) {
+        setActiveTab(match.accountType);
+        setPage(1);
       }
     }
   }, [searchValue, items]);
@@ -120,14 +115,15 @@ const ModeratorApprovedHistory = ({ searchValue }) => {
       if (item.accountType !== activeTab) return false;
       // Search by name
       if (q && !(item.name || '').toLowerCase().includes(q)) return false;
-      // Verified filter
-  if (verifiedFilter === 'unhold' && item.isVerified !== 1) return false;
-      if (verifiedFilter === 'hold' && item.isVerified !== 2) return false;
+      // Verified filter - check the current hold status from holdMap
+      const currentlyOnHold = holdMap[item.id];
+      if (verifiedFilter === 'unhold' && currentlyOnHold) return false;
+      if (verifiedFilter === 'hold' && !currentlyOnHold) return false;
       // Department filter
       if (deptFilter && item.department !== deptFilter) return false;
       return true;
     });
-  }, [items, activeTab, verifiedFilter, deptFilter, searchValue]);
+  }, [items, activeTab, verifiedFilter, deptFilter, searchValue, holdMap]);
 
   const paginatedItems = useMemo(() => filteredItems.slice(
     (page - 1) * ITEMS_PER_PAGE,

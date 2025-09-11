@@ -3,15 +3,16 @@ import { useLocation } from 'react-router-dom';
 
 const routeTitleMap = {
   '/': 'NUtify',
-  '/login': 'Login - NUtify',
-  '/signup': 'Sign Up - NUtify',
+  '/Login': 'Login - NUtify',
+  '/Signup': 'Sign Up - NUtify',
   '/forgot-password': 'Forgot Password - NUtify',
   '/student/home': 'Home - NUtify',
   '/student/history': 'History - NUtify',
   '/faculty/home': 'Home - NUtify',
   '/faculty/history': 'History - NUtify',
   '/moderator/home': 'Home - NUtify',
-  '/moderator/history': 'History - NUtify'
+  '/moderator/history': 'Approvals - NUtify',
+  '/moderator/approved': 'Approved - NUtify'
 };
 
 export const usePageTitle = () => {
