@@ -1040,748 +1040,456 @@ class _StudentHomeState extends State<StudentHome> {
   }
 }
 
-// Appointment Request Modal
+// Appointment Request Modal (date-first flow with per-date capacity)
 void showAppointmentRequestModal(
   BuildContext context,
   String facultyName,
   int facultyId,
-) async {
-  print('[DEBUG] POSTING to fetchFacultySchedules with facultyId: $facultyId');
-  List<Map<String, dynamic>> schedules = await fetchFacultySchedules(facultyId);
-  print('[DEBUG] Schedules returned:');
-  print(schedules);
-  // Only consider schedules with status 'available'
-  List<Map<String, dynamic>> availableSchedules = schedules
-      .where((s) => (s['status'] ?? '').toLowerCase() == 'available')
-      .toList();
-  print('[DEBUG] Available schedules:');
-  print(availableSchedules);
-
-  // Keep a reference to the root (caller) context to show nested pickers above the dialog
+) {
   final BuildContext rootContext = context;
+  final TextEditingController reasonController = TextEditingController();
 
-  // Define the order of days for sorting
-  const List<String> dayOrder = [
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-    'Sunday',
-  ];
+  DateTime? selectedDate; // chosen calendar date
+  bool loading = false; // schedule fetch in progress
+  List<Map<String, dynamic>> dateSchedules = []; // schedules returned for date
+  int? selectedIndex; // which schedule chosen
 
-  // Deduplicate and sort days based on dayOrder
-  List<String> days = availableSchedules
-      .map((s) => (s['day_of_week'] ?? s['day'] ?? '').toString())
-      .where((d) => d.isNotEmpty)
-      .toSet()
-      .toList();
-  days.sort((a, b) {
-    int ia = dayOrder.indexOf(a);
-    int ib = dayOrder.indexOf(b);
-    if (ia == -1 && ib == -1) return a.compareTo(b);
-    if (ia == -1) return 1;
-    if (ib == -1) return -1;
-    return ia.compareTo(ib);
-  });
-  print('[DEBUG] Days extracted from available schedules (deduped & sorted):');
-  print(days);
-  String selectedDay = days.isNotEmpty ? days[0] : '';
-  int? selectedIndex;
-  DateTime? selectedDate; // NEW: appointment calendar date matching selectedDay
-
-  // Helper to map day name to weekday int (Mon=1..Sun=7)
-  int _weekdayFromDayName(String day) {
-    switch (day) {
-      case 'Monday':
-        return DateTime.monday;
-      case 'Tuesday':
-        return DateTime.tuesday;
-      case 'Wednesday':
-        return DateTime.wednesday;
-      case 'Thursday':
-        return DateTime.thursday;
-      case 'Friday':
-        return DateTime.friday;
-      case 'Saturday':
-        return DateTime.saturday;
-      case 'Sunday':
-        return DateTime.sunday;
-      default:
-        return -1;
+  Future<void> _pickDate(StateSetter setState) async {
+    final now = DateTime.now();
+    final first = DateTime(now.year, now.month, now.day);
+    final last = DateTime(now.year + 1, now.month, now.day);
+    final picked = await showDatePicker(
+      context: rootContext,
+      useRootNavigator: true,
+      initialDate: selectedDate ?? first,
+      firstDate: first,
+      lastDate: last,
+      initialEntryMode: DatePickerEntryMode.calendarOnly,
+      builder: (ctx, child) {
+        final theme = Theme.of(rootContext);
+        return Theme(
+          data: theme.copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Color(0xFF35408E),
+              secondary: Color(0xFFFFD418),
+              onPrimary: Colors.white,
+              onSurface: Color(0xFF1A2049),
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: const Color(0xFF35408E),
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null) {
+      setState(() {
+        selectedDate = picked;
+        loading = true;
+        selectedIndex = null;
+        dateSchedules = [];
+      });
+      final dateStr = '${picked.year.toString().padLeft(4, '0')}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
+      final fetched = await fetchFacultySchedules(facultyId, date: dateStr);
+      setState(() {
+        loading = false;
+  // Show all schedules (including those with status 'booked' or full) so user can see why a slot is unavailable
+  dateSchedules = fetched;
+      });
     }
+  }
+
+  bool _isDisabledSlot(Map<String, dynamic> sched) {
+    if (sched['day_of_week'] != null && sched['day_of_week'].toString().toUpperCase() == 'OTS') return false; // OTS exempt
+    if (sched['is_full_for_date'] == true) return true;
+    if (sched['is_full'] == true) return true; // fallback
+    return false;
+  }
+
+  void _submit(StateSetter setState, BuildContext dialogContext) async {
+    if (selectedDate == null || selectedIndex == null) return;
+    final prefs = await SharedPreferences.getInstance();
+    final String? studentIdStr = prefs.getString('userId');
+    if (studentIdStr == null) {
+      showRequestSnackBarError(rootContext, 'User ID not found. Please log in again.');
+      return;
+    }
+    final int studentId = int.tryParse(studentIdStr) ?? 0;
+    if (studentId == 0) {
+      showRequestSnackBarError(rootContext, 'Invalid user ID. Please log in again.');
+      return;
+    }
+    final schedule = dateSchedules[selectedIndex!];
+    final scheduleId = int.tryParse(schedule['schedule_id']?.toString() ?? schedule['id']?.toString() ?? '0') ?? 0;
+    if (scheduleId <= 0) {
+      showRequestSnackBarError(rootContext, 'Invalid schedule selected.');
+      return;
+    }
+    final reason = reasonController.text.trim();
+    if (reason.isEmpty) {
+      showRequestSnackBarError(rootContext, 'Reason is required.');
+      return;
+    }
+    final String appointmentDate = '${selectedDate!.year.toString().padLeft(4, '0')}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.day.toString().padLeft(2, '0')}';
+    setState(() => loading = true);
+    final result = await postSetAppointment(
+      studentId: studentId,
+      teacherId: facultyId,
+      scheduleId: scheduleId,
+      reason: reason,
+      appointmentDate: appointmentDate,
+    );
+    setState(() => loading = false);
+    if ((result['success'] == false || result['error'] == true) && (result['code'] == 'FULL_FOR_DATE' || (result['message'] ?? '').toString().toLowerCase().contains('full'))) {
+      showRequestSnackBarError(rootContext, 'Schedule is full for selected date.');
+      // Refetch to reflect new state
+      final fetched = await fetchFacultySchedules(facultyId, date: appointmentDate);
+      setState(() {
+  // After refetch, keep all schedules visible (no filtering by status)
+  dateSchedules = fetched;
+        selectedIndex = null;
+      });
+      return;
+    }
+    if (result['error'] == true || result['success'] == false) {
+      showRequestSnackBarError(rootContext, (result['message'] ?? 'Failed to schedule').toString());
+      return;
+    }
+    Navigator.of(dialogContext).pop();
+    showRequestSnackBar(rootContext, 'Appointment request sent successfully!');
   }
 
   showDialog(
     context: rootContext,
     barrierDismissible: false,
     builder: (dialogContext) {
-      final TextEditingController reasonController = TextEditingController();
       return StatefulBuilder(
         builder: (sbContext, setState) {
-          // Filter available schedules for the selected day (exact match)
-          List<Map<String, dynamic>> availableTimes = availableSchedules.where((
-            s,
-          ) {
-            String day = (s['day_of_week'] ?? s['day'] ?? '').toString();
-            return day == selectedDay;
-          }).toList();
-
-          // Button enabled only if a day is selected, there are available times, a schedule is selected,
-          // a valid date matching the selected day is chosen, and a reason is provided
-          bool isScheduleButtonEnabled =
-              selectedDay.isNotEmpty &&
-              availableTimes.isNotEmpty &&
-              selectedIndex != null &&
-              selectedDate != null &&
-              reasonController.text.trim().isNotEmpty;
-
+          final bool buttonEnabled = selectedDate != null && !loading && selectedIndex != null && reasonController.text.trim().isNotEmpty;
           return Dialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             elevation: 0,
             backgroundColor: Colors.transparent,
-            insetPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 24,
-            ),
+            insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
             child: AnimatedPadding(
-              padding: EdgeInsets.only(
-                bottom: MediaQuery.of(rootContext).viewInsets.bottom,
-              ),
+              padding: EdgeInsets.only(bottom: MediaQuery.of(rootContext).viewInsets.bottom),
               duration: const Duration(milliseconds: 200),
               curve: Curves.easeOut,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxHeight: MediaQuery.of(rootContext).size.height * 0.9,
-                ),
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(rootContext).viewInsets.bottom + 12,
-                  ),
-                  child: ClipRRect(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
-                    clipBehavior: Clip.antiAlias,
-                    child: Container(
-                      padding: EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.15),
-                            spreadRadius: 3,
-                            blurRadius: 20,
-                            offset: Offset(0, 8),
-                          ),
-                        ],
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.15),
+                        spreadRadius: 3,
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
                       ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          // Title
-                          RichText(
-                            text: TextSpan(
-                              children: [
-                                TextSpan(
-                                  text: "$facultyName",
-                                  style: TextStyle(
-                                    fontFamily: 'Arimo',
-                                    fontWeight: FontWeight.bold,
-                                    fontStyle: FontStyle.italic,
-                                    fontSize: 22,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: "'s available schedules",
-                                  style: TextStyle(
-                                    fontFamily: 'Arimo',
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: 22,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: 24),
-                          // Day Dropdown
-                          Container(
-                            width: double.infinity,
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Color(0xFFF5F5F5),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: Colors.grey.shade300),
-                            ),
-                            child: DropdownButtonHideUnderline(
-                              child: Theme(
-                                data: Theme.of(
-                                  context,
-                                ).copyWith(canvasColor: Colors.white),
-                                child: DropdownButton<String>(
-                                  value: selectedDay,
-                                  isExpanded: true,
-                                  icon: Icon(Icons.arrow_drop_down),
-                                  style: TextStyle(
-                                    fontFamily: 'Arimo',
-                                    fontSize: 18,
-                                    color: Colors.black,
-                                  ),
-                                  items: days.map((day) {
-                                    return DropdownMenuItem<String>(
-                                      value: day,
-                                      child: Text(day),
-                                    );
-                                  }).toList(),
-                                  onChanged: (val) {
-                                    setState(() {
-                                      selectedDay = val!;
-                                      selectedIndex =
-                                          null; // reset selected schedule for new day
-                                      selectedDate =
-                                          null; // reset date since day changed
-                                    });
-                                  },
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 16),
-                          // Schedules available for the day
-                          Text(
-                            'Schedules available for the day:',
-                            style: TextStyle(
-                              fontFamily: 'Arimo',
-                              fontSize: 16,
-                              color: Colors.black87,
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                          Container(
-                            constraints: BoxConstraints(maxHeight: 220),
-                            child: availableTimes.isEmpty
-                                ? Center(
-                                    child: Text(
-                                      'No available schedules for this day.',
-                                      style: TextStyle(
-                                        fontFamily: 'Arimo',
-                                        fontSize: 15,
-                                        color: Colors.grey[600],
-                                      ),
-                                    ),
-                                  )
-                                : ListView.separated(
-                                    shrinkWrap: true,
-                                    itemCount: availableTimes.length,
-                                    separatorBuilder: (context, idx) =>
-                                        SizedBox(height: 12),
-                                    itemBuilder: (context, idx) {
-                                      var sched = availableTimes[idx];
-                                      String start = formatTime(
-                                        sched['start_time'] ?? sched['startTime'],
-                                      );
-                                      String end = formatTime(
-                                        sched['end_time'] ?? sched['endTime'],
-                                      );
-                                      bool isSelected = selectedIndex == idx;
-                                      final bool isCapacityMode = sched['is_capacity_mode'] == true;
-                                      final int remaining = sched['remaining'] ?? 0;
-                                      final int? capacity = sched['capacity'] == null ? null : int.tryParse(sched['capacity'].toString());
-                                      final int? booked = sched['booked_count'] == null ? null : int.tryParse(sched['booked_count'].toString());
-                                      final bool isFull = sched['is_full'] == true;
-                                      final bool disabled = isFull; // can't select full slot
-                                      return Opacity(
-                                        opacity: disabled ? 0.55 : 1,
-                                        child: GestureDetector(
-                                          onTap: disabled
-                                              ? null
-                                              : () {
-                                                  setState(() {
-                                                    selectedIndex = idx;
-                                                  });
-                                                },
-                                          child: Container(
-                                            padding: EdgeInsets.symmetric(
-                                              vertical: 14,
-                                              horizontal: 18,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: isSelected ? Color(0xFFFFF8E1) : Color(0xFFF5F5F5),
-                                              borderRadius: BorderRadius.circular(14),
-                                              border: Border.all(
-                                                color: isSelected ? Color(0xFFFFD418) : Colors.transparent,
-                                                width: 2,
-                                              ),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black.withOpacity(0.08),
-                                                  blurRadius: 8,
-                                                  offset: Offset(0, 3),
-                                                ),
-                                              ],
-                                            ),
-                                            child: Row(
-                                              children: [
-                                                Expanded(
-                                                  child: Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      Text(
-                                                        '$start - $end',
-                                                        style: TextStyle(
-                                                          fontFamily: 'Arimo',
-                                                          fontSize: 18,
-                                                          color: Color(0xFF283593),
-                                                          fontWeight: FontWeight.w600,
-                                                        ),
-                                                      ),
-                                                      if (isCapacityMode) ...[
-                                                        SizedBox(height: 4),
-                                                        Row(
-                                                          children: [
-                                                            _capacityPill(
-                                                              label: isFull ? 'Full' : 'Remaining: $remaining',
-                                                              color: isFull ? Colors.red.shade400 : Color(0xFF283593),
-                                                              bg: isFull ? Colors.red.shade50 : Color(0xFFE8EAF6),
-                                                            ),
-                                                            SizedBox(width: 6),
-                                                            if (capacity != null && booked != null)
-                                                              _capacityPill(
-                                                                label: '${booked}/${capacity} booked',
-                                                                color: Colors.grey.shade700,
-                                                                bg: Colors.grey.shade200,
-                                                              ),
-                                                          ],
-                                                        ),
-                                                      ],
-                                                    ],
-                                                  ),
-                                                ),
-                                                if (isSelected && !disabled)
-                                                  Icon(
-                                                    Icons.check_circle,
-                                                    color: Color(0xFFFFB300),
-                                                    size: 24,
-                                                  ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                          ),
-
-                          SizedBox(height: 16),
-                          // NEW: Appointment Date selector (only dates matching selectedDay are enabled)
-                          Text(
-                            'Select Appointment Date:',
-                            style: TextStyle(
-                              fontFamily: 'Arimo',
-                              fontSize: 16,
-                              color: Colors.black87,
-                            ),
-                          ),
-                          SizedBox(height: 8),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 14,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Color(0xFFF5F5F5),
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      color: Colors.grey.shade300,
-                                    ),
-                                  ),
-                                  child: Text(
-                                    selectedDate == null
-                                        ? 'No date selected'
-                                        : '${selectedDate!.year.toString().padLeft(4, '0')}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.day.toString().padLeft(2, '0')}',
-                                    style: TextStyle(
-                                      fontFamily: 'Arimo',
-                                      fontSize: 15,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(width: 10),
-                              ElevatedButton.icon(
-                                onPressed: selectedDay.isEmpty
-                                    ? null
-                                    : () async {
-                                        print('[DEBUG] Opening date picker');
-                                        final now = DateTime.now();
-                                        final first = DateTime(
-                                          now.year,
-                                          now.month,
-                                          now.day,
-                                        );
-                                        final last = DateTime(
-                                          now.year + 1,
-                                          now.month,
-                                          now.day,
-                                        );
-                                        final targetWeekday =
-                                            _weekdayFromDayName(selectedDay);
-
-                                        // Ensure initialDate satisfies selectableDayPredicate even if selectedDate is set
-                                        DateTime _nextMatchingWeekday(
-                                          DateTime start,
-                                          int weekday,
-                                        ) {
-                                          final int delta =
-                                              (weekday - start.weekday) % 7;
-                                          return start.add(
-                                            Duration(days: delta),
-                                          );
-                                        }
-
-                                        DateTime _prevMatchingWeekday(
-                                          DateTime start,
-                                          int weekday,
-                                        ) {
-                                          final int delta =
-                                              (start.weekday - weekday) % 7;
-                                          return start.subtract(
-                                            Duration(days: delta),
-                                          );
-                                        }
-
-                                        DateTime baseInitial =
-                                            selectedDate ?? first;
-                                        if (baseInitial.isBefore(first))
-                                          baseInitial = first;
-                                        if (baseInitial.isAfter(last))
-                                          baseInitial = last;
-                                        DateTime initial = _nextMatchingWeekday(
-                                          baseInitial,
-                                          targetWeekday,
-                                        );
-                                        if (initial.isAfter(last)) {
-                                          initial = _prevMatchingWeekday(
-                                            last,
-                                            targetWeekday,
-                                          );
-                                        }
-
-                                        final picked = await showDatePicker(
-                                          context: rootContext,
-                                          useRootNavigator: true,
-                                          initialDate: initial,
-                                          firstDate: first,
-                                          lastDate: last,
-                                          initialEntryMode:
-                                              DatePickerEntryMode.calendarOnly,
-                                          selectableDayPredicate: (DateTime day) {
-                                            // Only allow dates whose weekday matches selectedDay
-                                            return day.weekday == targetWeekday;
-                                          },
-                                          builder: (ctx, child) {
-                                            final theme = Theme.of(rootContext);
-                                            return Theme(
-                                              data: theme.copyWith(
-                                                colorScheme:
-                                                    const ColorScheme.light(
-                                                      primary: Color(
-                                                        0xFF35408E,
-                                                      ),
-                                                      secondary: Color(
-                                                        0xFFFFD418,
-                                                      ),
-                                                      onPrimary: Colors.white,
-                                                      onSurface: Color(
-                                                        0xFF1A2049,
-                                                      ),
-                                                    ),
-                                                textButtonTheme:
-                                                    TextButtonThemeData(
-                                                      style:
-                                                          TextButton.styleFrom(
-                                                            foregroundColor:
-                                                                const Color(
-                                                                  0xFF35408E,
-                                                                ),
-                                                          ),
-                                                    ),
-                                              ),
-                                              child: child!,
-                                            );
-                                          },
-                                        );
-                                        if (picked != null) {
-                                          setState(() => selectedDate = picked);
-                                        }
-                                      },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFFFFD418),
-                                  foregroundColor: Colors.black,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 14,
-                                    vertical: 12,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  elevation: 0,
-                                ),
-                                icon: const Icon(Icons.event),
-                                label: const Text(
-                                  'Pick date',
-                                  style: TextStyle(
-                                    fontFamily: 'Arimo',
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          SizedBox(height: 16),
-                          // Reason for Appointment Text Field
-                          Text(
-                            'Reason for Appointment:',
-                            style: TextStyle(
-                              fontFamily: 'Arimo',
-                              fontSize: 16,
-                              color: Colors.black87,
-                            ),
-                          ),
-                          SizedBox(height: 8),
-                          Container(
-                            width: double.infinity,
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Color(0xFFF5F5F5),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: Colors.grey.shade300),
-                            ),
-                            child: TextField(
-                              controller: reasonController,
-                              scrollPadding: EdgeInsets.only(
-                                bottom:
-                                    MediaQuery.of(
-                                      rootContext,
-                                    ).viewInsets.bottom +
-                                    100,
-                              ),
-                              maxLines: 2,
-                              minLines: 1,
-                              onChanged: (val) {
-                                setState(() {}); // Update button enabled state
-                              },
-                              decoration: InputDecoration(
-                                hintText: 'Enter your reason...',
-                                hintStyle: TextStyle(
-                                  fontFamily: 'Arimo',
-                                  color: Colors.grey,
-                                  fontSize: 15,
-                                ),
-                                border: InputBorder.none,
-                                isDense: true,
-                                contentPadding: EdgeInsets.zero,
-                              ),
-                              style: TextStyle(
+                    ],
+                  ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        RichText(
+                          text: TextSpan(children: [
+                            TextSpan(
+                              text: facultyName,
+                              style: const TextStyle(
                                 fontFamily: 'Arimo',
-                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                fontStyle: FontStyle.italic,
+                                fontSize: 22,
                                 color: Colors.black,
                               ),
                             ),
+                            const TextSpan(
+                              text: "'s schedules",
+                              style: TextStyle(
+                                fontFamily: 'Arimo',
+                                fontSize: 22,
+                                color: Colors.black,
+                              ),
+                            )
+                          ]),
+                        ),
+                        const SizedBox(height: 24),
+                        // Date selector first
+                        const Text(
+                          'Select Date:',
+                          style: TextStyle(
+                            fontFamily: 'Arimo',
+                            fontSize: 16,
+                            color: Colors.black87,
                           ),
-                          SizedBox(height: 24),
-                          // Action Buttons
-                          Row(
-                            children: [
-                              // Cancel Button
-                              Expanded(
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    // Use the dialog's context to pop the route to avoid deactivated ancestor errors
-                                    Navigator.of(dialogContext).pop();
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.grey.shade300,
-                                    foregroundColor: Colors.black,
-                                    padding: EdgeInsets.symmetric(vertical: 16),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    elevation: 0,
-                                  ),
-                                  child: Text(
-                                    'Cancel',
-                                    style: TextStyle(
-                                      fontFamily: 'Arimo',
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF5F5F5),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: Colors.grey.shade300),
+                                ),
+                                child: Text(
+                                  selectedDate == null
+                                      ? 'No date selected'
+                                      : '${selectedDate!.year.toString().padLeft(4, '0')}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.day.toString().padLeft(2, '0')}',
+                                  style: const TextStyle(
+                                    fontFamily: 'Arimo',
+                                    fontSize: 15,
+                                    color: Colors.black,
                                   ),
                                 ),
                               ),
-                              SizedBox(width: 16),
-                              // Schedule Button
-                              Expanded(
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    gradient: isScheduleButtonEnabled
-                                        ? LinearGradient(
-                                            colors: [
-                                              Color(0xFFFFD54F),
-                                              Color(0xFFFFB300),
-                                            ],
-                                            begin: Alignment.topLeft,
-                                            end: Alignment.bottomRight,
-                                          )
-                                        : LinearGradient(
-                                            colors: [
-                                              Colors.grey.shade300,
-                                              Colors.grey.shade400,
-                                            ],
-                                            begin: Alignment.topLeft,
-                                            end: Alignment.bottomRight,
-                                          ),
-                                    borderRadius: BorderRadius.circular(12),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: isScheduleButtonEnabled
-                                            ? Color(
-                                                0xFFFFB000,
-                                              ).withOpacity(0.25)
-                                            : Colors.grey.withOpacity(0.15),
-                                        blurRadius: 8,
-                                        offset: Offset(0, 4),
-                                      ),
-                                    ],
-                                  ),
-                                  child: ElevatedButton(
-                                    onPressed: isScheduleButtonEnabled
-                                        ? () async {
-                                            final prefs =
-                                                await SharedPreferences.getInstance();
-                                            final String? studentIdStr = prefs
-                                                .getString('userId');
-                                            if (studentIdStr == null) {
-                                              ScaffoldMessenger.of(
-                                                context,
-                                              ).showSnackBar(
-                                                SnackBar(
-                                                  content: Text(
-                                                    'User ID not found. Please log in again.',
-                                                  ),
-                                                ),
-                                              );
-                                              return;
-                                            }
-                                            final int studentId =
-                                                int.tryParse(studentIdStr) ?? 0;
-                                            if (studentId == 0) {
-                                              ScaffoldMessenger.of(
-                                                context,
-                                              ).showSnackBar(
-                                                SnackBar(
-                                                  content: Text(
-                                                    'Invalid user ID. Please log in again.',
-                                                  ),
-                                                ),
-                                              );
-                                              return;
-                                            }
-                                            int scheduleId =
-                                                availableTimes[selectedIndex!]['schedule_id'];
-                                            String reason = reasonController
-                                                .text
-                                                .trim();
-                                            final String appointmentDate =
-                                                '${selectedDate!.year.toString().padLeft(4, '0')}-${selectedDate!.month.toString().padLeft(2, '0')}-${selectedDate!.day.toString().padLeft(2, '0')}';
-
-                                            if (scheduleId > 0 &&
-                                                reason.isNotEmpty) {
-                                              var result =
-                                                  await postSetAppointment(
-                                                    studentId: studentId,
-                                                    teacherId: facultyId,
-                                                    scheduleId: scheduleId,
-                                                    reason: reason,
-                                                    appointmentDate:
-                                                        appointmentDate, // NEW
-                                                  );
-                                              if (result['error'] == true) {
-                                                ScaffoldMessenger.of(
-                                                  context,
-                                                ).showSnackBar(
-                                                  SnackBar(
-                                                    content: Text(
-                                                      result['message'],
-                                                    ),
-                                                  ),
-                                                );
-                                              } else {
-                                                // Close dialog on success using the dialog context
-                                                Navigator.of(
-                                                  dialogContext,
-                                                ).pop();
-                                                showRequestSnackBar(
-                                                  rootContext,
-                                                  'Appointment request sent successfully!',
-                                                );
-                                              }
-                                            } else {
-                                              showRequestSnackBarError(
-                                                context,
-                                                'There was an error. Appointment could not be scheduled.',
-                                              );
-                                            }
-                                          }
-                                        : null,
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.transparent,
-                                      shadowColor: Colors.transparent,
-                                      padding: EdgeInsets.symmetric(
-                                        vertical: 16,
-                                      ),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      elevation: 0,
-                                      disabledBackgroundColor:
-                                          Colors.transparent,
-                                      disabledForegroundColor: Colors.white
-                                          .withOpacity(0.5),
-                                    ),
-                                    child: Text(
-                                      'Schedule',
-                                      style: TextStyle(
-                                        fontFamily: 'Arimo',
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: isScheduleButtonEnabled
-                                            ? Colors.white
-                                            : Colors.grey.shade400,
-                                      ),
-                                    ),
-                                  ),
+                            ),
+                            const SizedBox(width: 10),
+                            ElevatedButton.icon(
+                              onPressed: loading ? null : () => _pickDate(setState),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFFFFD418),
+                                foregroundColor: Colors.black,
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                elevation: 0,
+                              ),
+                              icon: const Icon(Icons.event),
+                              label: const Text(
+                                'Pick date',
+                                style: TextStyle(fontFamily: 'Arimo', fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        // Schedules list (after date chosen)
+                        if (selectedDate != null) ...[
+                          Row(
+                            children: [
+                              const Text(
+                                'Available Slots:',
+                                style: TextStyle(
+                                  fontFamily: 'Arimo',
+                                  fontSize: 16,
+                                  color: Colors.black87,
                                 ),
+                              ),
+                              const SizedBox(width: 8),
+                              if (loading) const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(strokeWidth: 2),
                               ),
                             ],
                           ),
+                          const SizedBox(height: 10),
+                          if (loading)
+                            _ScheduleSkeletonList()
+                          else if (dateSchedules.isEmpty)
+                            const Text(
+                              'No available schedules for this date.',
+                              style: TextStyle(fontFamily: 'Arimo', fontSize: 15, color: Colors.grey),
+                            )
+                          else
+                            ConstrainedBox(
+                              constraints: const BoxConstraints(maxHeight: 240),
+                              child: ListView.separated(
+                                shrinkWrap: true,
+                                itemCount: dateSchedules.length,
+                                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                                itemBuilder: (c, idx) {
+                                  final sched = dateSchedules[idx];
+                                  final start = formatTime(sched['start_time'] ?? sched['startTime']);
+                                  final end = formatTime(sched['end_time'] ?? sched['endTime']);
+                                  final bool disabled = _isDisabledSlot(sched);
+                                  final bool isSelected = selectedIndex == idx;
+                                  final cap = int.tryParse(sched['capacity']?.toString() ?? '');
+                                  final daily = int.tryParse(sched['daily_count']?.toString() ?? '');
+                                  final remainingForDate = sched['remaining_for_date'] ?? sched['remaining'];
+                                  final isFullForDate = sched['is_full_for_date'] == true || sched['is_full'] == true;
+                                  return Opacity(
+                                    opacity: disabled ? 0.55 : 1,
+                                    child: GestureDetector(
+                                      onTap: disabled
+                                          ? null
+                                          : () => setState(() => selectedIndex = idx),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 18),
+                                        decoration: BoxDecoration(
+                                          color: isSelected ? const Color(0xFFFFF8E1) : const Color(0xFFF5F5F5),
+                                          borderRadius: BorderRadius.circular(14),
+                                          border: Border.all(
+                                            color: isSelected ? const Color(0xFFFFD418) : Colors.transparent,
+                                            width: 2,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(0.08),
+                                              blurRadius: 8,
+                                              offset: const Offset(0, 3),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    '$start - $end',
+                                                    style: const TextStyle(
+                                                      fontFamily: 'Arimo',
+                                                      fontSize: 18,
+                                                      color: Color(0xFF283593),
+                                                      fontWeight: FontWeight.w600,
+                                                    ),
+                                                  ),
+                                                  if (cap != null && cap > 0) ...[
+                                                    const SizedBox(height: 4),
+                                                    Row(
+                                                      children: [
+                                                        _capacityPill(
+                                                          label: isFullForDate ? 'Full' : 'Remaining: ${remainingForDate ?? (cap - (daily ?? 0))}',
+                                                          color: isFullForDate ? Colors.red.shade400 : const Color(0xFF283593),
+                                                          bg: isFullForDate ? Colors.red.shade50 : const Color(0xFFE8EAF6),
+                                                        ),
+                                                        const SizedBox(width: 6),
+                                                        if (daily != null)
+                                                          _capacityPill(
+                                                            label: '${daily}/${cap}',
+                                                            color: Colors.grey.shade700,
+                                                            bg: Colors.grey.shade200,
+                                                          ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ],
+                                              ),
+                                            ),
+                                            if (isSelected && !disabled)
+                                              const Icon(Icons.check_circle, color: Color(0xFFFFB300), size: 24),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
                         ],
-                      ),
+                        const SizedBox(height: 20),
+                        const Text(
+                          'Reason for Appointment:',
+                          style: TextStyle(
+                            fontFamily: 'Arimo',
+                            fontSize: 16,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF5F5F5),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.grey.shade300),
+                          ),
+                          child: TextField(
+                            controller: reasonController,
+                            maxLines: 2,
+                            minLines: 1,
+                            onChanged: (_) => setState(() {}),
+                            decoration: const InputDecoration(
+                              hintText: 'Enter your reason...',
+                              hintStyle: TextStyle(fontFamily: 'Arimo', color: Colors.grey, fontSize: 15),
+                              border: InputBorder.none,
+                              isDense: true,
+                              contentPadding: EdgeInsets.zero,
+                            ),
+                            style: const TextStyle(fontFamily: 'Arimo', fontSize: 15, color: Colors.black),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: loading ? null : () => Navigator.of(dialogContext).pop(),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.grey.shade300,
+                                  foregroundColor: Colors.black,
+                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                  elevation: 0,
+                                ),
+                                child: const Text(
+                                  'Cancel',
+                                  style: TextStyle(fontFamily: 'Arimo', fontSize: 16, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  gradient: buttonEnabled
+                                      ? const LinearGradient(
+                                          colors: [Color(0xFFFFD54F), Color(0xFFFFB300)],
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                        )
+                                      : LinearGradient(
+                                          colors: [Colors.grey.shade300, Colors.grey.shade400],
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                        ),
+                                  borderRadius: BorderRadius.circular(12),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: buttonEnabled ? const Color(0xFFFFB000).withOpacity(0.25) : Colors.grey.withOpacity(0.15),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                child: ElevatedButton(
+                                  onPressed: buttonEnabled ? () => _submit(setState, dialogContext) : null,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.transparent,
+                                    shadowColor: Colors.transparent,
+                                    padding: const EdgeInsets.symmetric(vertical: 16),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                    elevation: 0,
+                                    disabledBackgroundColor: Colors.transparent,
+                                    disabledForegroundColor: Colors.white.withOpacity(0.5),
+                                  ),
+                                  child: Text(
+                                    loading ? 'Scheduling...' : 'Schedule',
+                                    style: TextStyle(
+                                      fontFamily: 'Arimo',
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: buttonEnabled ? Colors.white : Colors.grey.shade400,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -1794,47 +1502,100 @@ void showAppointmentRequestModal(
   );
 }
 
-Future<List<Map<String, dynamic>>> fetchFacultySchedules(int facultyId) async {
-  // Calls the backend API to fetch schedules for a teacher (facultyId)
-  const String apiUrl =
-      'https://nutify.site/api.php?action=studentFetchTeacherSched';
+Future<List<Map<String, dynamic>>> fetchFacultySchedules(int facultyId, {String? date}) async {
+  const String apiUrl = 'https://nutify.site/api.php?action=studentFetchTeacherSched';
   try {
+    final body = <String, dynamic>{'id': facultyId.toString()};
+    if (date != null) body['date'] = date; // new per-date parameter
     final response = await http.post(
       Uri.parse(apiUrl),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'id': facultyId.toString()}),
+      body: jsonEncode(body),
     );
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       if (data is List) {
-        return List<Map<String, dynamic>>.from(data.map((e) => _augmentSchedule(e))); 
+        return List<Map<String, dynamic>>.from(data.map(_augmentSchedule));
       } else if (data is Map && data.containsKey('schedules')) {
-        return List<Map<String, dynamic>>.from((data['schedules'] as List).map((e) => _augmentSchedule(e)));
-      } else {
-        return [];
+        return List<Map<String, dynamic>>.from((data['schedules'] as List).map(_augmentSchedule));
       }
     } else {
       print('Failed to fetch schedules: ${response.statusCode}');
-      return [];
     }
   } catch (e) {
     print('Error fetching faculty schedules: $e');
-    return [];
   }
+  return [];
 }
 
 Map<String, dynamic> _augmentSchedule(dynamic raw) {
   final map = Map<String, dynamic>.from(raw as Map);
   final cap = map['capacity'];
-  final booked = map['booked_count'];
   int? capacity = cap == null ? null : int.tryParse(cap.toString());
-  int? bookedCount = booked == null ? null : int.tryParse(booked.toString());
   bool isCapacityMode = (capacity ?? 0) > 0;
-  int remaining = isCapacityMode ? (capacity! - (bookedCount ?? 0)) : 0;
+  int? dailyCount = map['daily_count'] == null ? null : int.tryParse(map['daily_count'].toString());
+  int remainingForDate = (dailyCount != null && capacity != null)
+      ? (capacity - dailyCount).clamp(0, capacity)
+      : (isCapacityMode ? capacity! : 0);
   map['is_capacity_mode'] = isCapacityMode;
-  map['remaining'] = remaining;
-  map['is_full'] = isCapacityMode && remaining <= 0 && (map['day_of_week']?.toString().toUpperCase() != 'OTS');
+  map['remaining_for_date'] = remainingForDate;
+  map['remaining'] = remainingForDate; // backward compatibility with old UI code
+  final bool isOTS = (map['day_of_week']?.toString().toUpperCase() == 'OTS');
+  final bool fullByDate = isCapacityMode && remainingForDate <= 0 && !isOTS;
+  map['is_full_for_date'] = fullByDate;
+  map['is_full'] = fullByDate; // fallback flag
   return map;
+}
+
+// Simple skeleton placeholder list while fetching schedules
+class _ScheduleSkeletonList extends StatelessWidget {
+  const _ScheduleSkeletonList();
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: List.generate(3, (i) => _ScheduleSkeleton()).expand((w) => [w, const SizedBox(height: 12)]).toList()..removeLast(),
+    );
+  }
+}
+
+class _ScheduleSkeleton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 18),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade200,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _shimmerBox(width: 140, height: 16),
+                const SizedBox(height: 8),
+                _shimmerBox(width: 90, height: 12),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          _shimmerBox(width: 24, height: 24, radius: 12),
+        ],
+      ),
+    );
+  }
+
+  Widget _shimmerBox({required double width, required double height, double radius = 6}) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: Colors.grey.shade300,
+        borderRadius: BorderRadius.circular(radius),
+      ),
+    );
+  }
 }
 
 Widget _capacityPill({required String label, required Color color, required Color bg}) {

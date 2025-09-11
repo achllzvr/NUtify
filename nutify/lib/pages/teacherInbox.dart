@@ -305,7 +305,7 @@ class _TeacherInboxState extends State<TeacherInbox>
                       appointment.appointmentReason,
                       appointmentRemarks: '',
                       capacity: (appointment as dynamic).capacity,
-                      bookedCount: (appointment as dynamic).bookedCount,
+                      // bookedCount removed
                     );
                   },
                 ),
@@ -399,7 +399,7 @@ class _TeacherInboxState extends State<TeacherInbox>
                       appointment.appointmentReason,
                       appointmentRemarks: appointment.appointmentRemarks,
                       capacity: (appointment as dynamic).capacity,
-                      bookedCount: (appointment as dynamic).bookedCount,
+                      // bookedCount removed
                     );
                   },
                 ),
@@ -493,7 +493,7 @@ class _TeacherInboxState extends State<TeacherInbox>
                       appointment.appointmentReason,
                       appointmentRemarks: appointment.appointmentRemarks,
                       capacity: (appointment as dynamic).capacity,
-                      bookedCount: (appointment as dynamic).bookedCount,
+                      // bookedCount removed
                     );
                   },
                 ),
@@ -587,7 +587,7 @@ class _TeacherInboxState extends State<TeacherInbox>
                       appointment.appointmentReason,
                       appointmentRemarks: appointment.appointmentRemarks,
                       capacity: (appointment as dynamic).capacity,
-                      bookedCount: (appointment as dynamic).bookedCount,
+                      // bookedCount removed
                     );
                   },
                 ),
@@ -828,11 +828,11 @@ class _TeacherInboxState extends State<TeacherInbox>
     String scheduleTime,
     String status,
     String appointmentId,
-    String? appointmentReason,
-    {String? appointmentRemarks,
-     int? capacity,
-     int? bookedCount}
-  ) {
+  String? appointmentReason,
+  {String? appointmentRemarks,
+   int? capacity,
+   // int? bookedCount // deprecated
+  }) {
   // Get initials for avatar
   String initials = studentName
     .split(' ')
@@ -879,7 +879,7 @@ class _TeacherInboxState extends State<TeacherInbox>
           reason: appointmentReason,
           remarks: appointmentRemarks,
           capacity: capacity,
-          bookedCount: bookedCount,
+          // bookedCount removed
         );
       },
       child: Card(
@@ -1090,7 +1090,7 @@ class _TeacherInboxState extends State<TeacherInbox>
                               reason: appointmentReason,
                               remarks: appointmentRemarks,
                               capacity: capacity,
-                              bookedCount: bookedCount,
+                              // bookedCount removed
                             );
                           },
                           style: ElevatedButton.styleFrom(
@@ -1569,7 +1569,7 @@ extension on _TeacherInboxState {
     String? reason,
     String? remarks,
     int? capacity,
-    int? bookedCount,
+  // int? bookedCount, // deprecated
   }) {
     final colors = _getDarkerStatusColors(status);
     showModalBottomSheet(
@@ -1667,8 +1667,7 @@ extension on _TeacherInboxState {
               if (reason != null && reason.trim().isNotEmpty) _kv('Reason', reason.trim()),
               if (capacity != null && capacity > 0) ...[
                 _kv('Capacity', capacity.toString()),
-                if (bookedCount != null) _kv('Booked', bookedCount.toString()),
-                if (bookedCount != null) _kv('Remaining', (capacity - bookedCount).clamp(0, capacity).toString()),
+                // booked_count metrics removed
               ],
               if (remarks != null && remarks.trim().isNotEmpty) _kv('Remarks', remarks.trim()),
               const SizedBox(height: 8),

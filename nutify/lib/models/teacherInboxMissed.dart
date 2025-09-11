@@ -11,7 +11,6 @@ class TeacherInboxMissed {
   final String appointmentReason;
   final String appointmentRemarks;
   final int? capacity;
-  final int? bookedCount;
 
   TeacherInboxMissed({
     required this.id,
@@ -21,8 +20,7 @@ class TeacherInboxMissed {
     required this.scheduleTime,
   required this.appointmentReason,
   required this.appointmentRemarks,
-    this.capacity,
-    this.bookedCount,
+  this.capacity,
   });
 
   factory TeacherInboxMissed.fromJson(Map<String, dynamic> json) {
@@ -34,8 +32,7 @@ class TeacherInboxMissed {
       scheduleTime: json['schedule_time']?.toString() ?? '',
   appointmentReason: json['appointment_reason']?.toString() ?? '',
       appointmentRemarks: json['appointment_remarks']?.toString() ?? '',
-      capacity: _parseNullableInt(json['capacity']),
-      bookedCount: _parseNullableInt(json['booked_count']),
+  capacity: _parseNullableInt(json['capacity']),
     );
   }
 

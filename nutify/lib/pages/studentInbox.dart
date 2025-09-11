@@ -303,7 +303,7 @@ class _StudentInboxState extends State<StudentInbox>
                               reason: appointment.appointmentReason,
                               remarks: appointment.appointmentRemarks,
                               capacity: appointment.capacity,
-                              bookedCount: appointment.bookedCount,
+                              // bookedCount removed (deprecated)
                             );
                           },
                           style: ElevatedButton.styleFrom(
@@ -528,7 +528,7 @@ class _StudentInboxState extends State<StudentInbox>
                               reason: appointment.appointmentReason,
                               remarks: appointment.appointmentRemarks,
                               capacity: appointment.capacity,
-                              bookedCount: appointment.bookedCount,
+                              // bookedCount removed (deprecated)
                             );
                           },
                           style: ElevatedButton.styleFrom(
@@ -753,7 +753,7 @@ class _StudentInboxState extends State<StudentInbox>
                               reason: appointment.appointmentReason,
                               remarks: appointment.appointmentRemarks,
                               capacity: appointment.capacity,
-                              bookedCount: appointment.bookedCount,
+                              // bookedCount removed (deprecated)
                             );
                           },
                           style: ElevatedButton.styleFrom(
@@ -978,7 +978,7 @@ class _StudentInboxState extends State<StudentInbox>
                               reason: appointment.appointmentReason,
                               remarks: appointment.appointmentRemarks,
                               capacity: appointment.capacity,
-                              bookedCount: appointment.bookedCount,
+                              // bookedCount removed (deprecated)
                             );
                           },
                           style: ElevatedButton.styleFrom(
@@ -1298,7 +1298,7 @@ class _StudentInboxState extends State<StudentInbox>
     String? reason,
     String? remarks,
     int? capacity,
-    int? bookedCount,
+  // int? bookedCount, // deprecated
   }) {
     final colors = _getDarkerStatusColors(status);
     showModalBottomSheet(
@@ -1396,8 +1396,7 @@ class _StudentInboxState extends State<StudentInbox>
               if (reason != null && reason.trim().isNotEmpty) _kv('Reason', reason.trim()),
               if (capacity != null && capacity > 0) ...[
                 _kv('Capacity', capacity.toString()),
-                if (bookedCount != null) _kv('Booked', bookedCount.toString()),
-                if (bookedCount != null) _kv('Remaining', (capacity - bookedCount).clamp(0, capacity).toString()),
+                // booked_count metrics removed
               ],
               if (remarks != null && remarks.trim().isNotEmpty) _kv('Remarks', remarks.trim()),
               const SizedBox(height: 8),

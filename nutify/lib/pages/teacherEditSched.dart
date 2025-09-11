@@ -311,7 +311,7 @@ class _TeacherEditSchedState extends State<TeacherEditSched>
   }
 
   Widget _buildCapacityChip(TeacherSchedule schedule) {
-    final booked = schedule.bookedCount ?? 0;
+  final booked = 0; // booked_count deprecated; per-date counts handled elsewhere
     final cap = schedule.capacity ?? 0;
     final remaining = schedule.remaining;
     final color = schedule.isFull ? Colors.red.shade600 : Color(0xFF35408E);
@@ -984,8 +984,8 @@ class _TeacherEditSchedState extends State<TeacherEditSched>
                                 child: Row(
                                   children: [
                                     IconButton(
-                                      icon: Icon(Icons.remove_circle_outline, color: editedCapacity > (schedule.bookedCount ?? 0) ? Color(0xFF35408E) : Colors.grey),
-                                      onPressed: editedCapacity > (schedule.bookedCount ?? 0) ? () => setState(() { editedCapacity--; }) : null,
+                                      icon: Icon(Icons.remove_circle_outline, color: editedCapacity > 1 ? Color(0xFF35408E) : Colors.grey),
+                                      onPressed: editedCapacity > 1 ? () => setState(() { editedCapacity--; }) : null,
                                     ),
                                     Expanded(
                                       child: Center(
@@ -1002,14 +1002,7 @@ class _TeacherEditSchedState extends State<TeacherEditSched>
                                   ],
                                 ),
                               ),
-                              if ((schedule.bookedCount ?? 0) > 0)
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 6.0),
-                                  child: Text(
-                                    'Currently booked: ${schedule.bookedCount}. Capacity cannot go below this.',
-                                    style: TextStyle(fontFamily: 'Arimo', fontSize: 12, color: Colors.grey.shade600),
-                                  ),
-                                ),
+                              // booked_count note removed
                             ],
                           ),
                         ),

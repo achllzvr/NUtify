@@ -10,7 +10,7 @@ class TeacherSchedule {
   final String endTime;
   final String status;
   final int? capacity; // optional (null if backend not migrated)
-  final int? bookedCount; // optional
+  // booked_count deprecated (lifetime). Per-date counts provided separately when needed.
   // Additional fields for 12-hour format display
   final String startTime12h;
   final String endTime12h;
@@ -23,7 +23,6 @@ class TeacherSchedule {
     required this.endTime,
     required this.status,
   this.capacity,
-  this.bookedCount,
     required this.startTime12h,
     required this.endTime12h,
   });
@@ -37,7 +36,7 @@ class TeacherSchedule {
       endTime: json['end_time'] ?? '',
       status: json['status'] ?? 'available',
   capacity: json['capacity'] != null ? int.tryParse(json['capacity'].toString()) : null,
-  bookedCount: json['booked_count'] != null ? int.tryParse(json['booked_count'].toString()) : null,
+  // booked_count intentionally ignored (deprecated)
       startTime12h: json['start_time_12h'] ?? _convertTo12Hour(json['start_time'] ?? ''),
       endTime12h: json['end_time_12h'] ?? _convertTo12Hour(json['end_time'] ?? ''),
     );
@@ -51,16 +50,16 @@ class TeacherSchedule {
       'start_time': startTime,
       'end_time': endTime,
       'status': status,
-    'capacity': capacity,
-    'booked_count': bookedCount,
+  'capacity': capacity,
       'start_time_12h': startTime12h,
       'end_time_12h': endTime12h,
     };
   }
 
   bool get isCapacityMode => (capacity ?? 0) > 0;
-  int get remaining => isCapacityMode ? (capacity! - (bookedCount ?? 0)) : 0;
-  bool get isFull => isCapacityMode && remaining <= 0 && dayOfWeek.toUpperCase() != 'OTS';
+  // remaining now determined per-date externally; keep a fallback of full capacity available
+  int get remaining => capacity ?? 0;
+  bool get isFull => false; // per-date fullness calculated in calling context
 
   // Helper method to convert 24-hour time to 12-hour format on client side
   static String _convertTo12Hour(String time24) {
