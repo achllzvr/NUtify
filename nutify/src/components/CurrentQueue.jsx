@@ -87,37 +87,12 @@ function formatDateRange(dateLike, fromTimeLike, toTimeLike) {
   return dateLabel; // may be '' if nothing available
 }
 
-const facultyList = [
-  { id: 1, name: 'Jayson Guia', department: 'Faculty - SACE', avatar: null },
-  { id: 2, name: 'Jei Pastrana', department: 'Faculty - SACE', avatar: null },
-  { id: 3, name: 'Irene Balmes', department: 'Faculty - SACE', avatar: null },
-  { id: 4, name: 'Carlo Torres', department: 'Faculty - SACE', avatar: null },
-  { id: 5, name: 'Archie Menisis', department: 'Faculty - SACE', avatar: null },
-  { id: 6, name: 'Michael Joseph Aramil', department: 'Faculty - SACE', avatar: null },
-  { id: 7, name: 'Erwin De Castro', department: 'Faculty - SACE', avatar: null },
-  { id: 8, name: 'Joel Enriquez', department: 'Faculty - SACE', avatar: null },
-  { id: 9, name: 'Bernie Fabito', department: 'Faculty - SACE', avatar: null },
-  { id: 10, name: 'Bobby Buendia', department: 'Faculty - SAHS', avatar: null },
-  { id: 11, name: 'Penny Lumbera', department: 'Faculty - SAHS', avatar: null },
-  { id: 12, name: 'Larry Fronda', department: 'Faculty - SAHS', avatar: null }
-];
-
-const studentNames = [
-  "Kier Kriztopher",
-  "Achilles Vonn",
-  "Sophia Marie",
-  "Beatriz Gail",
-  "Prinz Noel",
-  "Mark Matthew",
-  "Nicole Aermione",
-  "Mike Roan",
-  "Romeo Paolo"
-];
+// (removed unused sample data arrays)
 
 // state will hold backend appointments
 const QUEUE_PER_PAGE = 10;
 
-const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, truncateReason, moderatorId = 0 }) => {
+const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, moderatorId = 0 }) => {
   const [page, setPage] = useState(1);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -131,8 +106,10 @@ const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, truncateR
         setError('');
         // Use provided moderatorId or default 0; backend may ignore or use permissions
         const data = await getModeratorHomeAppointments(moderatorId);
-        // Expect { appointments: [...] } or an array
-        const list = Array.isArray(data) ? data : (data.appointments || []);
+  // Expect { appointments: [...] } or an array
+  // Debug: log raw response so we can inspect why today's queues may be missing
+  try { console.debug('getModeratorHomeAppointments raw response:', data); } catch { /* no-op in older consoles */ }
+  const list = Array.isArray(data) ? data : (data.appointments || []);
         // Map to UI fields
         const mapped = list
           .filter(a => a) // safety
