@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap');
+/* Removed Montserrat import; using Helvetica/Arimo stacks */
 
 .footer-section {
   background: #fff;
@@ -20,7 +20,7 @@
 }
 
 .footer-title {
-  font-family: "Montserrat", Arial, sans-serif;
+  font-family: "Helvetica", Arial, sans-serif;
   font-weight: 800;
   font-size: clamp(1.4rem, 4vw, 3.3em);
   margin: 0 0 10px 0;
@@ -29,7 +29,7 @@
 }
 
 .footer-desc {
-  font-family: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Inter", "Arimo", Arial, sans-serif;
   font-size: clamp(0.9rem, 1vw + 0.6rem, 1.05em);
   color: #000;
   margin: 0;
@@ -70,7 +70,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font: 500 0.95rem "Inter", "Helvetica Neue", Arial, sans-serif;
+  font: 500 0.95rem "Inter", "Arimo", Arial, sans-serif;
   letter-spacing: 0.2px;
   color: #000;
   background: transparent;

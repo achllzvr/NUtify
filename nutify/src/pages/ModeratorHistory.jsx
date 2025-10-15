@@ -138,7 +138,7 @@ const ModeratorHistory = () => {
             alignItems: "center",
             gap: "10px",
             zIndex: 3000,
-            fontFamily: "Helvetica, Arial, sans-serif",
+            fontFamily: "Arimo, Arial, sans-serif",
             fontSize: "15px",
             fontWeight: 500,
             opacity: verifyAlertTransition ? 1 : 0,

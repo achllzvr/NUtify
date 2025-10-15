@@ -1,5 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;700;800;900&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap");
+/* Removed Montserrat import; using Helvetica/Arimo stacks */
 
 :root {
   --primary-bg: linear-gradient(
@@ -10,8 +10,8 @@
 
   --primary-text: #ffffff;
   --secondary-text: #dfe5ff;
-  --font-main: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --font-secondary: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-main: "Inter", "Arimo", Arial, sans-serif;
+  --font-secondary: "Arimo", Arial, sans-serif;
 }
 
 
@@ -106,7 +106,7 @@
 }
 
 .hero-title {
-  font-family: "Montserrat", Arial, sans-serif;
+  font-family: "Helvetica", Arial, sans-serif;
   font-weight: 900;
   font-size: 4em; /* increased size! */
   letter-spacing: -0.9px;
@@ -170,7 +170,7 @@
     text-align: center;
   }
   .hero-title {
-    font-family: "Montserrat", Arial, sans-serif;
+    font-family: "Helvetica", Arial, sans-serif;
     font-weight: 800;
     font-size: 3.2rem;
     letter-spacing: -1.5px;

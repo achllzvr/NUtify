@@ -255,7 +255,7 @@
   justify-content: center;
 }
 .header-title {
-  font-family: "Montserrat", sans-serif;
+  font-family: "Helvetica", Arial, sans-serif;
   font-size: 32px;
   font-weight: 700;
   color: #2c3e50;
@@ -263,7 +263,7 @@
   line-height: 1.2;
 }
 .header-subtitle {
-  font-family: "Helvetica", sans-serif;
+  font-family: "Arimo", Arial, sans-serif;
   font-size: 16px;
   color: #7f8c8d;
   margin: 4px 0 0 0;
@@ -305,7 +305,7 @@
   border: none;
   outline: none;
   background: transparent;
-  font-family: "Helvetica", sans-serif;
+  font-family: "Arimo", Arial, sans-serif;
   font-size: 16px;
   color: #2c3e50;
   padding: 8px 0;

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap');
+/* Removed Montserrat import; using Helvetica/Arimo stacks */
 
 .student-content-section {
   background: #fff;
@@ -15,7 +15,7 @@
 }
 
 .student-content-title {
-  font-family: "Montserrat", Arial, sans-serif;
+  font-family: "Helvetica", Arial, sans-serif;
   font-weight: 800;
   font-size: 3.3em;
   margin: 0;
@@ -24,7 +24,7 @@
 }
 
 .student-content-subtitle {
-  font-family: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Inter", "Arimo", Arial, sans-serif;
   font-size: 1.05em;
   color: #222;
   margin-top: 5px;
@@ -67,7 +67,7 @@
 }
 
 .student-content-feature-title {
-  font-family: "Montserrat", Arial, sans-serif;
+  font-family: "Helvetica", Arial, sans-serif;
   font-weight: 800;
   font-size: 2.2em;
   margin-bottom: 5px;
@@ -76,7 +76,7 @@
 }
 
 .student-content-feature-desc {
-  font-family: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Inter", "Arimo", Arial, sans-serif;
   font-size: 1.1em;
   color: #222;
   line-height: 1.5;
