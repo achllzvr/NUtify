@@ -91,28 +91,18 @@
 
 /* History card section */
 .moderator-history-section {
-  background: var(--glass-bg);
-  border-radius: var(--glass-radius);
-  border: 1px solid var(--glass-border-weak);
+  background: #f0f0f0;
+  border-radius: 20px;
+  border: none;
   padding: 15px 25px 25px 25px;
-  box-shadow: 0 16px 42px var(--glass-shadow-soft), 0 2px 10px var(--glass-shadow);
+  box-shadow: 8px 8px 18px rgba(0,0,0,0.08), -8px -8px 18px rgba(255,255,255,0.85);
   transition: all 0.3s ease;
   height: 780px;
   display: flex;
   flex-direction: column;
   width: 100%;
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
   position: relative;
   overflow: hidden;
-}
-.moderator-history-section::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: linear-gradient(to bottom, rgba(255,255,255,0.5), rgba(255,255,255,0.12) 35%, rgba(255,255,255,0) 60%);
-  pointer-events: none;
 }
 
 /* Card list: scrollable container for history items */
@@ -149,25 +139,18 @@
   justify-content: space-between;
   padding: 82px 32px 82px 32px;
   margin: 0 2px 24px 2px;
-  background: var(--glass-bg);
-  border-radius: var(--glass-radius-sm);
-  border: 1px solid var(--glass-border-weak);
-  box-shadow: 0 10px 24px var(--glass-shadow-soft), inset 0 1px 0 var(--glass-highlight);
+  background: #f0f0f0;
+  border-radius: 14px;
+  border: none;
+  box-shadow: 8px 8px 15px rgba(0,0,0,0.08), -8px -8px 15px rgba(255,255,255,0.85);
   transition: all 0.3s ease;
   height: 10px;
-  backdrop-filter: blur(calc(var(--glass-blur) - 4px));
-  -webkit-backdrop-filter: blur(calc(var(--glass-blur) - 4px));
   position: relative;
   overflow: hidden;
 }
-.moderator-history-appointment-item::before,
-.moderator-history-item::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: linear-gradient(to bottom, rgba(255,255,255,0.45), rgba(255,255,255,0.1) 36%, rgba(255,255,255,0) 60%);
-  pointer-events: none;
+.moderator-history-appointment-item:hover,
+.moderator-history-item:hover {
+  box-shadow: 10px 10px 20px rgba(0,0,0,0.1), -10px -10px 20px rgba(255,255,255,0.88);
 }
 
 /* Button container aligns right */
@@ -238,16 +221,16 @@
 /* See more button for pagination */
 .moderator-history-see-more-btn,
 .moderator-home-see-more-btn {
-  background: var(--glass-bg);
+  background: #f0f0f0;
   width: 260px;
   margin-top: 5px;
-  border: 1px solid var(--glass-border-weak);
+  border: none;
   border-radius: 15px;
   padding: 10px 0;
   font-size: 20px;
   color: #35408e;
   cursor: pointer;
-  box-shadow: 0 8px 20px var(--glass-shadow-soft);
+  box-shadow: 8px 8px 15px rgba(0, 0, 0, 0.09), -8px -8px 15px rgba(255, 255, 255, 0.8);
   transition: all 0.2s ease;
   font-family: "Arimo", Arial, sans-serif;
   font-weight: 700;
@@ -351,8 +334,8 @@
   display: flex;
   align-items: center;
   padding: 15px 20px;
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border-weak);
+  background: #f0f0f0;
+  border: none;
   border-radius: 15px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -362,8 +345,7 @@
   color: #2c3e50;
 }
 .moderator-history-filter-option:hover {
-  background: var(--glass-bg-strong);
-  border-color: var(--glass-border);
+  box-shadow: 6px 6px 12px rgba(0,0,0,0.08), -6px -6px 12px rgba(255,255,255,0.85);
 }
 .moderator-history-filter-option.selected {
   background: rgba(53, 64, 142, 0.1);
@@ -446,12 +428,10 @@
 
 /* History details modal */
 .moderator-history-details-modal-content {
-  background: var(--glass-bg-strong);
+  background: linear-gradient(145deg, #ffffff, #d7d7d7);
   border-radius: 20px;
-  border: 1px solid var(--glass-border) !important;
-  box-shadow: 0 12px 42px var(--glass-shadow);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: none !important;
+  box-shadow: 8px 8px 18px rgba(0,0,0,0.08), -8px -8px 18px rgba(255,255,255,0.85);
 }
 .moderator-history-details-modal-body {
   display: flex;
