@@ -64,6 +64,13 @@
   align-items: flex-start;
   justify-content: center;
   margin-left: 0;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border-weak);
+  border-radius: var(--glass-radius);
+  box-shadow: 0 8px 24px var(--glass-shadow-soft), 0 2px 8px var(--glass-shadow);
+  padding: 24px 28px;
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
 }
 
 .student-content-feature-title {

@@ -17,6 +17,13 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border-weak);
+  border-radius: var(--glass-radius);
+  box-shadow: 0 8px 24px var(--glass-shadow-soft), 0 2px 8px var(--glass-shadow);
+  padding: 24px 28px;
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
 }
 
 .footer-title {
@@ -64,25 +71,24 @@
   width: auto !important;
   min-width: max-content;
   white-space: nowrap;
-  padding: 0 18px;
   height: 40px;
-  padding: 0 14px;
+  padding: 0 16px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font: 500 0.95rem "Inter", "Arimo", Arial, sans-serif;
+  font: 600 0.95rem "Inter", "Arimo", Arial, sans-serif;
   letter-spacing: 0.2px;
   color: #000;
-  background: transparent;
-  border: 1px solid #000;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border-weak);
   border-radius: 12px;
   cursor: pointer;
-  transition: transform 0.25s ease-in-out, background-color 0.25s ease-in-out, border-color 0.25s ease-in-out, color 0.25s ease-in-out, box-shadow 0.25s ease-in-out;
+  box-shadow: 0 6px 18px var(--glass-shadow-soft);
+  transition: transform 0.2s ease, filter 0.2s ease, box-shadow 0.2s ease;
+  backdrop-filter: blur(calc(var(--glass-blur) - 4px));
+  -webkit-backdrop-filter: blur(calc(var(--glass-blur) - 4px));
 }
-.footer-cta-btn:hover {
-  transform: translateY(-1px);
-  background-color: #f8f8f8;
-}
+.footer-cta-btn:hover { transform: translateY(-1px); filter: brightness(1.03); }
 .footer-cta-btn:active {
   transform: translateY(0);
 }

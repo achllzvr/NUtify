@@ -5,7 +5,11 @@
   top: 0;
   width: 80px;
   height: 100vh;
+  /* keep original brand gradient color, add glass treatment */
   background: linear-gradient(180deg, #35408e 0%, #1a2049 100%);
+  border-right: 1px solid var(--glass-border-weak);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
   z-index: 1000;
   display: flex;
   flex-direction: column;
@@ -126,9 +130,9 @@
   width: 215px;
 }
 .sidebar-icon.active {
-  background: #2a3273;
-  box-shadow: inset 5px 5px 7px rgba(0, 0, 0, 0.15),
-    inset -5px -5px 7px rgba(255, 255, 255, 0.03);
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 10px 24px var(--glass-shadow-soft), inset 0 1px 0 var(--glass-highlight);
 }
 .nav-text {
   margin-left: 15px;
@@ -175,10 +179,10 @@
 }
 .settings-dropdown {
   position: absolute;
-  background: #ffffff;
-  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3),
-    -5px -5px 10px rgba(255, 255, 255, 0.05);
-  border-radius: 5px;
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 12px 42px var(--glass-shadow);
+  border-radius: 10px;
   min-width: 180px;
   opacity: 0;
   visibility: hidden;
@@ -237,13 +241,25 @@
   left: 80px;
   right: 0;
   height: 80px;
-  background: #ffffff;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  z-index: 999;
+  background: var(--glass-bg-strong);
+  border-bottom: 1px solid var(--glass-border);
+  box-shadow: 0 10px 28px var(--glass-shadow);
+  backdrop-filter: saturate(140%) contrast(105%) blur(var(--glass-blur));
+  -webkit-backdrop-filter: saturate(140%) contrast(105%) blur(var(--glass-blur));
+  z-index: 1200;
   display: flex;
   align-items: center;
   padding: 0 30px;
   transition: left 0.3s ease;
+  position: relative;
+  overflow: visible;
+}
+.top-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.5), rgba(255,255,255,0.12) 45%, rgba(255,255,255,0) 65%);
+  pointer-events: none;
 }
 .sidebar.expanded ~ .top-header {
   left: 250px;
@@ -281,16 +297,30 @@
   position: relative;
   display: flex;
   align-items: center;
-  background: #f8f9fa;
+  background: var(--glass-bg);
   border-radius: 25px;
+  border: 1px solid var(--glass-border-weak);
   padding: 8px 15px;
   width: 400px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 18px var(--glass-shadow-soft);
   transition: all 0.3s ease;
+  overflow: visible;
+  z-index: 1;
+  backdrop-filter: saturate(130%) contrast(105%) blur(calc(var(--glass-blur) - 6px));
+  -webkit-backdrop-filter: saturate(130%) contrast(105%) blur(calc(var(--glass-blur) - 6px));
 }
 .search-input-wrapper:focus-within {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  background: #ffffff;
+  box-shadow: 0 10px 24px var(--glass-shadow);
+  background: var(--glass-bg-strong);
+  border-color: var(--glass-border);
+}
+.search-input-wrapper::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.55), rgba(255,255,255,0.1) 40%, rgba(255,255,255,0) 60%);
+  pointer-events: none;
 }
 .menu-icon {
   width: 20px;
