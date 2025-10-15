@@ -112,10 +112,10 @@
   cursor: pointer;
   position: relative; /* enable hover overlay positioning */
   overflow: hidden;   /* clip hover overlay */
-  /* orchestrate background after the slide begins */
-  transition: background 220ms cubic-bezier(0.4, 0, 0.2, 1) 120ms,
-              box-shadow 180ms ease-in-out,
-              color 180ms ease-in-out;
+  /* refined sequencing: quick but smooth */
+  transition: background 260ms cubic-bezier(0.4, 0, 0.2, 1) 90ms,
+              box-shadow 240ms cubic-bezier(0.4, 0, 0.2, 1),
+              color 200ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Item hover effect */
@@ -124,15 +124,15 @@
   box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.08),
     inset -5px -5px 10px rgba(255, 255, 255, 0.9);
 }
-/* Remove white glow/inset shadow for faculty card during hover */
+/* Replace white glow with subtle outer elevation during hover */
 .moderator-home-faculty-item:hover {
-  box-shadow: none !important;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18) !important;
 }
 
 /* Faculty card: slide contents right, then turn blue, then show gold bell + tooltip */
 .moderator-home-faculty-item > * {
-  transition: transform 260ms cubic-bezier(0.4, 0, 0.2, 1),
-              opacity 200ms cubic-bezier(0.22, 1, 0.36, 1) 80ms;
+  transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 220ms cubic-bezier(0.22, 1, 0.36, 1) 60ms;
   will-change: transform, opacity;
   position: relative;
   z-index: 1; /* keep under overlay */
@@ -175,14 +175,12 @@
   mask-position: center;
   filter: drop-shadow(0 1px 1px rgba(0,0,0,0.25));
   opacity: 0;
-  transition: opacity 200ms cubic-bezier(0.22, 1, 0.36, 1) 200ms,
-              transform 220ms cubic-bezier(0.4, 0, 0.2, 1) 200ms;
+  /* animation on hover will control visibility */
   pointer-events: none;
   z-index: 2; /* above content */
 }
 .moderator-home-faculty-item:hover::before {
-  opacity: 1;
-  transform: translate(-50%, -56%) scale(1.03);
+  animation: moderator-bell-pop 280ms cubic-bezier(0.22, 1, 0.36, 1) 140ms both;
 }
 /* Tooltip overlay */
 .moderator-home-faculty-item::after {
@@ -201,13 +199,59 @@
   border-radius: 8px;
   text-shadow: 0 1px 2px rgba(0,0,0,0.35);
   opacity: 0;
-  transition: opacity 200ms cubic-bezier(0.22, 1, 0.36, 1) 230ms;
+  /* animation on hover will control visibility */
   pointer-events: none;
   white-space: nowrap;
   z-index: 2; /* above content */
 }
 .moderator-home-faculty-item:hover::after {
-  opacity: 1;
+  animation: moderator-tooltip-fade 260ms cubic-bezier(0.22, 1, 0.36, 1) 180ms both;
+}
+
+/* Keyframes for refined animations */
+@keyframes moderator-bell-pop {
+  0% {
+    transform: translate(-50%, -50%) scale(0.92);
+    opacity: 0;
+  }
+  60% {
+    transform: translate(-50%, -55%) scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -56%) scale(1.0);
+    opacity: 1;
+  }
+}
+
+@keyframes moderator-tooltip-fade {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -40%);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .moderator-home-faculty-item,
+  .moderator-home-faculty-item > *,
+  .moderator-home-faculty-item::before,
+  .moderator-home-faculty-item::after {
+    transition: none !important;
+    animation: none !important;
+  }
+  .moderator-home-faculty-item:hover > * {
+    transform: none;
+    opacity: 0;
+  }
+  .moderator-home-faculty-item:hover::before,
+  .moderator-home-faculty-item:hover::after {
+    opacity: 1;
+  }
 }
 
 /* Avatar styles */
