@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthProvider";
+import { loginModerator } from "../api/auth";
 import userID from "../assets/icons/credit-card.svg";
 import lockIcon from "../assets/icons/lock.svg";
 import eyeIcon from "../assets/icons/eye.svg";
@@ -14,6 +15,8 @@ const Login = () => {
     password: "",
     remember: false,
   });
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const togglePasswordVisibility = () => {
@@ -30,23 +33,22 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Replace this with your real API call.
-    // const res = await fetch("/api/auth/login", { ... });
-    // const { token, user } = await res.json();
-    const token = "fake-jwt-token";
-    const user = {
-      // Fill with whatever your backend returns
-      id: undefined, // set if you have it
-      idNumber: formData.idNumber,
-      role: "moderator",
-      name: "Moderator",
-    };
-
-    login(token, user);
-
-    // Optional: keep your current UX flow
-    navigate("/moderator/home", { replace: true });
+    setError("");
+    setSubmitting(true);
+    try {
+      const user = await loginModerator({
+        username: formData.idNumber,
+        password: formData.password,
+      });
+      // For now we store a pseudo token using csrfToken (backend is session-based)
+      const token = user.csrfToken || "session";
+      login(token, user);
+      navigate("/moderator/home", { replace: true });
+    } catch (err) {
+      setError(err.message || "Login failed");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -57,6 +59,17 @@ const Login = () => {
           <p className="login-subtitle">Stay connected. Stay updated.</p>
 
           <form onSubmit={handleSubmit}>
+            {error && (
+              <div style={{
+                background: "#fdecea",
+                color: "#b71c1c",
+                padding: "10px 14px",
+                borderRadius: 10,
+                marginBottom: 14,
+                fontSize: 14,
+                fontWeight: 600
+              }}>{error}</div>
+            )}
             <div className="input-group">
               <img src={userID} alt="User" className="input-icon" />
               <input
@@ -113,8 +126,8 @@ const Login = () => {
               </Link>
             </div>
 
-            <button type="submit" className="login-button">
-              Login
+            <button type="submit" className="login-button" disabled={submitting}>
+              {submitting ? "Logging in…" : "Login"}
             </button>
 
             <div className="signup-link">

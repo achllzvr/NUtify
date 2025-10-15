@@ -208,14 +208,16 @@ body {
 
 .login-card {
   border-radius: 20px;
-  background: var(--glass-bg-strong);
-  border: 1px solid var(--glass-border);
+  background: #f0f0f0; /* revert to solid surface */
+  border: none;
   padding: 39px 32px;
   max-width: 510px;
   width: 100%;
-  box-shadow: 0 12px 42px var(--glass-shadow);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
+  /* soft neomorphic outer + inner feel */
+  box-shadow:
+    8px 8px 18px rgba(0,0,0,0.08),
+    -8px -8px 18px rgba(255,255,255,0.85),
+    inset 0 0 0 rgba(0,0,0,0);
 }
 
 .login-title {
@@ -323,10 +325,10 @@ body {
 .login-select {
   width: 100%;
   padding: 15px 25px 15px 65px;
-  border: 1px solid var(--glass-border-weak);
+  border: none;
   border-radius: 30px !important;
-  background: var(--glass-bg);
-  box-shadow: 0 2px 8px var(--glass-shadow-soft) inset, 0 6px 18px var(--glass-shadow-soft);
+  background: #f0f0f0;
+  box-shadow: 8px 8px 15px rgba(0, 0, 0, 0.09), -8px -8px 15px rgba(255, 255, 255, 0.8);
   font-size: 16px;
   color: #1c1d1e;
   outline: none;
@@ -336,8 +338,6 @@ body {
   -webkit-appearance: none;
   -moz-appearance: none;
   cursor: pointer;
-  backdrop-filter: blur(calc(var(--glass-blur) - 4px));
-  -webkit-backdrop-filter: blur(calc(var(--glass-blur) - 4px));
 }
 
 .login-select:focus {
@@ -400,10 +400,7 @@ textarea,
     margin-bottom: 35px;
   }
 
-  .login-select {
-    padding: 12px 20px 12px 50px;
-    font-size: 15px;
-  }
+  .login-select { padding: 12px 20px 12px 50px; font-size: 15px; }
 
   .signup-link,
   .forgot-password,
@@ -432,10 +429,7 @@ textarea,
     margin-bottom: 30px;
   }
 
-  .login-select {
-    padding: 13px 55px 13px 55px;
-    font-size: 14px;
-  }
+  .login-select { padding: 13px 55px 13px 55px; font-size: 14px; }
 
   .input-icon,
   .toggle-password {
