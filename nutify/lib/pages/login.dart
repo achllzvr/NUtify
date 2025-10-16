@@ -154,16 +154,29 @@ class _LoginPageState extends State<LoginPage> {
           final Map<String, dynamic> responseData = json.decode(response.body);
           print('Parsed Response Data: $responseData');
 
-          if (responseData['success'] == true) {
-            // Check verification status first
-            final dynamic isVerifiedRaw = responseData['is_verified'];
-            final String isVerifiedStr = isVerifiedRaw == null
-                ? ''
-                : (isVerifiedRaw is String
-                    ? isVerifiedRaw
-                    : isVerifiedRaw.toString());
+          final bool loginOk = (responseData['success'] == true) || (responseData['error'] == false);
 
-            if (isVerifiedStr != '1') {
+          if (loginOk) {
+            // Check verification status first (support multiple response shapes)
+            dynamic isVerifiedRaw = responseData['is_verified'];
+            final dynamic userObj = responseData['user'];
+            final dynamic dataObj = responseData['data'];
+            if (isVerifiedRaw == null && userObj is Map) {
+              isVerifiedRaw = userObj['is_verified'] ?? userObj['verified'] ?? userObj['isVerified'];
+            }
+            if (isVerifiedRaw == null && dataObj is Map) {
+              isVerifiedRaw = dataObj['is_verified'] ?? dataObj['verified'] ?? dataObj['isVerified'];
+            }
+            // Determine whether to block based on explicit 0 or 2 only
+            String? isVerifiedStr;
+            if (isVerifiedRaw != null) {
+              isVerifiedStr = (isVerifiedRaw is String)
+                  ? isVerifiedRaw.trim()
+                  : isVerifiedRaw.toString();
+            }
+            final bool shouldBlock = isVerifiedStr == '0' || isVerifiedStr == '2';
+
+            if (shouldBlock) {
               // Show front desk verification message and do not proceed
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -181,10 +194,11 @@ class _LoginPageState extends State<LoginPage> {
             }
 
             // Login successful and verified
-            String userId = responseData['user_id'].toString();
-            String userType = responseData['user_type'].toString().toLowerCase();
-            String userFn = responseData['user_fn'].toString();
-            String userLn = responseData['user_ln'].toString();
+            // Try top-level fields, then nested objects
+            String userId = (responseData['user_id'] ?? (userObj is Map ? userObj['user_id'] : null) ?? (dataObj is Map ? dataObj['user_id'] : null)).toString();
+            String userType = (responseData['user_type'] ?? (userObj is Map ? userObj['user_type'] : null) ?? (dataObj is Map ? dataObj['user_type'] : null)).toString().toLowerCase();
+            String userFn = (responseData['user_fn'] ?? (userObj is Map ? userObj['user_fn'] : null) ?? (dataObj is Map ? dataObj['user_fn'] : null)).toString();
+            String userLn = (responseData['user_ln'] ?? (userObj is Map ? userObj['user_ln'] : null) ?? (dataObj is Map ? dataObj['user_ln'] : null)).toString();
 
             // Save login state to SharedPreferences
             SharedPreferences prefs = await SharedPreferences.getInstance();
