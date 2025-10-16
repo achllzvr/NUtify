@@ -15,9 +15,9 @@ const Footer = () => {
   const controllerRef = useRef(null);
   const startedAtRef = useRef(0);
 
-  // Put your APK under public/android/app-release.apk
-  // Served by Vite at /android/app-release.apk
-  const APK_PATH = "/android/app-release.apk";
+  // Put your APK under public/downloads/app-release.apk
+  // Served by Vite at /downloads/app-release.apk
+  const APK_PATH = "/downloads/app-release.apk";
 
   useEffect(() => {
     AOS.init({ duration: 500, easing: "ease-out", once: true });
@@ -76,7 +76,7 @@ const Footer = () => {
       setProgress(100); setSpeed(0); setDone(true);
       const blob = new Blob(chunks, { type: "application/vnd.android.package-archive" });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement("a"); a.href = url; a.download = "NUtify.apk";
+  const a = document.createElement("a"); a.href = url; a.download = "app-release.apk";
       document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
     } catch (e) {
       if (e.name !== 'AbortError') setError(e.message || "Download failed");
@@ -113,7 +113,7 @@ const Footer = () => {
     <div className="download-modal-overlay" role="dialog" aria-modal="true">
       <div className="download-modal">
         <div className="dm-title">Android APK Download</div>
-        <div className="dm-sub">File: NUtify.apk</div>
+  <div className="dm-sub">File: app-release.apk</div>
 
         {error ? (
           <div className="dm-state dm-error">{error}</div>
