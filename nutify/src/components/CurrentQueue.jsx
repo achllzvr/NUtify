@@ -1,6 +1,6 @@
 // Current queue section
 import React, { useEffect, useMemo, useState } from 'react';
-import { getModeratorHomeAppointments } from '../api/moderator';
+import { getModeratorHomeAppointments, getModeratorOngoingAppointments, markMeetingOngoing } from '../api/moderator';
 import messageCircleIcon from '../assets/icons/message-circle.svg';
 import calendarIcon from '../assets/icons/calendar.svg';
 import folderIcon from '../assets/icons/folder.svg';
@@ -94,9 +94,14 @@ const QUEUE_PER_PAGE = 10;
 
 const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, moderatorId = 0 }) => {
   const [page, setPage] = useState(1);
-  const [items, setItems] = useState([]);
+  const [activeTab, setActiveTab] = useState('queue'); // 'queue' | 'ongoing'
+  const [items, setItems] = useState([]); // accepted -> queue
+  const [ongoingItems, setOngoingItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingOngoing, setLoadingOngoing] = useState(true);
   const [error, setError] = useState('');
+  const [errorOngoing, setErrorOngoing] = useState('');
+  const [busyId, setBusyId] = useState(null);
 
   useEffect(() => {
     let mounted = true;
@@ -104,15 +109,11 @@ const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, moderator
       try {
         setLoading(true);
         setError('');
-        // Use provided moderatorId or default 0; backend may ignore or use permissions
+        // Fetch accepted -> queue
         const data = await getModeratorHomeAppointments(moderatorId);
-  // Expect { appointments: [...] } or an array
-  // Debug: log raw response so we can inspect why today's queues may be missing
-  try { console.debug('getModeratorHomeAppointments raw response:', data); } catch { /* no-op in older consoles */ }
-  const list = Array.isArray(data) ? data : (data.appointments || []);
-        // Map to UI fields
+        const list = Array.isArray(data) ? data : (data.appointments || []);
         const mapped = list
-          .filter(a => a) // safety
+          .filter(a => a)
           .map(a => {
             const id = a.appointment_id || a.id;
             const studentName = a.student_name || a.student || [a.student_fn, a.student_ln].filter(Boolean).join(' ');
@@ -155,20 +156,94 @@ const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, moderator
     return () => { mounted = false; };
   }, [moderatorId]);
 
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        setLoadingOngoing(true);
+        setErrorOngoing('');
+        const data = await getModeratorOngoingAppointments(moderatorId);
+        const list = Array.isArray(data) ? data : (data.appointments || []);
+        const mapped = list
+          .filter(a => a)
+          .map(a => {
+            const id = a.appointment_id || a.id;
+            const studentName = a.student_name || a.student || [a.student_fn, a.student_ln].filter(Boolean).join(' ');
+            const facultyName = a.teacher_name || a.faculty || [a.teacher_fn, a.teacher_ln].filter(Boolean).join(' ');
+            const department = a.department ? `Faculty - ${a.department}` : (a.faculty_department || 'Faculty');
+            const reason = a.appointment_reason || a.reason || 'Other';
+            const singleDateTime = a.appointment_date || a.appointment_datetime || a.datetime || a.time || a.created_at;
+            const dateOnly = a.schedule_date || a.date || a.appointment_day;
+            const fromTime = a.schedule_time_from || a.start_time || a.time_from;
+            const toTime = a.schedule_time_to || a.end_time || a.time_to;
+            let timeStr = '';
+            if (singleDateTime) {
+              timeStr = formatDateRange(singleDateTime, null, null);
+            }
+            if (!timeStr && (dateOnly || fromTime || toTime)) {
+              timeStr = formatDateRange(dateOnly || singleDateTime, fromTime, toTime);
+            }
+            return {
+              id,
+              name: facultyName || '',
+              studentName: studentName || '',
+              department,
+              time: timeStr,
+              avatar: null,
+              reason: mapReason(reason)
+            };
+          });
+        if (mounted) setOngoingItems(mapped);
+      } catch (e) {
+        if (mounted) setErrorOngoing(e.message || 'Failed to load ongoing meetings');
+      } finally {
+        if (mounted) setLoadingOngoing(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, [moderatorId]);
+
   const filteredQueue = useMemo(() => items.filter(a =>
     a.name.toLowerCase().includes(mainSearch.toLowerCase()) ||
     a.studentName.toLowerCase().includes(mainSearch.toLowerCase()) ||
     a.department.toLowerCase().includes(mainSearch.toLowerCase())
   ), [items, mainSearch]);
 
-  const totalPages = Math.max(1, Math.ceil(filteredQueue.length / QUEUE_PER_PAGE));
-  const paginatedQueue = filteredQueue.slice(
+  const filteredOngoing = useMemo(() => ongoingItems.filter(a =>
+    a.name.toLowerCase().includes(mainSearch.toLowerCase()) ||
+    a.studentName.toLowerCase().includes(mainSearch.toLowerCase()) ||
+    a.department.toLowerCase().includes(mainSearch.toLowerCase())
+  ), [ongoingItems, mainSearch]);
+
+  const dataForActive = activeTab === 'queue' ? filteredQueue : filteredOngoing;
+  const totalPages = Math.max(1, Math.ceil(dataForActive.length / QUEUE_PER_PAGE));
+  const paginatedQueue = dataForActive.slice(
     (page - 1) * QUEUE_PER_PAGE,
     page * QUEUE_PER_PAGE
   );
 
   const handlePrev = () => setPage(prev => Math.max(prev - 1, 1));
   const handleNext = () => setPage(prev => Math.min(prev + 1, totalPages));
+
+  async function handleStartMeeting(appointment) {
+    if (!appointment?.id) return;
+    try {
+      setBusyId(appointment.id);
+      setError('');
+      const res = await markMeetingOngoing(appointment.id);
+      if (res && res.error === false) {
+        // Optimistically remove from the list
+        setItems(prev => prev.filter(it => it.id !== appointment.id));
+      } else {
+        const msg = res?.message || 'Failed to start meeting';
+        setError(msg);
+      }
+    } catch (e) {
+      setError(e.message || 'Failed to start meeting');
+    } finally {
+      setBusyId(null);
+    }
+  }
 
   const formatDateWithYear = (dateStr) => {
     if (!dateStr) return '';
@@ -191,28 +266,42 @@ const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, moderator
         flexDirection: 'column'
       }}
     >
-      <div className="moderator-home-section-header">
-    <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
-          Current Queue
-          <span
-            aria-label="queued appointments count"
+      <div className="moderator-home-section-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <h2 style={{ margin: 0 }}>Appointments</h2>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button
+            onClick={() => { setActiveTab('queue'); setPage(1); }}
             style={{
-      display: 'inline-flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontSize: '13px',
-      padding: '4px 10px',
+              padding: '6px 10px',
               borderRadius: '9999px',
-      background: loading ? '#9CA3AF' : (error ? '#EF4444' : '#ffa600ff'),
-      color: '#ffffff',
-      fontWeight: 700,
-      lineHeight: 1,
-      boxShadow: '0 1px 3px rgba(0,0,0,0.15)'
+              border: 'none',
+              fontWeight: 700,
+              cursor: 'pointer',
+              background: activeTab === 'queue' ? '#ffa600ff' : '#f0f0f0',
+              color: activeTab === 'queue' ? '#fff' : '#7f8c8d',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.15)'
             }}
+            aria-label="Current queue count"
           >
-            {loading ? '...' : (error ? '—' : items.length)}
-          </span>
-        </h2>
+            Current Queue {loading ? '…' : (error ? '' : `(${items.length})`)}
+          </button>
+          <button
+            onClick={() => { setActiveTab('ongoing'); setPage(1); }}
+            style={{
+              padding: '6px 10px',
+              borderRadius: '9999px',
+              border: 'none',
+              fontWeight: 700,
+              cursor: 'pointer',
+              background: activeTab === 'ongoing' ? '#10B981' : '#f0f0f0',
+              color: activeTab === 'ongoing' ? '#fff' : '#7f8c8d',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.15)'
+            }}
+            aria-label="Ongoing meetings count"
+          >
+            Ongoing Meetings {loadingOngoing ? '…' : (errorOngoing ? '' : `(${ongoingItems.length})`)}
+          </button>
+        </div>
       </div>
       <div
         className="moderator-home-queue-list"
@@ -227,19 +316,20 @@ const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, moderator
           marginRight: '-8px'
         }}
       >
-        {loading ? (
+        {activeTab === 'queue' ? (
+          loading ? (
           <div style={{ textAlign: 'center', color: '#888', marginTop: '40px', fontSize: '1.2em', fontWeight: 500 }}>
             Loading queue...
           </div>
-        ) : error ? (
+          ) : error ? (
           <div style={{ textAlign: 'center', color: '#d9534f', marginTop: '40px', fontSize: '1.0em', fontWeight: 500 }}>
             {error}
           </div>
-        ) : paginatedQueue.length === 0 ? (
+          ) : paginatedQueue.length === 0 ? (
           <div style={{ textAlign: 'center', color: '#888', marginTop: '40px', fontSize: '1.2em', fontWeight: 500 }}>
             No queue for today.
           </div>
-        ) : (
+          ) : (
           paginatedQueue.map(appointment => {
             const reasonLabel = mapReason(appointment.reason);
             const { icon, bg } = reasonIconMap[reasonLabel];
@@ -341,6 +431,14 @@ const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, moderator
                       }}
                     >
                       <button
+                        className="moderator-home-see-more-btn verify small-btn-text"
+                        style={{ width: '130px', fontSize: '12px', padding: '8px 15px' }}
+                        onClick={() => handleStartMeeting(appointment)}
+                        disabled={busyId === appointment.id}
+                      >
+                        {busyId === appointment.id ? 'Starting…' : 'Start Meeting'}
+                      </button>
+                      <button
                         className="moderator-home-see-more-btn gray details small-btn-text"
                         style={{ width: '130px', fontSize: '12px', padding: '8px 15px' }}
                         onClick={() => onViewDetails({ ...appointment, reason: fullReasonText })}
@@ -360,6 +458,142 @@ const CurrentQueue = ({ mainSearch, onViewDetails, onNotifyAppointees, moderator
               </div>
             );
           })
+        )
+        ) : (
+          loadingOngoing ? (
+            <div style={{ textAlign: 'center', color: '#888', marginTop: '40px', fontSize: '1.2em', fontWeight: 500 }}>
+              Loading ongoing meetings...
+            </div>
+          ) : errorOngoing ? (
+            <div style={{ textAlign: 'center', color: '#d9534f', marginTop: '40px', fontSize: '1.0em', fontWeight: 500 }}>
+              {errorOngoing}
+            </div>
+          ) : paginatedQueue.length === 0 ? (
+            <div style={{ textAlign: 'center', color: '#888', marginTop: '40px', fontSize: '1.2em', fontWeight: 500 }}>
+              No ongoing meetings.
+            </div>
+          ) : (
+            paginatedQueue.map(appointment => {
+              const reasonLabel = mapReason(appointment.reason);
+              const { icon, bg } = reasonIconMap[reasonLabel];
+              const fullReasonText =
+                reasonLabel === 'Other'
+                  ? '*Unspecified Reason. Please consult with appointee.'
+                  : reasonLabel;
+              const words = fullReasonText.split(' ');
+              const shortReasonText =
+                words.length > 6 ? words.slice(0, 6).join(' ') + '...' : fullReasonText;
+              return (
+                <div
+                  key={appointment.id}
+                  className="moderator-home-queue-card"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'stretch',
+                    width: '100%',
+                    minWidth: 0,
+                    boxSizing: 'border-box',
+                    flexDirection: 'row'
+                  }}
+                >
+                  {/* Icon bar */}
+                  <div
+                    className="moderator-home-queue-icon-bar"
+                    style={{
+                      width: '60px',
+                      minWidth: '60px',
+                      height: '100%',
+                      background: bg,
+                      borderTopLeftRadius: '15px',
+                      borderBottomLeftRadius: '15px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      boxShadow: 'inset 8px 8px 15px rgba(0,0,0,0.10), inset -8px -8px 15px rgba(255,255,255,0.08)',
+                      backgroundClip: 'padding-box',
+                      marginRight: '-5px'
+                    }}
+                  >
+                    <img src={icon} alt={reasonLabel} style={{ width: 20, height: 20, filter: 'brightness(0) invert(1)' }} />
+                  </div>
+                  {/* Card content */}
+                  <div style={{ flex: 1 }}>
+                    <div
+                      className="moderator-home-appointment-item"
+                      style={{
+                        padding: '18px 22px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        borderTopLeftRadius: 0,
+                        borderBottomLeftRadius: 0,
+                        flexDirection: 'row'
+                      }}
+                    >
+                      <div className="moderator-home-appointment-main" style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+                        <div className="moderator-home-appointment-avatar">
+                          <div
+                            className="moderator-home-avatar-img"
+                            style={{
+                              width: '40px',
+                              height: '40px',
+                              borderRadius: '50%',
+                              backgroundColor: '#e0e0e0',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '16px',
+                              fontWeight: 'bold',
+                              color: '#666'
+                            }}
+                          >
+                            {appointment.name.split(' ').map(n => n[0]).join('').substring(0, 2)}
+                          </div>
+                        </div>
+                        <div className="moderator-home-appointment-info" style={{ flex: 1 }}>
+                          <div className="moderator-home-appointment-name">{appointment.name}</div>
+                          <div className="moderator-home-appointment-details">
+                            Student: {appointment.studentName}
+                          </div>
+                          <div className="moderator-home-appointment-time">
+                            Date: {formatDateWithYear(appointment.time)}
+                          </div>
+                          <div className="moderator-home-appointment-details" style={{ marginTop: '2px', marginBottom: '8px' }}>
+                            Reason: {shortReasonText}
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        className="moderator-home-appointment-actions"
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '10px',
+                          alignItems: 'flex-end',
+                          minWidth: '140px'
+                        }}
+                      >
+                        <button
+                          className="moderator-home-see-more-btn gray details small-btn-text"
+                          style={{ width: '130px', fontSize: '12px', padding: '8px 15px' }}
+                          onClick={() => onViewDetails({ ...appointment, reason: fullReasonText })}
+                        >
+                          View Details
+                        </button>
+                        <button
+                          className="moderator-home-notify-btn verify small-btn-text"
+                          style={{ width: '130px', fontSize: '12px', padding: '8px 15px' }}
+                          onClick={() => onNotifyAppointees(appointment)}
+                        >
+                          <span style={{ display: 'block', lineHeight: '1.2' }}>Notify<br />Appointees</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )
         )}
       </div>
       <div style={{ display: 'flex', justifyContent: 'center', marginTop: '12px', gap: '10px' }}>

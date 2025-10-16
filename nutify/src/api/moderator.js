@@ -6,6 +6,11 @@ export async function getModeratorHomeAppointments(userID) {
   return apiPost('getModeratorHomeAppointments', { userID });
 }
 
+// Fetch ongoing appointments for moderator page
+export async function getModeratorOngoingAppointments(userID) {
+  return apiPost('getModeratorOngoingAppointments', { userID });
+}
+
 // Fetch moderator requests for inbox page
 export async function getModeratorRequests() {
   return apiPost('getModeratorOnTheSpotRequests', {});
@@ -47,6 +52,11 @@ export async function getStudentsLog() {
 // Send notifications to both student and teacher for an appointment
 export async function notifyAppointees(appointment_id) {
   return apiPost('notifyAppointees', { appointment_id });
+}
+
+// Mark appointment as ongoing and set both users to in-meeting
+export async function markMeetingOngoing(appointment_id) {
+  return apiPost('moderatorMarkOngoingMeeting', { appointment_id });
 }
 
 // Send a direct call notification to a teacher (front desk)
