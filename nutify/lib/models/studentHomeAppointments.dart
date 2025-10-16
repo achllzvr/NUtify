@@ -45,21 +45,49 @@ class StudentHomeAppointments {
 
       print('Using user ID for home appointments: $userId');
 
+      // Some backends accept different param keys; send a superset
+      final body = {
+        'userID': userId,
+        'user_id': userId,
+        'student_id': userId,
+        // Request accepted appointments explicitly across all dates (backend may ignore unknown keys)
+        'status': 'accepted',
+        'accepted_only': true,
+        'include_all_accepted': true,
+      };
       final response = await http.post(
         Uri.parse('https://nutify.site/api.php?action=getStudentHomeAppointments'),
         headers: {'Content-Type': 'application/json'},
-        body: json.encode({'userID': userId}),
+        body: json.encode(body),
       );
 
       print('Student Home Appointments Response status: ${response.statusCode}');
       print('Student Home Appointments Response body: ${response.body}');
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        
-        if (data['success'] == true && data['appointments'] != null) {
-          List<dynamic> appointments = data['appointments'];
-          return appointments.map((appointment) => StudentHomeAppointments.fromJson(appointment)).toList();
+        final raw = response.body.trim();
+        if (raw.isEmpty) return [];
+        final data = json.decode(raw);
+
+        List<dynamic>? list;
+        if (data is List) {
+          list = data;
+        } else if (data is Map) {
+          // Prefer appointments key
+          if (data['appointments'] is List) list = data['appointments'];
+          // Fallback keys used in some routes
+          else if (data['data'] is List) list = data['data'];
+          else if (data['rows'] is List) list = data['rows'];
+        }
+
+        if (list != null) {
+          // Map and dedup by id
+          final mapped = list
+              .map((e) => StudentHomeAppointments.fromJson(Map<String, dynamic>.from(e)))
+              .toList();
+          final seen = <String>{};
+          final deduped = mapped.where((a) => seen.add(a.id)).toList();
+          return deduped;
         }
       }
     } catch (e) {

@@ -151,7 +151,7 @@ class _TeacherHomeState extends State<TeacherHome> {
         final startOfToday = DateTime(now.year, now.month, now.day);
 
         // Upcoming: all appointments from today onward (today and future)
-        final upcoming = all.where((a) {
+        List<TeacherHomeAppointments> upcoming = all.where((a) {
           final start = _parseStartDateTime(a);
           if (start != null) {
             return !start.isBefore(startOfToday); // >= startOfToday
@@ -164,9 +164,12 @@ class _TeacherHomeState extends State<TeacherHome> {
             final db = _parseStartDateTime(b) ?? _parseDateOnly(b.scheduleDate) ?? DateTime(2100);
             return da.compareTo(db);
           });
+        // Deduplicate by appointment ID
+        final seenU = <String>{};
+        upcoming = upcoming.where((a) => seenU.add(a.id)).toList();
 
         // Missed: strictly before today (yesterday and earlier)
-        final missed = all.where((a) {
+        List<TeacherHomeAppointments> missed = all.where((a) {
           final start = _parseStartDateTime(a);
           if (start != null) {
             return start.isBefore(startOfToday);
@@ -179,6 +182,9 @@ class _TeacherHomeState extends State<TeacherHome> {
             final db = _parseStartDateTime(b) ?? _parseDateOnly(b.scheduleDate) ?? DateTime(1900);
             return db.compareTo(da); // newest missed first
           });
+        // Deduplicate by appointment ID
+        final seenM = <String>{};
+        missed = missed.where((a) => seenM.add(a.id)).toList();
 
         // Apply query filtering
         bool hasQuery = _homeQuery.trim().isNotEmpty;
