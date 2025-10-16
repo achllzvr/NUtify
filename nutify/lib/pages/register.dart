@@ -47,9 +47,14 @@ class _RegisterPageState extends State<RegisterPage> {
 
   bool get _isValidEmailFormat {
     String email = _emailController.text.trim();
-    return email.isNotEmpty && 
-           email.endsWith('@students.nu-lipa.edu.ph') &&
-           RegExp(r'^[\w-\.]+@students\.nu-lipa\.edu\.ph$').hasMatch(email);
+    if (email.isEmpty) return false;
+    if (_selectedAccountType == 'Faculty') {
+      return email.endsWith('@faculty.nu-lipa.edu.ph') &&
+          RegExp(r'^[\w\.-]+@faculty\.nu-lipa\.edu\.ph$').hasMatch(email);
+    }
+    // Default to Student rule
+    return email.endsWith('@students.nu-lipa.edu.ph') &&
+        RegExp(r'^[\w\.-]+@students\.nu-lipa\.edu\.ph$').hasMatch(email);
   }
 
   // Password strength calculation
@@ -396,8 +401,23 @@ class _RegisterPageState extends State<RegisterPage> {
             children: [
               buildTextField(
                 controller: _emailController,
-                hintText: 'Email (@students.nu-lipa.edu.ph)',
+                hintText: _selectedAccountType == 'Faculty'
+                    ? 'Email (@faculty.nu-lipa.edu.ph)'
+                    : 'Email (@students.nu-lipa.edu.ph)',
                 keyboardType: TextInputType.emailAddress,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 6, left: 5, right: 5),
+                child: Text(
+                  _selectedAccountType == 'Faculty'
+                      ? 'Use your NU Lipa faculty email (@faculty.nu-lipa.edu.ph)'
+                      : 'Use your NU Lipa student email (@students.nu-lipa.edu.ph)',
+                  style: TextStyle(
+                    fontFamily: 'Arimo',
+                    fontSize: 12,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
               ),
               // Email validation feedback
               if (_emailController.text.isNotEmpty)
@@ -734,6 +754,8 @@ class _RegisterPageState extends State<RegisterPage> {
         setState(() {
           _selectedAccountType = type;
         });
+        // Re-run email validation rules and any pending checks when type changes
+        _onEmailChanged();
       },
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -921,7 +943,7 @@ class _RegisterPageState extends State<RegisterPage> {
           'last_name': lastName,
           'email': email,
           'password': password,
-          'account_type': _selectedAccountType,
+          'account_type': _selectedAccountType, // 'Student' or 'Faculty'
           'department': _selectedDepartment,
         }),
       );
