@@ -48,9 +48,11 @@ const FacultyList = ({ mainSearch, facultyStatusFilter, setFacultyStatusFilter, 
               }
             }
             const normStatus = (raw) => {
-              const norm = (raw || '').toString().toLowerCase();
-              if (norm === 'online') return 'online';
-              if (norm === 'busy' || norm === 'away' || norm === 'engaged') return 'busy';
+              const s = (raw || '').toString().trim().toLowerCase().replace(/[_\s]+/g, '-');
+              if (s === 'online') return 'online';
+              if (s === 'busy' || s === 'away' || s === 'engaged') return 'busy';
+              if (s === 'in-class' || s === 'class') return 'in-class';
+              if (s === 'in-meeting' || s === 'meeting') return 'in-meeting';
               return 'offline';
             };
             withStatus = mapped.map(f => ({ ...f, status: normStatus(map[f.id] ?? f.status) }));
@@ -61,9 +63,11 @@ const FacultyList = ({ mainSearch, facultyStatusFilter, setFacultyStatusFilter, 
             try {
               const r = await getUserStatus(f.id);
               const raw = (r && (r.status || r.user_status)) || f.status;
-              const norm = (raw || '').toString().toLowerCase();
-              if (norm === 'online') return { ...f, status: 'online' };
-              if (norm === 'busy' || norm === 'away' || norm === 'engaged') return { ...f, status: 'busy' };
+              const s = (raw || '').toString().trim().toLowerCase().replace(/[_\s]+/g, '-');
+              if (s === 'online') return { ...f, status: 'online' };
+              if (s === 'busy' || s === 'away' || s === 'engaged') return { ...f, status: 'busy' };
+              if (s === 'in-class' || s === 'class') return { ...f, status: 'in-class' };
+              if (s === 'in-meeting' || s === 'meeting') return { ...f, status: 'in-meeting' };
               return { ...f, status: 'offline' };
             } catch {
               return f;
@@ -83,13 +87,16 @@ const FacultyList = ({ mainSearch, facultyStatusFilter, setFacultyStatusFilter, 
 
   // Normalize various backend status strings to online|busy|offline
   const normalizeStatus = (raw) => {
-    const norm = (raw || '').toString().toLowerCase();
-    if (norm === 'online') return 'online';
-    if (norm === 'busy' || norm === 'away' || norm === 'engaged') return 'busy';
+    const s = (raw || '').toString().trim().toLowerCase().replace(/[_\s]+/g, '-');
+    if (s === 'online') return 'online';
+    if (s === 'busy' || s === 'away' || s === 'engaged') return 'busy';
+    if (s === 'in-class' || s === 'class') return 'in-class';
+    if (s === 'in-meeting' || s === 'meeting') return 'in-meeting';
     return 'offline';
   };
 
   // Poll statuses every 5 seconds for current faculty list
+  const itemIds = useMemo(() => items.map(i => i.id).join(','), [items]);
   useEffect(() => {
     if (!items || items.length === 0) return; // nothing to poll
     let mounted = true;
@@ -122,7 +129,7 @@ const FacultyList = ({ mainSearch, facultyStatusFilter, setFacultyStatusFilter, 
       mounted = false;
       clearInterval(handle);
     };
-  }, [items.map(i => i.id).join(',')]);
+  }, [itemIds, items]);
 
   const filteredFacultyList = useMemo(() => items.filter(f =>
     (facultyStatusFilter === 'all' || f.status === facultyStatusFilter) &&
@@ -225,7 +232,16 @@ const FacultyList = ({ mainSearch, facultyStatusFilter, setFacultyStatusFilter, 
                 <div className="moderator-home-faculty-name">{faculty.name}</div>
                 <div className="moderator-home-faculty-department">{faculty.department}</div>
               </div>
-              <div className={`moderator-home-faculty-status ${faculty.status}`}></div>
+              <span
+                className={`status-badge ${faculty.status}`}
+                aria-label={`Status: ${faculty.status}`}
+              >
+                {faculty.status === 'online' && 'Online'}
+                {faculty.status === 'busy' && 'Busy'}
+                {faculty.status === 'in-class' && 'In class'}
+                {faculty.status === 'in-meeting' && 'In meeting'}
+                {faculty.status === 'offline' && 'Offline'}
+              </span>
             </div>
           ))
         )}

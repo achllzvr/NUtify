@@ -322,40 +322,25 @@
 }
 
 /* Online/offline indicator */
-.moderator-home-faculty-status {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  margin-left: 0;
-  flex-shrink: 0;
-  box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.1),
-    -3px -3px 6px rgba(255, 255, 255, 0.8);
-  position: absolute; /* pull out of flow so centering works */
+/* Status badges */
+.status-badge {
+  position: absolute;
   right: 15px;
   top: 50%;
   transform: translateY(-50%);
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 800;
+  font-family: "Inter", "Arimo", Arial, sans-serif;
+  letter-spacing: 0.2px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
 }
-.moderator-home-faculty-status.online {
-  background: #27ae60;
-  box-shadow: 3px 3px 6px rgba(39, 174, 96, 0.3),
-    -3px -3px 6px rgba(255, 255, 255, 0.8),
-    inset 2px 2px 4px rgba(39, 174, 96, 0.8),
-    inset -2px -2px 4px rgba(46, 204, 113, 0.8);
-}
-.moderator-home-faculty-status.busy {
-  background: #F59E0B; /* orange */
-  box-shadow: 3px 3px 6px rgba(245, 158, 11, 0.3),
-    -3px -3px 6px rgba(255, 255, 255, 0.8),
-    inset 2px 2px 4px rgba(245, 158, 11, 0.8),
-    inset -2px -2px 4px rgba(251, 191, 36, 0.8);
-}
-.moderator-home-faculty-status.offline {
-  background: #8B0000; /* dark red */
-  box-shadow: 3px 3px 6px rgba(139, 0, 0, 0.28),
-    -3px -3px 6px rgba(255, 255, 255, 0.8),
-    inset 2px 2px 4px rgba(139, 0, 0, 0.8),
-    inset -2px -2px 4px rgba(220, 20, 60, 0.8);
-}
+.status-badge.online { background: #E8F7EF; color: #1E7F45; border: 1px solid #CDEEDB; }
+.status-badge.busy { background: #FFF4E5; color: #AA6806; border: 1px solid #FFE4BF; }
+.status-badge.in-class { background: #EAF2FF; color: #1E40AF; border: 1px solid #D4E2FF; }
+.status-badge.in-meeting { background: #F0E8FF; color: #5B21B6; border: 1px solid #E2D6FF; }
+.status-badge.offline { background: #FBEAEA; color: #8B0000; border: 1px solid #F3CACA; }
 
 /* Schedule modal times */
 .moderator-home-schedule-times-container {

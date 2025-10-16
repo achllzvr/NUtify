@@ -18,17 +18,13 @@ import folderIcon from '../assets/icons/folder.svg';
 import archiveIcon from '../assets/icons/archive.svg';
 import { useAuth } from "../auth/AuthProvider";
 
-// Reason options and mapping
-const REASON_OPTIONS = ['Consultation', 'Meeting', 'Project', 'Other'];
-function mapReason(reason) {
-  if (!reason) return 'Other';
-  const found = REASON_OPTIONS.find(opt => reason.trim().toLowerCase().startsWith(opt.toLowerCase()));
-  return found || 'Other';
-}
-const getReasonText = (reason) =>
-  mapReason(reason) === 'Other'
-    ? (<em>*Unspecified Reason. Please consult with appointee.</em>)
-    : mapReason(reason);
+// Render reason text as provided (fallback if empty)
+const getReasonText = (reason) => {
+  if (!reason || String(reason).trim().length === 0) {
+    return (<em>*No reason provided.</em>);
+  }
+  return String(reason);
+};
 
 const truncateReason = (reason, maxLength = 40) => {
   if (!reason) return '';
@@ -58,7 +54,6 @@ const ModeratorHome = () => {
   const [studentResults, setStudentResults] = useState([]);
   const [studentLoading, setStudentLoading] = useState(false);
   const [reason, setReason] = useState('');
-  const [reasonType, setReasonType] = useState('Consultation');
   const [mainSearchInput, setMainSearchInput] = useState('');
   const [mainSearch, setMainSearch] = useState('');
   const [requestAlertVisible, setRequestAlertVisible] = useState(false);
@@ -208,7 +203,7 @@ const ModeratorHome = () => {
         const studentRes = await fetchIdByName(studentName);
         student_id = studentRes && (studentRes.user_id || studentRes.id || studentRes.userID);
       }
-      const appointment_reason = reasonType === 'Other' ? (reason || 'Other') : reasonType;
+      const appointment_reason = (reason || '').trim();
       if (teacher_id && student_id) {
         await createImmediateAppointment(teacher_id, student_id, appointment_reason);
       }
@@ -270,12 +265,6 @@ const ModeratorHome = () => {
     }
   }, [showRequestModal]);
 
-  const reasonOptions = [
-    'Consultation',
-    'Meeting',
-    'Project',
-    'Other'
-  ];
 
   // Main render
   return (
@@ -615,62 +604,25 @@ const ModeratorHome = () => {
                     )}
                   </div>
 
-                  {/* Reason select */}
+                  {/* Reason input */}
                   <div style={{ fontWeight: 500, marginBottom: '6px' }}>Reason</div>
                   <div style={{ marginBottom: '18px' }}>
-                    <select
-                      className="moderator-home-faculty-filter-dropdown"
-                      value={reasonType}
-                      onChange={e => {
-                        setReasonType(e.target.value);
-                        if (e.target.value !== 'Other') setReason('');
-                      }}
+                    <input
+                      type="text"
+                      className="login-input"
+                      placeholder="Enter appointment reason"
+                      value={reason}
+                      onChange={e => setReason(e.target.value)}
                       style={{
-                        borderRadius: '15px',
-                        padding: '8px 18px',
-                        fontSize: '15px',
-                        fontFamily: '"Arimo", Arial, sans-serif',
-                        border: 'none',
-                        background: '#f0f0f0',
-                        boxShadow: '8px 8px 15px rgba(0, 0, 0, 0.09), -8px -8px 15px rgba(255, 255, 255, 0.8)',
-                        outline: 'none',
-                        minWidth: '120px',
-                        width: '100%',
-                        appearance: 'none',
-                        backgroundImage:
-                          "url(\"data:image/svg+xml;utf8,<svg fill='%237F8C8D' height='18' viewBox='0 0 24 24' width='18' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>\")",
-                        backgroundRepeat: 'no-repeat',
-                        backgroundPosition: 'right 14px center',
-                        backgroundSize: '18px 18px'
+                        borderRadius: '10px',
+                        paddingLeft: '25px'
                       }}
-                    >
-                      {reasonOptions.map(opt => (
-                        <option key={opt} value={opt}>{opt}</option>
-                      ))}
-                    </select>
-                    {reasonType === 'Other' && (
-                      <input
-                        type="text"
-                        className="login-input"
-                        placeholder="Enter Reason"
-                        value={reason}
-                        onChange={e => setReason(e.target.value)}
-                        style={{
-                          borderRadius: '10px',
-                          marginTop: '10px',
-                          paddingLeft: '25px'
-                        }}
-                      />
-                    )}
+                    />
                   </div>
                   <button
                     className="Schedule-Button"
                     disabled={
-                      !(
-                        facultySelected &&
-                        studentName &&
-                        ((reasonType !== 'Other' && reasonType) || (reasonType === 'Other' && reason))
-                      )
+                      !(facultySelected && studentName && (reason && reason.trim().length > 0))
                     }
                     onClick={() => {
                       handleSchedule();
