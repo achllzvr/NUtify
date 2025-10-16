@@ -6,6 +6,7 @@ import 'package:nutify/services/firebase_service.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:nutify/services/ongoing_service.dart';
 
 class LoginPage extends StatefulWidget {
   LoginPage({super.key});
@@ -231,6 +232,8 @@ class _LoginPageState extends State<LoginPage> {
 
               // Navigate based on user type (student, teacher)
               if (userType == 'student') {
+                // Ensure ongoing banner check runs immediately after login
+                OngoingService().start();
                 // Student
                 Navigator.pushAndRemoveUntil(
                   context,
@@ -241,6 +244,8 @@ class _LoginPageState extends State<LoginPage> {
                   (Route<dynamic> route) => false,
                 );
               } else if (userType == 'teacher') {
+                // Ensure ongoing banner check runs immediately after login
+                OngoingService().start();
                 // Teacher
                 Navigator.pushAndRemoveUntil(
                   context,
