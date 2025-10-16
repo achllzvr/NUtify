@@ -155,7 +155,32 @@ class _LoginPageState extends State<LoginPage> {
           print('Parsed Response Data: $responseData');
 
           if (responseData['success'] == true) {
-            // Login successful
+            // Check verification status first
+            final dynamic isVerifiedRaw = responseData['is_verified'];
+            final String isVerifiedStr = isVerifiedRaw == null
+                ? ''
+                : (isVerifiedRaw is String
+                    ? isVerifiedRaw
+                    : isVerifiedRaw.toString());
+
+            if (isVerifiedStr != '1') {
+              // Show front desk verification message and do not proceed
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      'Please proceed to the faculty front desk and ask for account verification and approval to be able to use your account.',
+                      style: TextStyle(fontFamily: 'Arimo'),
+                    ),
+                    backgroundColor: Colors.orange,
+                    duration: Duration(seconds: 4),
+                  ),
+                );
+              }
+              return;
+            }
+
+            // Login successful and verified
             String userId = responseData['user_id'].toString();
             String userType = responseData['user_type'].toString().toLowerCase();
             String userFn = responseData['user_fn'].toString();

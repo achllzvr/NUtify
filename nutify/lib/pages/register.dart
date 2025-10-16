@@ -987,7 +987,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                         SizedBox(height: 12),
                         Text(
-                          responseData['message'] ?? 'Your account is pending verification.',
+                          'Please proceed to the faculty front desk and ask for account verification and approval to be able to use your account.',
                           style: TextStyle(
                             fontFamily: 'Arimo',
                             fontSize: 14,
