@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // Page: Moderator History
 import React, { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";

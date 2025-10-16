@@ -86,9 +86,6 @@
     rgba(53, 64, 142, 1) 0%,
     rgba(26, 32, 73, 1) 100%
   );
-  /* allow glass content to pop */
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
 }
 
 .hero-main-container {
@@ -106,13 +103,6 @@
   padding-left: 3em;
   z-index: 2;
   margin-right: 30px;
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border-weak);
-  border-radius: var(--glass-radius);
-  box-shadow: 0 8px 24px var(--glass-shadow-soft), 0 2px 8px var(--glass-shadow);
-  padding: 24px 28px;
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
 }
 
 .hero-title {

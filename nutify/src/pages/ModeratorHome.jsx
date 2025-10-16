@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // Page: Moderator Home
 import React, { useState, useEffect } from 'react';
 import { notifyAppointees, createImmediateAppointment, fetchIdByName, searchUsers, sendDirectFacultyNotification } from '../api/moderator';
