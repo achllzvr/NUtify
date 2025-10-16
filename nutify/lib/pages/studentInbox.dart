@@ -26,6 +26,8 @@ class _StudentInboxState extends State<StudentInbox>
   String _globalQ = '', _pendingQ = '', _declinedQ = '', _missedQ = '', _completedQ = '';
   String _userStatus = 'online';
   bool _statusLoading = false;
+  // Dynamic status order for cycling; fetched from server with safe fallback
+  List<String> _statusOrder = UserStatusService.allowed;
 
   Future<void> _reloadInbox() async {
     // Kick all fetchers and then rebuild
@@ -122,7 +124,10 @@ class _StudentInboxState extends State<StudentInbox>
           return Center(child: CircularProgressIndicator());
         }
         
-        List<StudentInboxPending> pendingAppointments = snapshot.data ?? [];
+  List<StudentInboxPending> pendingAppointments = snapshot.data ?? [];
+  // Deduplicate by appointment ID
+  final seenP = <String>{};
+  pendingAppointments = pendingAppointments.where((a) => seenP.add(a.id)).toList();
 
         // Per-tab search bar
         final tabSearch = Padding(
@@ -144,14 +149,16 @@ class _StudentInboxState extends State<StudentInbox>
 
         final q = (_globalQ + ' ' + _pendingQ).trim().toLowerCase();
         if (q.isNotEmpty) {
-          pendingAppointments = pendingAppointments.where((a) =>
-            a.teacherName.toLowerCase().contains(q) ||
-            a.department.toLowerCase().contains(q) ||
-            a.scheduleDate.toLowerCase().contains(q) ||
-            a.scheduleTime.toLowerCase().contains(q) ||
-            a.appointmentReason.toLowerCase().contains(q) ||
-            a.appointmentRemarks.toLowerCase().contains(q)
-          ).toList();
+          pendingAppointments = pendingAppointments.where((a) {
+            String rn = (a.appointmentReason).toLowerCase();
+            String rm = (a.appointmentRemarks).toLowerCase();
+            return a.teacherName.toLowerCase().contains(q)
+                || a.department.toLowerCase().contains(q)
+                || a.scheduleDate.toLowerCase().contains(q)
+                || a.scheduleTime.toLowerCase().contains(q)
+                || rn.contains(q)
+                || rm.contains(q);
+          }).toList();
         }
 
         if (pendingAppointments.isEmpty) {
@@ -348,7 +355,10 @@ class _StudentInboxState extends State<StudentInbox>
           return Center(child: CircularProgressIndicator());
         }
         
-        List<StudentInboxCancelled> cancelledAppointments = snapshot.data ?? [];
+  List<StudentInboxCancelled> cancelledAppointments = snapshot.data ?? [];
+  // Deduplicate by appointment ID
+  final seenC = <String>{};
+  cancelledAppointments = cancelledAppointments.where((a) => seenC.add(a.id)).toList();
 
         final tabSearch = Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
@@ -369,14 +379,16 @@ class _StudentInboxState extends State<StudentInbox>
 
         final q = (_globalQ + ' ' + _declinedQ).trim().toLowerCase();
         if (q.isNotEmpty) {
-          cancelledAppointments = cancelledAppointments.where((a) =>
-            a.teacherName.toLowerCase().contains(q) ||
-            a.department.toLowerCase().contains(q) ||
-            a.scheduleDate.toLowerCase().contains(q) ||
-            a.scheduleTime.toLowerCase().contains(q) ||
-            a.appointmentReason.toLowerCase().contains(q) ||
-            a.appointmentRemarks.toLowerCase().contains(q)
-          ).toList();
+          cancelledAppointments = cancelledAppointments.where((a) {
+            String rn = (a.appointmentReason).toLowerCase();
+            String rm = (a.appointmentRemarks).toLowerCase();
+            return a.teacherName.toLowerCase().contains(q)
+                || a.department.toLowerCase().contains(q)
+                || a.scheduleDate.toLowerCase().contains(q)
+                || a.scheduleTime.toLowerCase().contains(q)
+                || rn.contains(q)
+                || rm.contains(q);
+          }).toList();
         }
 
         if (cancelledAppointments.isEmpty) {
@@ -573,7 +585,10 @@ class _StudentInboxState extends State<StudentInbox>
           return Center(child: CircularProgressIndicator());
         }
         
-        List<StudentInboxMissed> missedAppointments = snapshot.data ?? [];
+  List<StudentInboxMissed> missedAppointments = snapshot.data ?? [];
+  // Deduplicate by appointment ID
+  final seenM = <String>{};
+  missedAppointments = missedAppointments.where((a) => seenM.add(a.id)).toList();
 
         final tabSearch = Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
@@ -594,14 +609,16 @@ class _StudentInboxState extends State<StudentInbox>
 
         final q = (_globalQ + ' ' + _missedQ).trim().toLowerCase();
         if (q.isNotEmpty) {
-          missedAppointments = missedAppointments.where((a) =>
-            a.teacherName.toLowerCase().contains(q) ||
-            a.department.toLowerCase().contains(q) ||
-            a.scheduleDate.toLowerCase().contains(q) ||
-            a.scheduleTime.toLowerCase().contains(q) ||
-            a.appointmentReason.toLowerCase().contains(q) ||
-            a.appointmentRemarks.toLowerCase().contains(q)
-          ).toList();
+          missedAppointments = missedAppointments.where((a) {
+            String rn = (a.appointmentReason).toLowerCase();
+            String rm = (a.appointmentRemarks).toLowerCase();
+            return a.teacherName.toLowerCase().contains(q)
+                || a.department.toLowerCase().contains(q)
+                || a.scheduleDate.toLowerCase().contains(q)
+                || a.scheduleTime.toLowerCase().contains(q)
+                || rn.contains(q)
+                || rm.contains(q);
+          }).toList();
         }
 
         if (missedAppointments.isEmpty) {
@@ -798,7 +815,10 @@ class _StudentInboxState extends State<StudentInbox>
           return Center(child: CircularProgressIndicator());
         }
         
-        List<StudentInboxCompleted> completedAppointments = snapshot.data ?? [];
+  List<StudentInboxCompleted> completedAppointments = snapshot.data ?? [];
+  // Deduplicate by appointment ID
+  final seenD = <String>{};
+  completedAppointments = completedAppointments.where((a) => seenD.add(a.id)).toList();
 
         final tabSearch = Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
@@ -819,14 +839,16 @@ class _StudentInboxState extends State<StudentInbox>
 
         final q = (_globalQ + ' ' + _completedQ).trim().toLowerCase();
         if (q.isNotEmpty) {
-          completedAppointments = completedAppointments.where((a) =>
-            a.teacherName.toLowerCase().contains(q) ||
-            a.department.toLowerCase().contains(q) ||
-            a.scheduleDate.toLowerCase().contains(q) ||
-            a.scheduleTime.toLowerCase().contains(q) ||
-            a.appointmentReason.toLowerCase().contains(q) ||
-            a.appointmentRemarks.toLowerCase().contains(q)
-          ).toList();
+          completedAppointments = completedAppointments.where((a) {
+            String rn = (a.appointmentReason).toLowerCase();
+            String rm = (a.appointmentRemarks).toLowerCase();
+            return a.teacherName.toLowerCase().contains(q)
+                || a.department.toLowerCase().contains(q)
+                || a.scheduleDate.toLowerCase().contains(q)
+                || a.scheduleTime.toLowerCase().contains(q)
+                || rn.contains(q)
+                || rm.contains(q);
+          }).toList();
         }
 
         if (completedAppointments.isEmpty) {
@@ -1115,21 +1137,13 @@ class _StudentInboxState extends State<StudentInbox>
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  _statusLoading
-                      ? SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Colors.white)))
-                      : Icon(
-                          _userStatus == 'online'
-                              ? Icons.circle
-                              : _userStatus == 'busy'
-                                  ? Icons.do_not_disturb_on
-                                  : Icons.circle_outlined,
-                          size: 16,
-                          color: _userStatus == 'online'
-                              ? Colors.limeAccent
-                              : _userStatus == 'busy'
-                                  ? Colors.orangeAccent
-                                  : Colors.white70,
-                        ),
+          _statusLoading
+            ? SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Colors.white)))
+            : Icon(
+              _statusIconFor(_userStatus),
+              size: 16,
+              color: _statusColorFor(_userStatus),
+            ),
                   const SizedBox(width: 6),
                   Text(
                     _userStatus[0].toUpperCase() + _userStatus.substring(1),
@@ -1250,15 +1264,17 @@ class _StudentInboxState extends State<StudentInbox>
   Future<void> _initUserStatus() async {
     setState(() => _statusLoading = true);
     final s = await UserStatusService.fetchStatus();
+    final allowed = await UserStatusService.fetchAllowedStatuses();
     setState(() {
       if (s != null) _userStatus = s;
+      if (allowed.isNotEmpty) _statusOrder = allowed;
       _statusLoading = false;
     });
   }
 
   Future<void> _cycleStatus() async {
     if (_statusLoading) return;
-    final order = ['online', 'busy', 'offline'];
+    final order = _statusOrder.isNotEmpty ? _statusOrder : ['online', 'busy', 'offline'];
     final idx = order.indexOf(_userStatus);
     final next = order[(idx + 1) % order.length];
     setState(() => _statusLoading = true);
@@ -1272,6 +1288,33 @@ class _StudentInboxState extends State<StudentInbox>
         SnackBar(content: Text('Failed to update status', style: TextStyle(fontFamily: 'Arimo', color: Colors.white)), backgroundColor: Colors.red),
       );
     }
+  }
+
+  // Flexible mapping for arbitrary statuses (same logic as studentHome)
+  IconData _statusIconFor(String s) {
+    final t = s.toLowerCase();
+    if (t.contains('online') || t == 'available') return Icons.circle;
+    if (t.contains('busy') || t.contains('occupied')) return Icons.do_not_disturb_on;
+    if (t.contains('dnd') || t.contains('do not disturb')) return Icons.remove_circle;
+    if (t.contains('class')) return Icons.school;
+    if (t.contains('meeting')) return Icons.video_call;
+    if (t.contains('away') || t.contains('idle')) return Icons.access_time;
+    if (t.contains('leave')) return Icons.beach_access;
+    if (t.contains('offline') || t.contains('invisible')) return Icons.circle_outlined;
+    return Icons.circle_outlined;
+  }
+
+  Color _statusColorFor(String s) {
+    final t = s.toLowerCase();
+    if (t.contains('online') || t == 'available') return Colors.limeAccent;
+    if (t.contains('busy') || t.contains('occupied')) return Colors.orangeAccent;
+    if (t.contains('dnd') || t.contains('do not disturb')) return Colors.redAccent;
+    if (t.contains('class')) return Colors.deepPurpleAccent;
+    if (t.contains('meeting')) return Colors.lightBlueAccent;
+    if (t.contains('away') || t.contains('idle')) return Colors.amberAccent;
+    if (t.contains('leave')) return Colors.cyanAccent;
+    if (t.contains('offline') || t.contains('invisible')) return Colors.white70;
+    return Colors.white70;
   }
 
   Widget _buildEmptyState(String message) {

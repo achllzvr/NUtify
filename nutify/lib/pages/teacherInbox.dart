@@ -24,6 +24,8 @@ class _TeacherInboxState extends State<TeacherInbox>
   String? teacherUserId;
   String _userStatus = 'online';
   bool _statusLoading = false;
+  // Dynamic status order for cycling; fetched from server with safe fallback
+  List<String> _statusOrder = UserStatusService.allowed;
   // Global search (applies to all tabs)
   final TextEditingController _inboxSearchController = TextEditingController();
   String _inboxQuery = '';
@@ -92,15 +94,17 @@ class _TeacherInboxState extends State<TeacherInbox>
   Future<void> _initUserStatus() async {
     setState(() => _statusLoading = true);
     final s = await UserStatusService.fetchStatus();
+    final allowed = await UserStatusService.fetchAllowedStatuses();
     setState(() {
       if (s != null) _userStatus = s;
+      if (allowed.isNotEmpty) _statusOrder = allowed;
       _statusLoading = false;
     });
   }
 
   Future<void> _cycleStatus() async {
     if (_statusLoading) return;
-    final order = ['online', 'busy', 'offline'];
+    final order = _statusOrder.isNotEmpty ? _statusOrder : ['online', 'busy', 'offline'];
     final idx = order.indexOf(_userStatus);
     final next = order[(idx + 1) % order.length];
     setState(() => _statusLoading = true);
@@ -114,6 +118,33 @@ class _TeacherInboxState extends State<TeacherInbox>
         SnackBar(content: Text('Failed to update status', style: TextStyle(fontFamily: 'Arimo', color: Colors.white)), backgroundColor: Colors.red),
       );
     }
+  }
+
+  // Flexible mapping for arbitrary statuses (reuse logic consistent with other pages)
+  IconData _statusIconFor(String s) {
+    final t = s.toLowerCase();
+    if (t.contains('online') || t == 'available') return Icons.circle;
+    if (t.contains('busy') || t.contains('occupied')) return Icons.do_not_disturb_on;
+    if (t.contains('dnd') || t.contains('do not disturb')) return Icons.remove_circle;
+    if (t.contains('class')) return Icons.school;
+    if (t.contains('meeting')) return Icons.video_call;
+    if (t.contains('away') || t.contains('idle')) return Icons.access_time;
+    if (t.contains('leave')) return Icons.beach_access;
+    if (t.contains('offline') || t.contains('invisible')) return Icons.circle_outlined;
+    return Icons.circle_outlined;
+  }
+
+  Color _statusColorFor(String s) {
+    final t = s.toLowerCase();
+    if (t.contains('online') || t == 'available') return Colors.limeAccent;
+    if (t.contains('busy') || t.contains('occupied')) return Colors.orangeAccent;
+    if (t.contains('dnd') || t.contains('do not disturb')) return Colors.redAccent;
+    if (t.contains('class')) return Colors.deepPurpleAccent;
+    if (t.contains('meeting')) return Colors.lightBlueAccent;
+    if (t.contains('away') || t.contains('idle')) return Colors.amberAccent;
+    if (t.contains('leave')) return Colors.cyanAccent;
+    if (t.contains('offline') || t.contains('invisible')) return Colors.white70;
+    return Colors.white70;
   }
 
   bool _isUserIdLoading = true;
@@ -229,7 +260,10 @@ class _TeacherInboxState extends State<TeacherInbox>
           return Center(child: CircularProgressIndicator());
         }
         
-        List<TeacherInboxPending> pendingAppointments = snapshot.data ?? [];
+  List<TeacherInboxPending> pendingAppointments = snapshot.data ?? [];
+  // Deduplicate by appointment ID
+  final seenP = <String>{};
+  pendingAppointments = pendingAppointments.where((a) => seenP.add(a.id)).toList();
 
   // Search bar for Pending tab
   Widget search = Padding(
@@ -325,7 +359,10 @@ class _TeacherInboxState extends State<TeacherInbox>
           return Center(child: CircularProgressIndicator());
         }
         
-        List<TeacherInboxCancelled> declinedAppointments = snapshot.data ?? [];
+  List<TeacherInboxCancelled> declinedAppointments = snapshot.data ?? [];
+  // Deduplicate by appointment ID
+  final seenC = <String>{};
+  declinedAppointments = declinedAppointments.where((a) => seenC.add(a.id)).toList();
 
         final search = Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
@@ -419,7 +456,10 @@ class _TeacherInboxState extends State<TeacherInbox>
           return Center(child: CircularProgressIndicator());
         }
         
-        List<TeacherInboxMissed> missedAppointments = snapshot.data ?? [];
+  List<TeacherInboxMissed> missedAppointments = snapshot.data ?? [];
+  // Deduplicate by appointment ID
+  final seenM = <String>{};
+  missedAppointments = missedAppointments.where((a) => seenM.add(a.id)).toList();
 
         final search = Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
@@ -513,7 +553,10 @@ class _TeacherInboxState extends State<TeacherInbox>
           return Center(child: CircularProgressIndicator());
         }
         
-        List<TeacherInboxCompleted> completedAppointments = snapshot.data ?? [];
+  List<TeacherInboxCompleted> completedAppointments = snapshot.data ?? [];
+  // Deduplicate by appointment ID
+  final seenD = <String>{};
+  completedAppointments = completedAppointments.where((a) => seenD.add(a.id)).toList();
 
         final search = Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
@@ -1180,21 +1223,13 @@ class _TeacherInboxState extends State<TeacherInbox>
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  _statusLoading
-                      ? SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Colors.white)))
-                      : Icon(
-                          _userStatus == 'online'
-                              ? Icons.circle
-                              : _userStatus == 'busy'
-                                  ? Icons.do_not_disturb_on
-                                  : Icons.circle_outlined,
-                          size: 16,
-                          color: _userStatus == 'online'
-                              ? Colors.limeAccent
-                              : _userStatus == 'busy'
-                                  ? Colors.orangeAccent
-                                  : Colors.white70,
-                        ),
+          _statusLoading
+            ? SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Colors.white)))
+            : Icon(
+              _statusIconFor(_userStatus),
+              size: 16,
+              color: _statusColorFor(_userStatus),
+            ),
                   const SizedBox(width: 6),
                   Text(
                     _userStatus[0].toUpperCase() + _userStatus.substring(1),

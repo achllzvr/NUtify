@@ -19,7 +19,20 @@ class _RegisterPageState extends State<RegisterPage> {
   String _selectedAccountType = 'Student';
   String? _selectedDepartment;
   
-  final List<String> _departments = ['SACE', 'SAHS', 'SABM', 'SHS'];
+  final List<String> _departments = [
+    'SACE',
+    'SAHS',
+    'SABM',
+    'SHS',
+  ];
+
+  List<String> _departmentsForType() {
+    final base = List<String>.from(_departments);
+    if (_selectedAccountType == 'Faculty') {
+      base.add('Others (Can be changed later at verification)');
+    }
+    return base;
+  }
 
   // Email validation state
   bool _isCheckingEmail = false;
@@ -210,23 +223,23 @@ class _RegisterPageState extends State<RegisterPage> {
           
           setState(() {
             _isCheckingEmail = false;
-            
-            // Handle different possible response formats
+
+            // Prefer explicit availability/existence flags only.
             bool emailExists = false;
             if (responseData.containsKey('exists')) {
               emailExists = responseData['exists'] == true || responseData['exists'] == 'true';
             } else if (responseData.containsKey('found')) {
               emailExists = responseData['found'] == true || responseData['found'] == 'true';
-            } else if (responseData.containsKey('success')) {
-              // Some APIs return success: false when email exists
-              emailExists = responseData['success'] == false;
             } else if (responseData.containsKey('available')) {
-              // Some APIs return available: false when email exists
+              // available=false => exists
               emailExists = responseData['available'] == false || responseData['available'] == 'false';
+            } else {
+              // No reliable signal provided; do not block registration.
+              emailExists = false;
             }
-            
+
             _emailExists = emailExists;
-            
+
             if (_emailExists) {
               _emailValidationMessage = '✗ Email already registered';
             } else {
@@ -437,18 +450,20 @@ class _RegisterPageState extends State<RegisterPage> {
                       SizedBox(width: _isCheckingEmail ? 8 : 0),
                       Expanded(
                         child: Text(
-                          _emailValidationMessage.isNotEmpty 
+                          _emailValidationMessage.isNotEmpty
                               ? _emailValidationMessage
-                              : !_isValidEmailFormat 
-                                  ? '✗ Invalid email format'
+                              : !_isValidEmailFormat
+                                  ? (_selectedAccountType == 'Faculty'
+                                      ? '✗ Invalid email format (use @faculty.nu-lipa.edu.ph)'
+                                      : '✗ Invalid email format (use @students.nu-lipa.edu.ph)')
                                   : '',
                           style: TextStyle(
                             fontFamily: 'Arimo',
                             fontSize: 12,
-                            color: _emailValidationMessage.startsWith('✓') 
-                                ? Colors.green 
+                            color: _emailValidationMessage.startsWith('✓')
+                                ? Colors.green
                                 : _emailValidationMessage.startsWith('✗') || !_isValidEmailFormat
-                                    ? Colors.red 
+                                    ? Colors.red
                                     : Colors.blue,
                             fontWeight: FontWeight.w500,
                           ),
@@ -721,7 +736,7 @@ class _RegisterPageState extends State<RegisterPage> {
         dropdownColor: Colors.white,
         menuMaxHeight: 200,
         borderRadius: BorderRadius.circular(12.0),
-        items: _departments.map((String department) {
+        items: _departmentsForType().map((String department) {
           return DropdownMenuItem<String>(
             value: department,
             child: Container(
@@ -756,6 +771,11 @@ class _RegisterPageState extends State<RegisterPage> {
         });
         // Re-run email validation rules and any pending checks when type changes
         _onEmailChanged();
+        // Ensure selected department remains valid for the new type
+        final allowed = _departmentsForType();
+        if (_selectedDepartment != null && !allowed.contains(_selectedDepartment)) {
+          setState(() { _selectedDepartment = null; });
+        }
       },
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),

@@ -19,6 +19,8 @@ class _TeacherHomeState extends State<TeacherHome> {
   String? teacherUserId;
   String _userStatus = 'online';
   bool _statusLoading = false;
+  // Dynamic status order for cycling; fetched from server with safe fallback
+  List<String> _statusOrder = UserStatusService.allowed;
   // Search state
   final TextEditingController _homeSearchController = TextEditingController();
   String _homeQuery = '';
@@ -59,15 +61,17 @@ class _TeacherHomeState extends State<TeacherHome> {
   Future<void> _initUserStatus() async {
     setState(() => _statusLoading = true);
     final s = await UserStatusService.fetchStatus();
+    final allowed = await UserStatusService.fetchAllowedStatuses();
     setState(() {
       if (s != null) _userStatus = s;
+      if (allowed.isNotEmpty) _statusOrder = allowed;
       _statusLoading = false;
     });
   }
 
   Future<void> _cycleStatus() async {
     if (_statusLoading) return;
-    final order = ['online', 'busy', 'offline'];
+    final order = _statusOrder.isNotEmpty ? _statusOrder : ['online', 'busy', 'offline'];
     final idx = order.indexOf(_userStatus);
     final next = order[(idx + 1) % order.length];
     setState(() => _statusLoading = true);
@@ -81,6 +85,33 @@ class _TeacherHomeState extends State<TeacherHome> {
         SnackBar(content: Text('Failed to update status', style: TextStyle(fontFamily: 'Arimo', color: Colors.white)), backgroundColor: Colors.red),
       );
     }
+  }
+
+  // Flexible mapping for arbitrary statuses (same logic as studentHome)
+  IconData _statusIconFor(String s) {
+    final t = s.toLowerCase();
+    if (t.contains('online') || t == 'available') return Icons.circle;
+    if (t.contains('busy') || t.contains('occupied')) return Icons.do_not_disturb_on;
+    if (t.contains('dnd') || t.contains('do not disturb')) return Icons.remove_circle;
+    if (t.contains('class')) return Icons.school;
+    if (t.contains('meeting')) return Icons.video_call;
+    if (t.contains('away') || t.contains('idle')) return Icons.access_time;
+    if (t.contains('leave')) return Icons.beach_access;
+    if (t.contains('offline') || t.contains('invisible')) return Icons.circle_outlined;
+    return Icons.circle_outlined;
+  }
+
+  Color _statusColorFor(String s) {
+    final t = s.toLowerCase();
+    if (t.contains('online') || t == 'available') return Colors.limeAccent;
+    if (t.contains('busy') || t.contains('occupied')) return Colors.orangeAccent;
+    if (t.contains('dnd') || t.contains('do not disturb')) return Colors.redAccent;
+    if (t.contains('class')) return Colors.deepPurpleAccent;
+    if (t.contains('meeting')) return Colors.lightBlueAccent;
+    if (t.contains('away') || t.contains('idle')) return Colors.amberAccent;
+    if (t.contains('leave')) return Colors.cyanAccent;
+    if (t.contains('offline') || t.contains('invisible')) return Colors.white70;
+    return Colors.white70;
   }
   
   Future<void> _loadTeacherUserId() async {
@@ -852,21 +883,13 @@ class _TeacherHomeState extends State<TeacherHome> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  _statusLoading
-                      ? SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Colors.white)))
-                      : Icon(
-                          _userStatus == 'online'
-                              ? Icons.circle
-                              : _userStatus == 'busy'
-                                  ? Icons.do_not_disturb_on
-                                  : Icons.circle_outlined,
-                          size: 16,
-                          color: _userStatus == 'online'
-                              ? Colors.limeAccent
-                              : _userStatus == 'busy'
-                                  ? Colors.orangeAccent
-                                  : Colors.white70,
-                        ),
+          _statusLoading
+            ? SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Colors.white)))
+            : Icon(
+              _statusIconFor(_userStatus),
+              size: 16,
+              color: _statusColorFor(_userStatus),
+            ),
                   const SizedBox(width: 6),
                   Text(
                     _userStatus[0].toUpperCase() + _userStatus.substring(1),

@@ -29,6 +29,10 @@ class _StudentHomeState extends State<StudentHome> {
   Future<List<StudentHomeAppointments>>? _upcomingFuture;
   String _userStatus = 'online';
   bool _statusLoading = false;
+  // Faculty status map: userId (string) -> status ('online'|'busy'|'offline')
+  final Map<String, String> _facultyStatuses = {};
+  // Dynamic status order for cycling; fetched from server with safe fallback
+  List<String> _statusOrder = UserStatusService.allowed;
 
   Future<void> _reloadHome() async {
     // Refresh both the professors list and upcoming appointments
@@ -51,15 +55,17 @@ class _StudentHomeState extends State<StudentHome> {
   Future<void> _initUserStatus() async {
     setState(() => _statusLoading = true);
     final s = await UserStatusService.fetchStatus();
+    final allowed = await UserStatusService.fetchAllowedStatuses();
     setState(() {
       if (s != null) _userStatus = s;
+      if (allowed.isNotEmpty) _statusOrder = allowed;
       _statusLoading = false;
     });
   }
 
   Future<void> _cycleStatus() async {
     if (_statusLoading) return;
-    final order = ['online', 'busy', 'offline'];
+    final order = _statusOrder.isNotEmpty ? _statusOrder : ['online', 'busy', 'offline'];
     final idx = order.indexOf(_userStatus);
     final next = order[(idx + 1) % order.length];
     setState(() => _statusLoading = true);
@@ -81,6 +87,33 @@ class _StudentHomeState extends State<StudentHome> {
     }
   }
 
+  // Flexible mapping for arbitrary statuses
+  IconData _statusIconFor(String s) {
+    final t = s.toLowerCase();
+    if (t.contains('online') || t == 'available') return Icons.circle;
+    if (t.contains('busy') || t.contains('occupied')) return Icons.do_not_disturb_on;
+    if (t.contains('dnd') || t.contains('do not disturb')) return Icons.remove_circle;
+    if (t.contains('class')) return Icons.school;
+    if (t.contains('meeting')) return Icons.video_call;
+    if (t.contains('away') || t.contains('idle')) return Icons.access_time;
+    if (t.contains('leave')) return Icons.beach_access;
+    if (t.contains('offline') || t.contains('invisible')) return Icons.circle_outlined;
+    return Icons.circle_outlined;
+  }
+
+  Color _statusColorFor(String s) {
+    final t = s.toLowerCase();
+    if (t.contains('online') || t == 'available') return Colors.limeAccent;
+    if (t.contains('busy') || t.contains('occupied')) return Colors.orangeAccent;
+    if (t.contains('dnd') || t.contains('do not disturb')) return Colors.redAccent;
+    if (t.contains('class')) return Colors.deepPurpleAccent;
+    if (t.contains('meeting')) return Colors.lightBlueAccent;
+    if (t.contains('away') || t.contains('idle')) return Colors.amberAccent;
+    if (t.contains('leave')) return Colors.cyanAccent;
+    if (t.contains('offline') || t.contains('invisible')) return Colors.white70;
+    return Colors.white70;
+  }
+
   Future<void> _loadProfessors() async {
     try {
       List<StudentSearch> professors = await StudentSearch.searchProfessors();
@@ -88,6 +121,9 @@ class _StudentHomeState extends State<StudentHome> {
         _allProfessors = professors;
         _isLoadingProfessors = false;
       });
+      // Fetch statuses for all known professors (deduped)
+      final ids = professors.map((p) => p.id).where((id) => id.isNotEmpty).toSet().toList();
+      _ensureStatusesForIds(ids);
     } catch (e) {
       setState(() {
         _isLoadingProfessors = false;
@@ -115,6 +151,9 @@ class _StudentHomeState extends State<StudentHome> {
           return professor.name.toLowerCase().contains(query.toLowerCase()) ||
               professor.department.toLowerCase().contains(query.toLowerCase());
         }).toList();
+        // Ensure statuses for the filtered results
+        final ids = _searchResults.map((p) => p.id).where((id) => id.isNotEmpty).toSet().toList();
+        _ensureStatusesForIds(ids);
       }
     });
   }
@@ -473,6 +512,11 @@ class _StudentHomeState extends State<StudentHome> {
   }
 
   Column mostRecentProfessors(List<RecentProfessor> recentProfessors) {
+    // Schedule status fetch for recent professors if missing
+    if (recentProfessors.isNotEmpty) {
+      final ids = recentProfessors.map((p) => p.id).where((id) => id.isNotEmpty).toSet().toList();
+      Future.microtask(() => _ensureStatusesForIds(ids));
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -584,6 +628,8 @@ class _StudentHomeState extends State<StudentHome> {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
+                            SizedBox(height: 6),
+                            _buildStatusBadge(_facultyStatuses[recentProfessors[index].id]),
                           ],
                         ),
                       ),
@@ -698,17 +744,9 @@ class _StudentHomeState extends State<StudentHome> {
                           ),
                         )
                       : Icon(
-                          _userStatus == 'online'
-                              ? Icons.circle
-                              : _userStatus == 'busy'
-                              ? Icons.do_not_disturb_on
-                              : Icons.circle_outlined,
+                          _statusIconFor(_userStatus),
                           size: 16,
-                          color: _userStatus == 'online'
-                              ? Colors.limeAccent
-                              : _userStatus == 'busy'
-                              ? Colors.orangeAccent
-                              : Colors.white70,
+                          color: _statusColorFor(_userStatus),
                         ),
                   const SizedBox(width: 6),
                   Text(
@@ -969,6 +1007,8 @@ class _StudentHomeState extends State<StudentHome> {
                             color: Colors.grey[600],
                           ),
                         ),
+                        const SizedBox(height: 6),
+                        _buildStatusBadge(_facultyStatuses[professor.id]),
                       ],
                     ),
                   ),
@@ -1036,6 +1076,81 @@ class _StudentHomeState extends State<StudentHome> {
           ),
         );
       },
+    );
+  }
+
+  // Ensure statuses are loaded for a list of user IDs (strings)
+  Future<void> _ensureStatusesForIds(List<String> ids) async {
+    final missing = ids.where((id) => id.isNotEmpty && !_facultyStatuses.containsKey(id)).toList();
+    if (missing.isEmpty) return;
+    try {
+      final resp = await http.post(
+        Uri.parse('https://nutify.site/api.php?action=getUserStatuses'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'user_ids': missing}),
+      );
+      if (resp.statusCode == 200 && resp.body.isNotEmpty) {
+        final data = json.decode(resp.body);
+        if (data != null && data['map'] != null) {
+          final map = Map<String, dynamic>.from(data['map']);
+          setState(() {
+            map.forEach((k, v) {
+              _facultyStatuses[k.toString()] = v?.toString() ?? 'offline';
+            });
+          });
+        } else if (data != null && data['statuses'] != null) {
+          final list = List<dynamic>.from(data['statuses']);
+          setState(() {
+            for (var item in list) {
+              final uid = (item['user_id'] ?? '').toString();
+              final st = (item['status'] ?? 'offline').toString();
+              _facultyStatuses[uid] = st;
+            }
+          });
+        }
+      }
+    } catch (e) {
+      print('Failed to fetch statuses: $e');
+    }
+  }
+
+  Widget _buildStatusBadge(String? status) {
+    if (status == null) return SizedBox.shrink();
+    final icon = Icon(_statusIconFor(status), size: 12, color: Colors.white);
+    // Derive a darker background from the app bar color mapping
+    Color bg;
+    final t = status.toLowerCase();
+    if (t.contains('online') || t == 'available') bg = Colors.green.shade600;
+    else if (t.contains('busy') || t.contains('occupied')) bg = Colors.orange.shade700;
+    else if (t.contains('dnd') || t.contains('do not disturb')) bg = Colors.red.shade700;
+    else if (t.contains('class')) bg = Colors.deepPurple.shade600;
+    else if (t.contains('meeting')) bg = Colors.blue.shade700;
+    else if (t.contains('away') || t.contains('idle')) bg = Colors.amber.shade700;
+    else if (t.contains('leave')) bg = Colors.cyan.shade700;
+    else if (t.contains('offline') || t.contains('invisible')) bg = Colors.grey.shade600;
+    else bg = Colors.grey.shade600;
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          icon,
+          SizedBox(width: 6),
+          Text(
+            status[0].toUpperCase() + status.substring(1),
+            style: TextStyle(
+              fontFamily: 'Arimo',
+              fontSize: 12,
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

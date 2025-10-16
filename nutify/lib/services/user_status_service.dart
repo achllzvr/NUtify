@@ -5,6 +5,28 @@ import 'package:shared_preferences/shared_preferences.dart';
 class UserStatusService {
   static const String _baseUrl = 'https://nutify.site/api.php';
   static const List<String> allowed = ['online', 'busy', 'offline'];
+  static List<String> _allowedCache = List.from(allowed);
+
+  // Attempt to fetch allowed statuses from backend; fallback to cache/default
+  static Future<List<String>> fetchAllowedStatuses() async {
+    try {
+      final resp = await http.get(Uri.parse('$_baseUrl?action=getAllowedUserStatuses'));
+      if (resp.statusCode == 200 && resp.body.isNotEmpty) {
+        final data = jsonDecode(resp.body);
+        // accept either { statuses: ['online', ...] } or a raw list
+        final list = (data is List)
+            ? List<String>.from(data.map((e) => e.toString()))
+            : (data is Map && data['statuses'] is List)
+                ? List<String>.from((data['statuses'] as List).map((e) => e.toString()))
+                : null;
+        if (list != null && list.isNotEmpty) {
+          _allowedCache = list;
+          return _allowedCache;
+        }
+      }
+    } catch (_) {}
+    return _allowedCache;
+  }
 
   static Future<String?> fetchStatus() async {
     try {
@@ -21,7 +43,8 @@ class UserStatusService {
         final data = jsonDecode(resp.body);
         if (data['status'] == 'success') {
           final s = (data['data']?['user_status'] ?? '').toString();
-          if (allowed.contains(s)) return s;
+          // Accept any string; caller may still show as-is. Validation occurs on update.
+          if (s.isNotEmpty) return s;
         }
       }
       return null;
@@ -31,7 +54,6 @@ class UserStatusService {
   }
 
   static Future<bool> updateStatus(String status) async {
-    if (!allowed.contains(status)) return false;
     try {
       final prefs = await SharedPreferences.getInstance();
       final userId = prefs.getString('userId');
