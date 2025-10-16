@@ -136,17 +136,7 @@ class _StudentProfileState extends State<StudentProfile> {
                     Icons.lock_reset_outlined,
                     Color(0xFFFF9800),
                     () {
-                      print('Forgot Password tapped');
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            'Feature not yet implemented',
-                            style: TextStyle(fontFamily: 'Arimo'),
-                          ),
-                          duration: Duration(seconds: 2),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
+                      _showForgotPasswordDialog();
                     },
                   ),
                   SizedBox(height: 15),
@@ -222,6 +212,103 @@ class _StudentProfileState extends State<StudentProfile> {
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> _showForgotPasswordDialog() async {
+    if (!mounted) return;
+    await showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: EdgeInsets.all(25),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  spreadRadius: 2,
+                  blurRadius: 15,
+                  offset: Offset(0, 5),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: Colors.orange.shade100,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.lock_reset,
+                    color: Colors.orange,
+                    size: 36,
+                  ),
+                ),
+                SizedBox(height: 18),
+                Text(
+                  'Forgot Password',
+                  style: TextStyle(
+                    fontFamily: 'Arimo',
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2C3E50),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Proceed to this link to reset your password: nutify.site/forgot-password',
+                  style: TextStyle(
+                    fontFamily: 'Arimo',
+                    fontSize: 14,
+                    color: Colors.grey.shade700,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 22),
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Color(0xFF35408E), Color(0xFF1A2049)],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      textStyle: const TextStyle(
+                        fontFamily: 'Arimo',
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: Text('OK'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
