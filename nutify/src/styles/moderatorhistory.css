@@ -84,10 +84,10 @@
 .moderator-history-filter-tabs[data-active="missed"]::after { width: 14.28%; left: 57.12%; }
 .moderator-history-filter-tabs[data-active="cancelled"]::after { width: 14.28%; left: 71.4%; }
 .moderator-history-filter-tabs[data-active="declined"]::after { width: 14.28%; left: 85.68%; }
-.moderator-history-filter-tabs[data-active="dailylog"]::after { width: 25%; left: 0; }
-.moderator-history-filter-tabs[data-active="request"]::after { width: 25%; left: 25%; }
-.moderator-history-filter-tabs[data-active="approval"]::after { width: 25%; left: 50%; }
-.moderator-history-filter-tabs[data-active="onhold"]::after { width: 25%; left: 75%; }
+/* Three tabs: dailylog | request | approval */
+.moderator-history-filter-tabs[data-active="dailylog"]::after { width: 33.333%; left: 0; }
+.moderator-history-filter-tabs[data-active="request"]::after { width: 33.333%; left: 33.333%; }
+.moderator-history-filter-tabs[data-active="approval"]::after { width: 33.333%; left: 66.666%; }
 
 /* History card section */
 .moderator-history-section {
@@ -144,7 +144,8 @@
   border: none;
   box-shadow: 8px 8px 15px rgba(0,0,0,0.08), -8px -8px 15px rgba(255,255,255,0.85);
   transition: all 0.3s ease;
-  height: 10px;
+  /* let content define height; use min-height via inline or component styles */
+  /* height: 10px; */
   position: relative;
   overflow: hidden;
 }

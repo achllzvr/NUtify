@@ -7,7 +7,6 @@ import RequestHistory, {
   requestHistoryItems,
 } from "../pages/components/RequestHistory";
 import ApprovalHistory from "../pages/components/ApprovalHistory";
-import OnHoldHistory from "../pages/components/OnHoldHistory";
 import "../styles/dashboard.css";
 import "../styles/moderatorhistory.css";
 
@@ -36,12 +35,11 @@ const ModeratorHistory = () => {
   const [filterModalOpen, setFilterModalOpen] = useState(false);
 
   // Filter tab options
-  const filterOptions = [
+  const filterOptions = React.useMemo(() => ([
     { value: "dailylog", label: "Daily Log", icon: filterIcon },
     { value: "request", label: "Today's Requests", icon: filterIcon },
     { value: "approval", label: "Approval", icon: filterIcon },
-    { value: "onhold", label: "On Hold", icon: filterIcon },
-  ];
+  ]), []);
 
   // Filter tab change handler
   const handleFilterChange = (filter) => {
@@ -64,7 +62,7 @@ const ModeratorHistory = () => {
   };
 
   // Verify handler
-  const handleVerify = (item) => {
+  const handleVerify = () => {
     const audio = new window.Audio("/nutified.wav");
     audio.play();
     setVerifyAlertVisible(true);
@@ -100,7 +98,7 @@ const ModeratorHistory = () => {
     if (filterParam && filterOptions.some((opt) => opt.value === filterParam)) {
       setActiveFilter(filterParam);
     }
-  }, []);
+  }, [filterOptions]);
 
   // Set document title
   useEffect(() => {
@@ -379,11 +377,6 @@ const ModeratorHistory = () => {
                   />
                 ) : activeFilter === "approval" ? (
                   <ApprovalHistory
-                    onVerify={handleVerify}
-                    searchTerm={searchTerm}
-                  />
-                ) : activeFilter === "onhold" ? (
-                  <OnHoldHistory
                     onVerify={handleVerify}
                     searchTerm={searchTerm}
                   />

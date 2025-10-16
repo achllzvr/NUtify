@@ -89,17 +89,25 @@ const OnHoldHistory = ({ onVerify, searchTerm }) => {
         setLoading(true);
         setError("");
         const data = await getAccountsOnHold();
-        // Expect { users: [...] } or array
-        const list = Array.isArray(data) ? data : (data.users || []);
-        const mapped = list.map((u) => ({
-          id: u.user_id || u.id,
-          name: [u.user_fn, u.user_ln].filter(Boolean).join(' ') || u.name || '',
-          type: u.user_type || u.type || 'User',
-          // Newly fetched fields
-          idNumber: u.id_number || u.student_id || u.employee_id || '',
-          email: u.email || u.user_email || '',
-          department: u.department || u.dept || u.department_name || (u.user_dept && (u.user_dept.department || u.user_dept.dept || u.user_dept.name)) || '',
-        }));
+        // Accept various response shapes from backend
+        const list = Array.isArray(data)
+          ? data
+          : (data.users || data.results || data.data || data.list || []);
+        const mapped = list.map((u) => {
+          const first = u.user_fn || u.first_name || u.firstname || u.fn;
+          const last = u.user_ln || u.last_name || u.lastname || u.ln;
+          const name = [first, last].filter(Boolean).join(' ') || u.full_name || u.name || '';
+          const dept = u.department || u.dept || u.department_name || u.college ||
+            (u.user_dept && (u.user_dept.department || u.user_dept.dept || u.user_dept.name)) || '';
+          return {
+            id: u.user_id || u.id,
+            name,
+            type: u.user_type || u.type || 'User',
+            idNumber: u.id_number || u.student_id || u.employee_id || u.nu_id || '',
+            email: u.email || u.user_email || u.mail || '',
+            department: dept,
+          };
+        });
         if (mounted) setOnHoldItems(mapped);
       } catch (e) {
         if (mounted) setError(e.message || 'Failed to load on-hold accounts');
@@ -167,9 +175,28 @@ const OnHoldHistory = ({ onVerify, searchTerm }) => {
 
   if (filteredItems.length === 0) {
     return (
-      <div style={{ textAlign: "center", color: "#888", marginTop: "40px", fontSize: '1.2em', fontWeight: 500 }}>
-        Nothing on hold.
-      </div>
+      <>
+        <div style={{ textAlign: "center", color: "#888", marginTop: "40px", fontSize: '1.2em', fontWeight: 500 }}>
+          Nothing on hold right now.
+          <div style={{ fontSize: '0.9em', color: '#9aa3ab', marginTop: 6 }}>Try switching tabs or clearing filters.</div>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '12px', gap: '10px' }}>
+          <span style={{
+            fontWeight: 500,
+            fontSize: '15px',
+            color: '#7f8c8d',
+            background: '#f0f0f0',
+            borderRadius: '8px',
+            padding: '6px 14px',
+            border: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            boxShadow: '4px 4px 8px #e0e0e0, -4px -4px 8px #fff'
+          }}>
+            Page 1 of 1
+          </span>
+        </div>
+      </>
     );
   }
 

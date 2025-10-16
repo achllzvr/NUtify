@@ -11,6 +11,11 @@ export async function getModeratorRequests() {
   return apiPost('getModeratorOnTheSpotRequests', {});
 }
 
+// Status codes mapping (from backend):
+// - 0: pending approval
+// - 1: verified
+// - 2: on hold
+
 // Fetch accounts on hold (is_verified = 2)
 export async function getAccountsOnHold() {
   return apiPost('getAccountsOnHold', {});
@@ -21,12 +26,13 @@ export async function getApprovedUsers(params = {}) {
   return apiPost('getApprovedUsers', params);
 }
 
-// Fetch pending users for approval (if needed)
+// Fetch pending users for approval (is_verified = 0)
 export async function getPendingUsers() {
   return apiPost('getPendingUsers', {});
 }
 
-// Update user verification: is_verified 1 (verified) or 2 (on hold)
+// Update user verification to the given status code
+// Allowed values: 0 (approval), 1 (verified), 2 (on hold)
 // Optionally include extra fields when verifying: { id_number, department, email }
 export async function updateUserVerification(user_id, is_verified, extra = {}) {
   // Merge extras only if provided; backend will ignore unknown fields

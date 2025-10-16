@@ -47,7 +47,7 @@ const ModeratorApprovedHistory = ({ searchValue }) => {
             .filter(Boolean)
             .join(' ') || u.name || '';
 
-          // Hold status: is_verified === 2 means On Hold
+          // Verification mapping: 0 = pending approval, 1 = verified, 2 = on hold
           const isVerified = u.is_verified ?? u.verified ?? u.status_code;
           const onHold = Number(isVerified) === 2 || (typeof isVerified === 'string' && isVerified.toLowerCase() === 'hold') || !!(u.hold || u.on_hold || u.is_hold);
 
@@ -60,7 +60,14 @@ const ModeratorApprovedHistory = ({ searchValue }) => {
             academicYear: u.academic_year || u.academicYear || u.acad_year || '',
             avatar: u.avatar || u.photo_url || '',
             onHold,
-            isVerified: Number(isVerified) || (onHold ? 2 : 1) // default to 1 if missing
+            // Preserve 0 explicitly (Number(0) || ... would incorrectly coerce to default)
+            // If isVerified is undefined/null/NaN, default using onHold flag; else use the numeric value
+            isVerified: (() => {
+              const n = Number(isVerified);
+              return Number.isNaN(n) || isVerified === undefined || isVerified === null
+                ? (onHold ? 2 : 1)
+                : n;
+            })()
           };
         }).filter(u => u.id);
         console.log('[Approved] Mapped items length:', mapped.length);
