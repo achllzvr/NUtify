@@ -23,3 +23,30 @@ export async function loginModerator({ username, password, fcmToken }) {
     csrfToken: data.csrfToken,
   };
 }
+
+// Request a password reset OTP to be sent to the user's email
+export async function requestPasswordReset(email) {
+  const res = await apiPost('requestPasswordReset', { email });
+  if (!res || res.error) {
+    throw new Error(res?.message || 'Failed to send OTP');
+  }
+  return res;
+}
+
+// Verify the OTP for a given email (no password change yet)
+export async function verifyPasswordResetOTP(email, otp) {
+  const res = await apiPost('verifyPasswordResetOTP', { email, otp });
+  if (!res || res.error) {
+    throw new Error(res?.message || 'Invalid or expired OTP');
+  }
+  return res;
+}
+
+// Reset password using a verified OTP
+export async function resetPasswordWithOTP(email, otp, newPassword) {
+  const res = await apiPost('resetPasswordWithOTP', { email, otp, new_password: newPassword });
+  if (!res || res.error) {
+    throw new Error(res?.message || 'Failed to reset password');
+  }
+  return res;
+}

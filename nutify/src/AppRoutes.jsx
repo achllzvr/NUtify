@@ -4,6 +4,7 @@ import ProtectedRoute from "./auth/ProtectedRoute";
 import RedirectIfAuth from "./auth/RedirectIfAuth";
 
 import LoginPage from "./pages/LoginPage";
+import ForgotPassword from "./pages/ForgotPassword";
 import AppHome from "./pages/AppHome";
 import AdminHome from "./pages/AdminHome";
 import NotFound from "./pages/NotFound";
@@ -15,6 +16,9 @@ export default function AppRoutes() {
         <Route element={<RedirectIfAuth />}>
           <Route path="/login" element={<LoginPage />} />
         </Route>
+
+        {/* Make Forgot Password publicly accessible and do not redirect if already logged in */}
+        <Route path="/forgot-password" element={<ForgotPassword />} />
 
         <Route element={<ProtectedRoute />}>
           <Route path="/app/*" element={<AppHome />} />
