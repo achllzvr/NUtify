@@ -38,8 +38,8 @@ const ModeratorHistory = () => {
   // Filter tab options
   const filterOptions = React.useMemo(() => ([
     { value: "dailylog", label: "Daily Log", icon: filterIcon },
-    { value: "request", label: "Today's Requests", icon: filterIcon },
-    { value: "approval", label: "Approval", icon: filterIcon },
+    { value: "request", label: "Today's On-the-Spot Requests", icon: filterIcon },
+    { value: "approval", label: "Account Approval", icon: filterIcon },
   ]), []);
 
   // Filter tab change handler

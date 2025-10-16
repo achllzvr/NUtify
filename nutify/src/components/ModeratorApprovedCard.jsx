@@ -200,8 +200,8 @@ const ModeratorApprovedHistory = ({ searchValue }) => {
               <span style={{ fontWeight: 600, color: '#47505B', fontSize: 14 }}>Status</span>
               <select className="filters-select" value={verifiedFilter} onChange={e => { setVerifiedFilter(e.target.value); setPage(1); }}>
                 <option value="all">All</option>
-                <option value="unhold">Unhold</option>
-                <option value="hold">Hold</option>
+                <option value="unhold">Can be unheld</option>
+                <option value="hold">Can be on hold</option>
               </select>
             </label>
             <label style={{ display: 'grid', gap: 6 }}>
