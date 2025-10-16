@@ -35,7 +35,17 @@ const VerifyModal = ({ open, onClose, onSubmit, user }) => {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 12 }}>
           <label style={{ display: 'grid', gap: 6 }}>
             <span style={{ fontWeight: 600, color: '#47505B', fontSize: 14 }}>NU ID</span>
-            <input value={idNumber} onChange={e => setIdNumber(e.target.value)} placeholder="e.g., 20XX-XXXXX" className="login-input" style={{ padding: '12px 14px', borderRadius: 10, border: '1px solid #ddd', background: '#fff', color: '#000', fontSize: 15 }} />
+            <input
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9-]*"
+              autoComplete="off"
+              value={idNumber}
+              onChange={e => setIdNumber(e.target.value)}
+              placeholder="e.g., 20XX-XXXXX"
+              className="login-input"
+              style={{ padding: '12px 14px', borderRadius: 10, border: '1px solid #ddd', background: '#fff', color: '#000', fontSize: 15 }}
+            />
           </label>
           <label style={{ display: 'grid', gap: 6 }}>
             <span style={{ fontWeight: 600, color: '#47505B', fontSize: 14 }}>Department</span>
@@ -100,7 +110,19 @@ const ApprovalHistory = ({ onVerify, searchTerm }) => {
           email: u.email || u.user_email || '',
           department: u.department || u.dept || u.department_name || (u.user_dept && (u.user_dept.department || u.user_dept.dept || u.user_dept.name)) || '',
         }));
-        if (mounted) setApprovalItems(mapped);
+        // Client-side de-duplication by stable identity (user id > email > id_number)
+        const uniqMap = new Map();
+        for (const it of mapped) {
+          const key =
+            (it.id != null ? `id:${it.id}` :
+            it.email ? `email:${String(it.email).toLowerCase()}` :
+            it.idNumber ? `nu:${String(it.idNumber)}` :
+            undefined);
+          if (!key) continue;
+          if (!uniqMap.has(key)) uniqMap.set(key, it);
+        }
+        const unique = Array.from(uniqMap.values());
+        if (mounted) setApprovalItems(unique);
       } catch (e) {
         if (mounted) setError(e.message || 'Failed to load pending approvals');
       } finally {
@@ -109,6 +131,11 @@ const ApprovalHistory = ({ onVerify, searchTerm }) => {
     })();
     return () => { mounted = false; };
   }, []);
+
+  // Reset to first page when search or data changes
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm, approvalItems.length]);
 
   // Remove item
   const handleHold = async (id) => {
@@ -141,17 +168,17 @@ const ApprovalHistory = ({ onVerify, searchTerm }) => {
     }
   };
 
-  // Filter items by search
+  // Filter items by search (stringify fields to avoid type errors)
   const filteredItems = useMemo(() => approvalItems.filter(
     (item) => {
       if (!searchTerm) return true;
-      const q = searchTerm.toLowerCase();
+      const q = String(searchTerm).toLowerCase();
       return (
-        (item.name || '').toLowerCase().includes(q) ||
-        (item.idNumber || '').toLowerCase().includes(q) ||
-        (item.email || '').toLowerCase().includes(q) ||
-        (item.department || '').toLowerCase().includes(q) ||
-        (item.type || '').toLowerCase().includes(q)
+        String(item.name || '').toLowerCase().includes(q) ||
+        String(item.idNumber || '').toLowerCase().includes(q) ||
+        String(item.email || '').toLowerCase().includes(q) ||
+        String(item.department || '').toLowerCase().includes(q) ||
+        String(item.type || '').toLowerCase().includes(q)
       );
     }
   ), [approvalItems, searchTerm]);
@@ -203,7 +230,7 @@ const ApprovalHistory = ({ onVerify, searchTerm }) => {
       >
         {paginatedItems.map((item) => (
           <div
-            key={item.id}
+            key={item.id ?? (item.email ? `email:${String(item.email).toLowerCase()}` : `nu:${String(item.idNumber)}`)}
             className="moderator-history-item"
             style={{
               minHeight: 100,
