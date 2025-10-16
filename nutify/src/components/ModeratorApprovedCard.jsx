@@ -30,7 +30,7 @@ const ModeratorApprovedHistory = ({ searchValue }) => {
   console.log('[Approved] API response:', resp);
   const list = Array.isArray(resp) ? resp : (resp.users || resp.data || []);
   console.log('[Approved] Parsed list length:', Array.isArray(list) ? list.length : 'n/a');
-        const mapped = list.map(u => {
+  const mapped = list.map(u => {
           // Normalize user type to label (Teacher instead of Faculty)
           const rawType = (u.user_type_id ?? u.user_type ?? u.type ?? '').toString();
           let accountType = '';
@@ -70,13 +70,23 @@ const ModeratorApprovedHistory = ({ searchValue }) => {
             })()
           };
         }).filter(u => u.id);
-        console.log('[Approved] Mapped items length:', mapped.length);
+        // De-duplicate by stable identity: user_id; fallback to email if available
+        const seen = new Map();
+        const unique = [];
+        for (const it of mapped) {
+          const key = `${it.id}`;
+          if (!seen.has(key)) {
+            seen.set(key, true);
+            unique.push(it);
+          }
+        }
+        console.log('[Approved] Mapped items length:', mapped.length, 'Unique:', unique.length);
         if (mounted) {
-          setItems(mapped);
+          setItems(unique);
           const initialHold = {};
-          mapped.forEach(u => { initialHold[u.id] = !!u.onHold; });
+          unique.forEach(u => { initialHold[u.id] = !!u.onHold; });
           setHoldMap(initialHold);
-          console.log('[Approved] State set: items:', mapped.length, 'holdMap keys:', Object.keys(initialHold).length);
+          console.log('[Approved] State set: items:', unique.length, 'holdMap keys:', Object.keys(initialHold).length);
         }
       } catch (e) {
         console.error('[Approved] Fetch error:', e);
@@ -117,17 +127,20 @@ const ModeratorApprovedHistory = ({ searchValue }) => {
   // Filtered items based on tab + filters + search
   const filteredItems = useMemo(() => {
     const q = (searchValue || '').trim().toLowerCase();
+    const dept = (deptFilter || '').toLowerCase();
     return items.filter(item => {
       // Tab filter by account type
-      if (item.accountType !== activeTab) return false;
-      // Search by name
-      if (q && !(item.name || '').toLowerCase().includes(q)) return false;
+      if ((item.accountType || '') !== activeTab) return false;
+      // Search by name or department
+      const name = (item.name || '').toLowerCase();
+      const itemDept = (item.department || '').toLowerCase();
+      if (q && !(name.includes(q) || itemDept.includes(q))) return false;
       // Verified filter - check the current hold status from holdMap
-      const currentlyOnHold = holdMap[item.id];
+      const currentlyOnHold = !!holdMap[item.id];
       if (verifiedFilter === 'unhold' && currentlyOnHold) return false;
       if (verifiedFilter === 'hold' && !currentlyOnHold) return false;
-      // Department filter
-      if (deptFilter && item.department !== deptFilter) return false;
+      // Department filter (case-insensitive)
+      if (dept && itemDept !== dept) return false;
       return true;
     });
   }, [items, activeTab, verifiedFilter, deptFilter, searchValue, holdMap]);

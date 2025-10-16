@@ -18,8 +18,8 @@ const FacultyList = ({ mainSearch, facultyStatusFilter, setFacultyStatusFilter, 
     (async () => {
       try {
         setLoading(true); setError('');
-        // Use searchUsers; if mainSearch empty, seed with 'a' to get some results
-        const q = mainSearch && mainSearch.trim() ? mainSearch.trim() : 'a';
+        // If no search, pass empty string to fetch ALL teachers
+        const q = mainSearch && mainSearch.trim() ? mainSearch.trim() : '';
   const data = await apiPost('findFacultyDirectory', { q });
         const list = Array.isArray(data) ? data : (data.results || []);
         const mapped = list.map(u => ({
